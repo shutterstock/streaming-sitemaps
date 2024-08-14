@@ -1,0 +1,60 @@
+{
+  "name": "@shutterstock/sitemaps",
+  "version": "0.0.0",
+  "description": "Utilities for generating and managing sitemaps - including a CDK construct for writing sitemaps from streams and a CLI for managing sitemaps",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "build:all": "npm run build && npm run build:cdk && npm run build:cli",
+    "build:cdk": "npm run -w @shutterstock/sitemaps-cdk compile",
+    "build:cli": "npm run -w @shutterstock/sitemaps-cli build",
+    "esbuild:all": "npm run esbuild:index-writer && npm run esbuild:sitemap-freshener && npm run esbuild:sitemap-writer",
+    "esbuild:index-writer": "esbuild packages/kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-index-writer/index.js",
+    "esbuild:sitemap-freshener": "esbuild packages/kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-sitemap-freshener/index.js",
+    "esbuild:sitemap-writer": "esbuild packages/kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-sitemap-writer/index.js",
+    "clean": "npm run clean:dist && npm run clean:tsbuildinfo",
+    "clean:deep": "npm run clean:dist && npm run clean:tsbuildinfo && npm run clean:modules",
+    "clean:dist": "npm exec --workspaces -- npx rimraf dist && npx rimraf dist",
+    "clean:modules": "npm exec --workspaces -- npx rimraf node_modules && npx rimraf node_modules",
+    "clean:tsbuildinfo": "npm exec --workspaces -- npx rimraf tsconfig.tsbuildinfo",
+    "cloc": "cloc --exclude-dir=node_modules,dist,distb,cdk.out --exclude-ext=json,xml .",
+    "test": "LISTR_RENDERER=simple AWS_REGION=test AWS_EMF_ENVIRONMENT=Local jest --runInBand --forceExit",
+    "test:perf": "node packages/kinesis-sitemap-writer/test/perf.js 3 2 sitemapWrapper",
+    "lint": "eslint ./ --ext .ts --ext .tsx",
+    "lint-and-fix": "eslint ./ --ext .ts --ext .tsx --fix"
+  },
+  "files": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.shuttercorp.net/sreng/streaming-sitemaps.git"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@aws-sdk/types": "3.567.0",
+    "@types/jest": "29.5.12",
+    "@types/node-fetch": "^2.6.11",
+    "@types/sinon": "^10.0.4",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
+    "aws-cdk": "2.117.0",
+    "aws-sdk-client-mock": "2.1.0",
+    "esbuild": "0.21.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-prettier": "5.1.3",
+    "jest": "29.7.0",
+    "jest-dynalite": "3.6.1",
+    "lcov-parse": "1.0.0",
+    "nock": "13.3.0",
+    "prettier": "^3.2.5",
+    "rxjs": "^6.6.7",
+    "sinon": "15.0.1",
+    "ts-jest": "29.1.2",
+    "ts-node": "10.9.1",
+    "typescript": "^5"
+  }
+}

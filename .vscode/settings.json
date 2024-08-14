@@ -1,0 +1,54 @@
+{
+  "files.exclude": {
+    // "**/node_modules/*": true,
+    // "cdk.out": true
+    // "node_modules": true,
+    // "**/node_modules": true
+  },
+  "search.exclude": {
+    "cdk.out": true,
+    "**/dist/*": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "files.associations": {
+    "Dockerfile*": "dockerfile"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "yaml.customTags": [
+    "!And",
+    "!And sequence",
+    "!If",
+    "!If sequence",
+    "!Not",
+    "!Not sequence",
+    "!Equals",
+    "!Equals sequence",
+    "!Or",
+    "!Or sequence",
+    "!FindInMap",
+    "!FindInMap sequence",
+    "!Base64",
+    "!Join",
+    "!Join sequence",
+    "!Cidr",
+    "!Ref",
+    "!Sub",
+    "!Sub sequence",
+    "!GetAtt",
+    "!GetAZs",
+    "!ImportValue",
+    "!ImportValue sequence",
+    "!Select",
+    "!Select sequence",
+    "!Split",
+    "!Split sequence"
+  ],
+  "[xml]": {
+    "editor.defaultFormatter": "DotJoshJohnson.xml"
+  }
+}

@@ -1,0 +1,64 @@
+name: Cleanup Merged PR
+
+# Controls when the action will run.
+on:
+  # https://frontside.com/blog/2020-05-26-github-actions-pull_request/
+  # Default pull-request types:
+  #  types: [ assigned, opened, synchronize, reopened ]
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!cf/**'
+
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+env:
+  AWS_REGION: us-east-1
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+jobs:
+  cleanup-pr:
+    permissions:
+      id-token: write
+      contents: read
+    environment: dev
+    env:
+      NODE_ENV: ${{ vars.NODE_ENV }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Build Role
+        id: build-role
+        uses: sstk-actions/runner-assume-role@v6.1.0
+        with:
+          target-account-id: ${{ vars.AWS_ACCOUNT_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+          upgrade-cli: 'false'
+          role-to-assume: build
+          deploy-build-policy: 'false' # Allowing this is bad <-- it impacts all builds
+
+      - name: Destroy CDK Stack - 1st Attempt
+        run: |
+          aws cloudformation delete-stack --stack-name "sitemaps-${NODE_ENV}-pr-${PR_NUMBER}"
+          aws cloudformation wait stack-delete-complete  --output text --stack-name "sitemaps-${NODE_ENV}-pr-${PR_NUMBER}"
+
+      # The S3 buckets can fail to delete if a file gets pushed right as the Lambda gets deleted
+      # This can cause the S3 bucket delete Lambda to miss the last file, which then causes
+      # the bucket to fail to be deleted.
+      # Here we try to empty both buckets then remove the buckets
+      # If emptying fails (e.g. if bucket already deleted) or if bucket delete fails we proceed anyway
+      - if: failure()
+        name: Fallback - Delete S3 Buckets then Destroy CDK Stack
+        run: |
+          echo "s3SitemapsBucketArn-${NODE_ENV}-pr-${PR_NUMBER}"
+          # list-exports does not work when the stack is in the DELETE_FAILED state
+          # aws cloudformation list-exports --query "Exports[?Name==\`s3SitemapsBucketArn-${NODE_ENV}-pr-${PR_NUMBER}\`].Value"  --output text
+          # export SITEMAPS_BUCKET_NAME=$(aws cloudformation list-exports --query "Exports[?Name==\`s3SitemapsBucketName-${NODE_ENV}-${PR_NUMBER}\`].Value"  --output text)
+          export SITEMAPS_BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name sitemaps-${NODE_ENV}-pr-${PR_NUMBER} --query "Stacks[0].Outputs[?OutputKey=='sitemapss3SitemapsBucketName'].OutputValue"  --output text)
+          aws s3 rm --recursive "s3://${SITEMAPS_BUCKET_NAME}/" || true
+          aws s3 rb "s3://${SITEMAPS_BUCKET_NAME}/" || true
+          aws cloudformation delete-stack --stack-name "sitemaps-${NODE_ENV}-pr-${PR_NUMBER}"
+          aws cloudformation wait stack-delete-complete  --output text --stack-name "sitemaps-${NODE_ENV}-pr-${PR_NUMBER}"

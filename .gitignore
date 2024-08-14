@@ -1,0 +1,31 @@
+oclif.manifest.json
+
+.idea/
+node_modules
+cdk.out/
+dist/
+*.tsbuildinfo
+*.log
+downloads/
+sitemaps/
+sitemap/
+*.zip
+.nyc_output/
+coverage/
+.DS_Store
+*.xml
+*.xml.gz
+*sitemap*.json
+*index*.json
+*sitemap*.jsonl
+*index*.jsonl
+
+# https://unix.stackexchange.com/questions/537174/gnu-tar-not-ignoring-directories-in-gitignore-with-exclude-vcs-ignores
+# needed for tar --exclude-vcs-ignores
+downloads
+coverage
+dist
+.idea
+cdk.out
+.nyc_output
+*.tgz

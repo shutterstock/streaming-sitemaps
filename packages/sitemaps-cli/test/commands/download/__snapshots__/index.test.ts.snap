@@ -1,0 +1,231 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`download http source succeeds downloading index file 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap1.xml.gz</loc>
+    <lastmod>2004-10-01T18:23:17+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap2.xml.gz</loc>
+    <lastmod>2005-01-01</lastmod>
+  </sitemap>
+</sitemapindex>"
+`;
+
+exports[`download http source succeeds downloading index file 2`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.example.com/foo1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://www.example.com/bar1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"
+`;
+
+exports[`download http source succeeds downloading index gzip file and converting to jsonl 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap1.xml.gz</loc>
+    <lastmod>2004-10-01T18:23:17+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap2.xml.gz</loc>
+    <lastmod>2005-01-01</lastmod>
+  </sitemap>
+</sitemapindex>"
+`;
+
+exports[`download http source succeeds downloading index gzip file and converting to jsonl 2`] = `
+"{"url":"http://www.example.com/data/sitemap1.xml.gz","lastmod":"2004-10-01T18:23:17+00:00"}
+{"url":"http://www.example.com/data/sitemap2.xml.gz","lastmod":"2005-01-01"}"
+`;
+
+exports[`download http source succeeds downloading index gzip file and converting to jsonl 3`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.example.com/foo1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://www.example.com/bar1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"
+`;
+
+exports[`download http source succeeds downloading index gzip file and converting to jsonl 4`] = `
+"{"url":"http://www.example.com/foo1.html","lastmod":"2005-01-01","changefreq":"monthly","priority":0.8}
+{"url":"http://www.example.com/bar1.html","lastmod":"2005-01-01","changefreq":"monthly","priority":0.8}"
+`;
+
+exports[`download http source succeeds downloading sitemap file 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.example.com/foo.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://www.example.com/bar.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"
+`;
+
+exports[`download http source succeeds downloading uncompressed index file and converting to jsonl 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap1.xml.gz</loc>
+    <lastmod>2004-10-01T18:23:17+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap2.xml.gz</loc>
+    <lastmod>2005-01-01</lastmod>
+  </sitemap>
+</sitemapindex>"
+`;
+
+exports[`download http source succeeds downloading uncompressed index file and converting to jsonl 2`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.example.com/foo1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://www.example.com/bar1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"
+`;
+
+exports[`download s3 source succeeds downloading compressed index from s3 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap1.xml.gz</loc>
+    <lastmod>2004-10-01T18:23:17+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap2.xml.gz</loc>
+    <lastmod>2005-01-01</lastmod>
+  </sitemap>
+</sitemapindex>"
+`;
+
+exports[`download s3 source succeeds downloading compressed index from s3 2`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.example.com/foo1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://www.example.com/bar1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"
+`;
+
+exports[`download s3 source succeeds downloading uncompressed index from s3 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap1.xml.gz</loc>
+    <lastmod>2004-10-01T18:23:17+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap2.xml.gz</loc>
+    <lastmod>2005-01-01</lastmod>
+  </sitemap>
+</sitemapindex>"
+`;
+
+exports[`download s3 source succeeds downloading uncompressed index from s3 2`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.example.com/foo1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://www.example.com/bar1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"
+`;
+
+exports[`download succeeds downloading compressed index from s3 without content-encoding header 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap1.xml.gz</loc>
+    <lastmod>2004-10-01T18:23:17+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.example.com/data/sitemap2.xml.gz</loc>
+    <lastmod>2005-01-01</lastmod>
+  </sitemap>
+</sitemapindex>"
+`;
+
+exports[`download succeeds downloading compressed index from s3 without content-encoding header 2`] = `
+"{"url":"http://www.example.com/data/sitemap1.xml.gz","lastmod":"2004-10-01T18:23:17+00:00"}
+{"url":"http://www.example.com/data/sitemap2.xml.gz","lastmod":"2005-01-01"}"
+`;
+
+exports[`download succeeds downloading compressed index from s3 without content-encoding header 3`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.example.com/foo1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://www.example.com/bar1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"
+`;
+
+exports[`download succeeds downloading compressed index from s3 without content-encoding header 4`] = `
+"{"url":"http://www.example.com/foo1.html","lastmod":"2005-01-01","changefreq":"monthly","priority":0.8}
+{"url":"http://www.example.com/bar1.html","lastmod":"2005-01-01","changefreq":"monthly","priority":0.8}"
+`;

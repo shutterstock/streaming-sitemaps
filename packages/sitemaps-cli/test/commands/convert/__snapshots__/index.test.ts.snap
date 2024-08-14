@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`convert file source succeeds converting index file 1`] = `
+"{"url":"http://www.example.com/sitemap1.xml.gz","lastmod":"2004-10-01T18:23:17+00:00"}
+{"url":"http://www.example.com/sitemap2.xml.gz","lastmod":"2005-01-01"}"
+`;
+
+exports[`convert file source succeeds converting sitemap file 1`] = `
+"{"url":"http://www.example.com/foo.html","lastmod":"2005-01-01","changefreq":"monthly","priority":0.8}
+{"url":"http://www.example.com/bar.html","lastmod":"2005-01-01","changefreq":"monthly","priority":0.8}"
+`;
+
+exports[`convert url source succeeds converting index from URL 1`] = `
+"{"url":"http://www.example.com/sitemap1.xml.gz","lastmod":"2004-10-01T18:23:17+00:00"}
+{"url":"http://www.example.com/sitemap2.xml.gz","lastmod":"2005-01-01"}"
+`;

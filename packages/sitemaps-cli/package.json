@@ -1,0 +1,90 @@
+{
+  "name": "@shutterstock/sitemaps-cli",
+  "version": "0.0.0",
+  "description": "CLI for managing, generating, downloading, mirroring, and transforming XML sitemaps",
+  "author": {
+    "name": "Shutterstock, Inc.",
+    "url": "https://github.com/shutterstock",
+    "organization": true
+  },
+  "keywords": [
+    "aws",
+    "cli",
+    "sitemap",
+    "xml",
+    "jsonl",
+    "download",
+    "upload",
+    "create",
+    "convert",
+    "csv"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "bin": {
+    "sitemaps-cli": "./bin/run.js"
+  },
+  "scripts": {
+    "clean": "shx rm -rf dist && shx rm -f tsconfig.tsbuildinfo",
+    "build": "shx rm -rf dist && ./bin/bundle.mjs",
+    "lint": "eslint . --ext .ts",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "posttest": "npm run lint",
+    "prepack": "oclif manifest && oclif readme",
+    "version": "oclif readme && git add README.md"
+  },
+  "license": "MIT",
+  "files": [
+    "/bin",
+    "/dist",
+    "/oclif.manifest.json",
+    "package.json",
+    "LICENSE.md"
+  ],
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.567.0",
+    "@aws-sdk/client-kinesis": "^3.567.0",
+    "@aws-sdk/client-lambda": "^3.567.0",
+    "@aws-sdk/client-s3": "^3.567.0",
+    "@aws-sdk/credential-providers": "^3.567.0",
+    "@oclif/test": "3.2.13",
+    "@shutterstock/chunker": "^1.0.11",
+    "@shutterstock/kinesis-helpers": "^1.0.15",
+    "@types/cli-progress": "^3.11.5",
+    "@types/cloneable-readable": "^2.0.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/source-map-support": "^0.5.4",
+    "@types/traverse": "^0.6.32",
+    "cli-progress": "^3.12.0",
+    "cloneable-readable": "^2.1.0",
+    "csv-parse": "^5.2.2",
+    "fs-extra": "^11.2.0",
+    "it-batch": "^1.0.9",
+    "listr2": "^3.13.3",
+    "node-fetch": "^2.7.0",
+    "oclif": "4.10.6",
+    "shx": "^0.3.3",
+    "sitemap": "^8.0.0",
+    "source-map-support": "^0.5.21",
+    "traverse": "^0.6.6"
+  },
+  "dependencies": {
+    "@oclif/core": "3.26.6",
+    "@oclif/plugin-help": "6.0.22"
+  },
+  "oclif": {
+    "bin": "sitemaps-cli",
+    "dirname": "sitemaps-cli",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins"
+    ],
+    "topicSeparator": " ",
+    "topics": {}
+  }
+}

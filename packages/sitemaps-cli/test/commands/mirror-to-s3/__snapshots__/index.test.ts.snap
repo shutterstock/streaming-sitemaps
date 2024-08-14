@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mirror-to-s3 mirrors file while decompressing and breaking file links 1`] = `"<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>http://www.example.com/data/sitemaps/sitemap1.xml</loc><lastmod>2004-10-01T18:23:17.000Z</lastmod></sitemap><sitemap><loc>http://www.example.com/data/sitemaps/sitemap2.xml</loc><lastmod>2005-01-01T00:00:00.000Z</lastmod></sitemap></sitemapindex>"`;
+
+exports[`mirror-to-s3 mirrors file while decompressing and breaking file links 2`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.example.com/foo1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://www.example.com/bar1.html</loc>
+    <lastmod>2005-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"
+`;

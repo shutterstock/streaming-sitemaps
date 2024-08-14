@@ -1,0 +1,54 @@
+name: Build IAM Roles
+
+# Controls when the action will run.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cf/**'
+      - '.github/workflows/build-role.yml'
+  workflow_dispatch:
+
+  # Runs with the `BUILD-ROLE` label on the PRs, with changes to files, otherwise skips
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'cf/**'
+      - '.github/workflows/build-role.yml'
+
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.pull_request.number) || github.head_ref }}
+  cancel-in-progress: false
+env:
+  AWS_REGION: us-east-1
+jobs:
+  create-build-role:
+    if: github.event_name != 'pull_request' || (github.event_name == 'pull_request' && contains( github.event.pull_request.labels.*.name, 'BUILD-ROLE'))
+    permissions:
+      id-token: write
+      contents: read
+    strategy:
+      matrix:
+        environmentLevel:
+          - dev
+    environment: ${{ matrix.environmentLevel }}
+    concurrency:
+      group: build-role-${{ matrix.environmentLevel }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.pull_request.number) || github.head_ref }}
+      cancel-in-progress: false
+    env:
+      NODE_ENV: ${{ matrix.environmentLevel }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy Build Role
+        uses: sstk-actions/runner-assume-role@v6.1.0
+        with:
+          target-account-id: ${{ vars.AWS_ACCOUNT_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+          upgrade-cli: 'false'
+          role-to-assume: build
+          deploy-build-policy: 'true' # Allowing this is bad <-- it impacts all builds

@@ -1,0 +1,32 @@
+{
+  "name": "@shutterstock/sitemaps-metrics-lib",
+  "version": "0.0.0",
+  "description": "Shutterstock sitemaps metrics library - Used to create CloudWatch Dashboards for streaming sitemaps",
+  "author": {
+    "name": "Shutterstock, Inc.",
+    "url": "https://github.com/shutterstock",
+    "organization": true
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": false,
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18"
+  },
+  "files": [
+    "dist/",
+    "!dist/**/*.test.*",
+    "!dist/**/*.d.ts.map",
+    "src/",
+    "!src/**/*.test.*",
+    "LICENSE.md",
+    "package.json"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*"
+  }
+}

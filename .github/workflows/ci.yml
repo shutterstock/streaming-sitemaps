@@ -1,0 +1,234 @@
+name: Build and Deploy - CI
+
+# Controls when the action will run.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!cf/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!cf/**'
+    types:
+      - opened
+      - synchronize
+      - labeled
+      - unlabeled
+      - reopened
+env:
+  AWS_REGION: 'us-east-1'
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  GITHUB_REPOSITORY_DASH: ${{ github.repository_owner }}-${{ github.event.repository.name }}
+jobs:
+  check-access:
+    runs-on: ubuntu-latest
+    outputs:
+      has-token-access: ${{ steps.check.outputs.has-token-access }}
+    steps:
+      - id: check
+        run: |
+          echo "has-token-access=$(if [[ '${{ github.event.pull_request.head.repo.fork }}' != 'true' && '${{ github.actor }}' != 'dependabot[bot]' ]]; then echo 'true'; else echo 'false'; fi)" >> $GITHUB_OUTPUT
+
+  install-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/configure-nodejs
+        with:
+          lookup-only: 'true' # We only want to lookup from the cache - if a hit, this job does nothing
+
+  test:
+    needs:
+      - install-deps
+      - check-access
+    # TODO: When moved to github.com, swap these lines
+    # runs-on: ubuntu-latest
+    runs-on: amd64-medium-ec2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/configure-nodejs
+
+      - name: Build All TypeScript
+        run: |
+          npm run build:all
+
+      - name: Run Node Tests
+        run: npm run test
+
+      - name: Upload code coverage
+        if: github.event_name == 'pull_request' && needs.check-access.outputs.has-token-access == 'true'
+        uses: ./.github/actions/coverage-report
+        with:
+          lcov-file: coverage/lcov.info
+          title: Node.js Code Coverage Report
+
+  build:
+    needs:
+      - install-deps
+    env:
+      NODE_ENV: dev
+    # TODO: When moved to github.com, swap these lines
+    # runs-on: ubuntu-latest
+    runs-on: amd64-medium-ec2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/configure-nodejs
+
+      - name: Run Lint
+        run: npm run lint
+
+      - name: Build All TypeScript
+        run: |
+          npm run build:all
+
+      # Note: We do NOT want to use `npm version` here to apply the version
+      # to the package.json files with `--workspaces`.
+      # `npm version --workspaces` will reinstall modules, defeating the purpose of caching
+      # `npm version --workspaces` will also update the package-lock.json and package.json
+      # files which will change our cache key and cause the node_modules
+      # to be saved to the cache at the end of this job, even though it didn't
+      # install the modules.
+      - name: Set version for PR
+        id: version
+        if: github.event_name == 'pull_request'
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          VERSION_TO_USE=${CURRENT_VERSION}-pr${PR_NUMBER}
+          echo "Version is ${VERSION_TO_USE}"
+          echo "version=${VERSION_TO_USE}" >> $GITHUB_OUTPUT
+          bin/version ${VERSION_TO_USE}
+
+      - name: NPM registry authentication
+        run: npm set //registry.npmjs.org/:_authToken ${{ secrets.NPMJSORG_PUBLISH_TOKEN }}
+
+      - name: Release sitemaps-cli - NPM - Dry Run
+        id: sitemaps-cli
+        working-directory: packages/sitemaps-cli
+        run: |
+          npm pack
+          npm publish --dry-run
+
+      - name: Upload sitemaps-cli artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sitemaps-cli
+          path: packages/sitemaps-cli/*.tgz
+
+      - name: Release sitemaps-db-lib - NPM - Dry Run
+        id: sitemaps-db-lib
+        working-directory: packages/sitemaps-db-lib
+        run: |
+          npm pack
+          npm publish --dry-run
+
+      - name: Upload sitemaps-db-lib artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sitemaps-db-lib
+          path: packages/sitemaps-db-lib/*.tgz
+
+      - name: Release sitemaps-metrics-lib - NPM - Dry Run
+        id: sitemaps-metrics-lib
+        working-directory: packages/sitemaps-metrics-lib
+        run: |
+          npm pack
+          npm publish --dry-run
+
+      - name: Upload sitemaps-metrics-lib artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sitemaps-metrics-lib
+          path: packages/sitemaps-metrics-lib/*.tgz
+
+      - name: Release sitemaps-models-lib - NPM - Dry Run
+        id: sitemaps-models-lib
+        working-directory: packages/sitemaps-models-lib
+        run: |
+          npm pack
+          npm publish --dry-run
+
+      - name: Upload sitemaps-models-lib artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sitemaps-models-lib
+          path: packages/sitemaps-models-lib/*.tgz
+
+      - name: Release sitemaps-cdk - NPM - Dry Run
+        id: sitemaps-cdk
+        working-directory: packages/sitemaps-cdk
+        run: |
+          # npm run package
+          npm pack
+          npm publish --dry-run
+
+      - name: Upload sitemaps-cdk artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sitemaps-cdk
+          path: packages/sitemaps-cdk/*.tgz
+
+  deploy:
+    # Disable for now as we have no CDK stack to deploy
+    if: false
+    permissions:
+      id-token: write
+      contents: read
+    concurrency:
+      group: deploy-${{ vars.NODE_ENV }}-${{ github.workflow }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    env:
+      NODE_ENV: ${{ vars.NODE_ENV }}
+    needs:
+      - build
+    environment: dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - if: github.event_name == 'pull_request'
+        name: Set Hotswap Flag on Pre-Switch
+        run: echo 'CDK_HOTSWAP_PRS=--hotswap' >> $GITHUB_ENV
+
+      - name: Compute PR Suffix
+        run: |
+          if [ -n "${PR_NUMBER}" ]; then
+            echo 'PR_SUFFIX='-pr-${PR_NUMBER} >> $GITHUB_ENV
+          else
+            echo 'PR_SUFFIX=' >> $GITHUB_ENV
+          fi
+
+      - uses: ./.github/actions/configure-nodejs
+
+      - name: Build All TypeScript
+        run: |
+          npm run build:all
+
+      # TODO: Use build role
+      # - name: Use Build Role
+      #   id: build-role
+
+      - name: Deploy CDK Stack
+        env:
+          AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+        run: npx cdk deploy ${CDK_HOTSWAP_PRS} --require-approval never sitemaps
+
+      - name: Compute Stack Output Name
+        run: |
+          echo "S3_SITEMAPS_BUCKET_ARN_EXPORT=s3SitemapsBucketArn-${NODE_ENV}${PR_SUFFIX}" >> $GITHUB_ENV
+          echo "S3_SITEMAPS_BUCKET_NAME_EXPORT=s3SitemapsBucketName-${NODE_ENV}${PR_SUFFIX}" >> $GITHUB_ENV
+
+      - name: Check Stack Outputs
+        run: |
+          aws cloudformation list-exports --query "Exports[?Name==\`${S3_SITEMAPS_BUCKET_ARN_EXPORT}}\`].Value"  --output text
+          aws cloudformation list-exports --query "Exports[?Name==\`${S3_SITEMAPS_BUCKET_NAME_EXPORT}}\`].Value"  --output text

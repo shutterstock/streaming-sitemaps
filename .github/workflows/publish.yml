@@ -1,0 +1,92 @@
+name: Package and Publish
+
+# Controls when the action will run.
+on:
+  release:
+    types: [published]
+  # push:
+  #   branches:
+  #     - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  install-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/configure-nodejs
+        with:
+          lookup-only: 'true' # We only want to lookup from the cache - if a hit, this job does nothing
+
+  publish:
+    needs:
+      - install-deps
+    # TODO: When moved to github.com, swap these lines
+    # runs-on: ubuntu-latest
+    runs-on: amd64-medium-ec2
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: ./.github/actions/configure-nodejs
+
+      # Note: We do NOT want to use `npm version` here to apply the version
+      # to the package.json files with `--workspaces`.
+      # `npm version --workspaces` will reinstall modules, defeating the purpose of caching
+      # `npm version --workspaces` will also update the package-lock.json and package.json
+      # files which will change our cache key and cause the node_modules
+      # to be saved to the cache at the end of this job, even though it didn't
+      # install the modules.
+      - name: Set version for PR or from Tag
+        run: |
+          VERSION_TO_USE=$(npm version from-git --allow-same-version --no-git-tag-version)
+          echo "Version is ${VERSION_TO_USE}"
+          bin/version ${VERSION_TO_USE}
+
+      - name: Build
+        run: npm run build:all
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: NPM registry authentication
+        run: npm set //registry.npmjs.org/:_authToken ${{ secrets.NPMJSORG_PUBLISH_TOKEN }}
+
+      - name: Release sitemaps-cli - NPM
+        id: sitemaps-cli
+        working-directory: packages/sitemaps-cli
+        run: |
+          npm publish
+
+      - name: Release sitemaps-db-lib - NPM
+        id: sitemaps-db-lib
+        working-directory: packages/sitemaps-db-lib
+        run: |
+          npm publish
+
+      - name: Release sitemaps-metrics-lib - NPM
+        id: sitemaps-metrics-lib
+        working-directory: packages/sitemaps-metrics-lib
+        run: |
+          npm publish
+
+      - name: Release sitemaps-models-lib - NPM
+        id: sitemaps-models-lib
+        working-directory: packages/sitemaps-models-lib
+        run: |
+          npm publish
+
+      - name: Release sitemaps-cdk - NPM
+        id: sitemaps-cdk
+        working-directory: packages/sitemaps-cdk
+        run: |
+          # npm run release
+          npm publish

@@ -1,0 +1,38 @@
+{
+  "name": "@shutterstock/sitemaps-models-lib",
+  "version": "0.0.0",
+  "description": "Kinesis stream message formats for streaming sitemaps",
+  "author": {
+    "name": "Shutterstock, Inc.",
+    "url": "https://github.com/shutterstock",
+    "organization": true
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "dist/",
+    "!dist/**/*.test.*",
+    "!dist/**/*.d.ts.map",
+    "src/",
+    "!src/**/*.test.*",
+    "LICENSE.md",
+    "package.json"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "sitemap": "^8.0.0"
+  },
+  "peerDependencies": {
+    "sitemap": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18"
+  }
+}
