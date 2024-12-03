@@ -20,6 +20,7 @@ on:
       - labeled
       - unlabeled
       - reopened
+
 env:
   AWS_REGION: 'us-east-1'
   PR_NUMBER: ${{ github.event.pull_request.number }}
