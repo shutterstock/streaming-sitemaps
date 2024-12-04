@@ -47,9 +47,7 @@ jobs:
     needs:
       - install-deps
       - check-access
-    # TODO: When moved to github.com, swap these lines
-    # runs-on: ubuntu-latest
-    runs-on: amd64-medium-ec2
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -75,9 +73,7 @@ jobs:
       - install-deps
     env:
       NODE_ENV: dev
-    # TODO: When moved to github.com, swap these lines
-    # runs-on: ubuntu-latest
-    runs-on: amd64-medium-ec2
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

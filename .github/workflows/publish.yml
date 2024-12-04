@@ -23,9 +23,7 @@ jobs:
   publish:
     needs:
       - install-deps
-    # TODO: When moved to github.com, swap these lines
-    # runs-on: ubuntu-latest
-    runs-on: amd64-medium-ec2
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
