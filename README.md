@@ -1,6 +1,6 @@
 ![CI Build](https://github.com/shutterstock/streaming-sitemaps/actions/workflows/ci.yml/badge.svg)
 
-# Streaming Sitemapss
+# Streaming Sitemap
 
 Streaming Sitemaps is a comprehensive solution for generating and managing XML sitemaps for large-scale websites. It provides a set of tools and AWS CDK constructs to create, convert, download, and manage sitemaps in an efficient and scalable manner.
 
