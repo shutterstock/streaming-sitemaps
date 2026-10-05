@@ -82,7 +82,9 @@ against committed output. A synthetic S3 transport exercises the published
 SDK's XML error deserialization without AWS or network calls. CDK synthesis
 compares all three packaged bundle hashes/source maps against this checkout's
 build, checks the resulting staged assets and resource wiring, and rejects
-context lookups. Negative controls must catch missing `sitemap`, `fs-extra`,
+context lookups. Bundle inspection rejects unresolved npm imports except the
+SDK's guarded optional CRT/v4a signers; those optional signing paths and real
+AWS requests are outside the offline check. Negative controls catch missing `sitemap`, `fs-extra`,
 the executable bin, and a missing Lambda bundle.
 
 CI runs the same gate after its explicit PR version injection, without npm
