@@ -63,6 +63,7 @@ publication interoperability, not dependency resolution.
 | `pnpm run lint` | Check TypeScript, including the construct, with root ESLint. |
 | `pnpm run test` | Prepare compressed fixtures, emit unbundled CLI commands for mocks, then run all Jest suites with V8 coverage. |
 | `pnpm run test:foundation` | Verify cleanup and version materialization preserve source and dependency trees. |
+| `pnpm run test:cdk-consumer <tarball>` | Install a freshly packed JavaScript construct in a disposable consumer and verify types, resource wiring, and local Lambda assets. |
 | `pnpm run clean` | Remove known build outputs and incremental state, preserving source and installed dependencies. |
 
 The optional `test:perf` harness requires local benchmark datasets in the
