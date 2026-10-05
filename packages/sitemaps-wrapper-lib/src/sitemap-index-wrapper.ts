@@ -37,20 +37,10 @@ export class SitemapIndexWrapper extends SitemapWrapperBase {
     this._options = options;
 
     // Create the map
-    this._sitemapOrIndex = new SitemapIndexStream({ level: ErrorLevel.SILENT });
-
-    // Pipe to either file or gzip (then to file)
-    this._sitemapOrIndex.pipe(this._sitemapDest);
+    this.connectOutput(new SitemapIndexStream({ level: ErrorLevel.SILENT }));
 
     // Save a reference to the last file URL
     this._lastFileURL = lastFile;
-
-    // Track written bytes
-    // Note: This is only accuate after `.end()` is called
-    // because of buffering in the streams - it causes
-    // the computed size to lag non-deterministically from the current size
-    // buffered + size written.
-    this._sitemapOrIndex.on('data', this.countBytes.bind(this));
   }
 
   /**
@@ -184,6 +174,7 @@ export class SitemapIndexWrapper extends SitemapWrapperBase {
 
   public async write({ item }: { item: IndexItem }): Promise<void> {
     await super.write({ item });
+    this._lastFileURL = item.url;
   }
 
   public async writeArray({ items }: { items: IndexItem[] }): Promise<void> {

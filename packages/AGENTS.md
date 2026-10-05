@@ -23,13 +23,19 @@ and example app run separately in `build:all` after their inputs are available.
 Read the [construct guide](sitemaps-cdk/AGENTS.md) before changing its configs.
 
 [jest.config.js](../jest.config.js) selects `packages/**/*.test.ts`, transforms
-with ts-jest and the root package config, and collects V8 LCOV/HTML/text coverage.
+with ts-jest and [tsconfig.test.json](../tsconfig.test.json), and collects V8
+LCOV/HTML/text/JSON-summary coverage, including unimported package source.
 There is no coverage threshold. [setupBeforeEnv.js](../setupBeforeEnv.js) starts
-jest-dynalite with the root table config. AWS clients are mocked in relevant
+jest-dynalite on an OS-assigned port with the root table config, including after
+tests reset their module registry. This avoids collisions between worktrees.
+Shared teardown closes that server even in suites without `withDb` hooks.
+AWS clients are mocked in relevant
 suites; keep the mock's Smithy types aligned with the installed SDK.
 [setupAfterEnv.cjs](../setupAfterEnv.cjs) restores Nock's shared Node HTTP
 interceptors after each suite. Native socket fixtures temporarily disable those
-interceptors and wait for actual requests before measuring their agent.
+interceptors and wait for actual requests before measuring their agent. Test
+teardown also restores the process exit code changed by expected oclif command
+failures, so Jest can exit naturally and retain its own failure status.
 
 Run a focused suite after building its dependencies:
 

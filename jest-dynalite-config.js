@@ -29,5 +29,9 @@ module.exports = {
       },
     },
   ],
-  basePort: 8000,
+  // Resolve from the listening server even after a test calls resetModules().
+  // The helper adds the worker ID back when constructing table-request URLs.
+  get basePort() {
+    return Number(process.env.MOCK_DYNAMODB_PORT) - Number(process.env.JEST_WORKER_ID || 1);
+  },
 };

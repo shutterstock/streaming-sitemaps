@@ -5,11 +5,11 @@ import path from 'path';
 import https from 'https';
 // fs-extra is commonjs so we have to import it this way
 import fsExtra from 'fs-extra';
-import { finished } from 'stream';
+import { pipeline, Readable } from 'stream';
 import { promisify } from 'util';
 import fetch, { HeadersInit } from 'node-fetch';
 import { Args, Command, Flags } from '@oclif/core';
-import { Listr, ListrErrorTypes } from 'listr2';
+import { Listr } from 'listr2';
 import {
   ErrorLevel,
   ObjectStreamToJSON,
@@ -28,7 +28,7 @@ if (https !== undefined) {
   https.globalAgent = new https.Agent(keepAliveOptions);
 }
 
-const finishedAsync = promisify(finished);
+const pipelineAsync = promisify(pipeline);
 
 interface IContextConvert {
   inputStream: NodeJS.ReadableStream;
@@ -86,12 +86,8 @@ export default class Convert extends Command {
             });
 
             if (indexResponse.status !== 200) {
-              task.report(
-                new Error(`sitemap failed HEAD request: ${indexResponse.status}, ${urlOrFile.url}`),
-                ListrErrorTypes.HAS_FAILED,
-              );
-
-              return;
+              if (indexResponse.body instanceof Readable) indexResponse.body.destroy();
+              this.error(`sitemap download failed: ${indexResponse.status}, ${urlOrFile.url}`);
             }
 
             // Push file path to context
@@ -121,7 +117,11 @@ export default class Convert extends Command {
           task: async (ctx, task) => {
             // Save the json version of the file to the same path
             const indexFilePath = ctx.filePath;
-            const indexFileLocal = indexFilePath.replace('.gz', '').replace('.xml', '.jsonl');
+            const convertedPath = indexFilePath.replace('.gz', '').replace('.xml', '.jsonl');
+            // An accepted input without these suffixes must not become its own
+            // output: opening the destination would truncate the source.
+            const indexFileLocal =
+              convertedPath === indexFilePath ? `${indexFilePath}.jsonl` : convertedPath;
             const indexFileLocalPath = path.parse(indexFileLocal);
             if (indexFileLocalPath.dir !== '') {
               await fs.mkdir(indexFileLocalPath.dir, { recursive: true });
@@ -132,43 +132,38 @@ export default class Convert extends Command {
             // Turn the XML into JSON items
             const outputFile = createWriteStream(indexFileLocal);
 
-            // Decompress the incoming file if it's a .gz
-            let uncompressedReadable: NodeJS.ReadableStream;
-            if (indexFilePath.endsWith('.gz')) {
-              uncompressedReadable = ctx.inputStream.pipe(zlib.createGunzip());
-            } else {
-              uncompressedReadable = ctx.inputStream;
-            }
-
             // Save the index file to disk
             const errors: string[] = [];
-            uncompressedReadable
-              .pipe(
-                parsedFlags.type === 'sitemap'
-                  ? new XMLToSitemapItemStream({
-                      logger: (level, ...message) => {
-                        errors.push(message.join(' '));
-                      },
-                      // Optional, passing SILENT overrides logger
-                      level: ErrorLevel.WARN,
-                    })
-                  : new XMLToSitemapIndexStream({
-                      logger: (level, ...message) => {
-                        errors.push(message.join(' '));
-                      },
-                      // Optional, passing SILENT overrides logger
-                      level: ErrorLevel.WARN,
-                    }),
-              )
-              .pipe(new CleanupSitemapItems())
-              // convert the object stream to JSON
-              .pipe(new ObjectStreamToJSON({ lineSeparated: true }))
-              // write the library compatible options to disk
-              .pipe(outputFile);
-            await finishedAsync(outputFile);
-
-            if (errors.length > 0) {
-              this.error(errors.join('\n'));
+            const parser =
+              parsedFlags.type === 'sitemap'
+                ? new XMLToSitemapItemStream({
+                    logger: (level, ...message) => {
+                      errors.push(message.join(' '));
+                    },
+                    // Optional, passing SILENT overrides logger
+                    level: ErrorLevel.WARN,
+                  })
+                : new XMLToSitemapIndexStream({
+                    logger: (level, ...message) => {
+                      errors.push(message.join(' '));
+                    },
+                    // Optional, passing SILENT overrides logger
+                    level: ErrorLevel.WARN,
+                  });
+            try {
+              const stages = [
+                ctx.inputStream,
+                ...(indexFilePath.endsWith('.gz') ? [zlib.createGunzip()] : []),
+                parser,
+                new CleanupSitemapItems(),
+                new ObjectStreamToJSON({ lineSeparated: true }),
+                outputFile,
+              ];
+              await pipelineAsync(stages);
+              if (errors.length > 0) this.error(errors.join('\n'));
+            } catch (error) {
+              await fs.rm(indexFileLocal, { force: true });
+              throw error;
             }
           },
           options: {

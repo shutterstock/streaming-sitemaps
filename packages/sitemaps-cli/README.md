@@ -2,6 +2,7 @@
 <!-- toc -->
 * [Table of contents](#table-of-contents)
 * [Usage](#usage)
+  * [Local files and development](#local-files-and-development)
 * [Commands](#commands)
 <!-- tocstop -->
  
@@ -19,6 +20,36 @@ USAGE
 ...
 ```
 <!-- usagestop -->
+
+## Local files and development
+
+The CLI supports Node >=18. Local CSV creation and XML conversion work offline:
+
+```sh
+sitemaps-cli create from-csv --column keywords data.csv https://www.example.com/sitemaps/ https://www.example.com/search/ ./output index.xml
+sitemaps-cli convert --type index ./output/index.xml
+sitemaps-cli convert ./output/sitemaps/sitemap-00001.xml
+```
+
+`convert` writes `.jsonl` next to a local XML input; without an XML suffix it
+appends `.jsonl` to the input name and preserves the source. For HTTP URLs it reproduces
+the URL path under the current directory. Choose `--type index` for index XML;
+the default is `sitemap`. `.xml.gz` inputs are decompressed automatically.
+`create from-csv --compress` compresses the index and sitemap files; an index
+filename ending in `.gz` also enables compression. Sitemap links use the supplied
+public directory URL, while output is written locally.
+
+S3, DynamoDB, Lambda and Kinesis commands require credentials and permissions
+for those resources. `freshen` defaults to both `--dry-run` and `--dry-run-db`;
+use `--no-dry-run` to write S3 and also `--no-dry-run-db` to permit database writes.
+`--yes` skips confirmation prompts, including repair regex confirmation.
+See the [operations recipes](../../OPERATIONS.md).
+
+For this checkout use Node 24 and pnpm 12.7.0 with the
+[root commands](../../README.md#development). `pnpm run build:cli` builds the
+local executable at `packages/sitemaps-cli/bin/run.js`; invoke it with Node from
+the root. Tests emit unbundled commands for shared AWS mocks, so rebuild the CLI
+after tests before trying its bundled distribution.
 
 # Commands
 <!-- commands -->

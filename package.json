@@ -19,7 +19,7 @@
     "clean:modules": "node bin/clean.cjs --modules-only",
     "clean:tsbuildinfo": "node bin/clean.cjs --tsbuildinfo",
     "cloc": "cloc --exclude-dir=node_modules,dist,distb,cdk.out --exclude-ext=json,xml .",
-    "test": "node bin/prepare-test-fixtures.cjs && pnpm --dir packages/sitemaps-cli exec tsc --build --force && LISTR_RENDERER=simple AWS_REGION=test AWS_EMF_ENVIRONMENT=Local NODE_OPTIONS=--experimental-vm-modules jest --runInBand --forceExit",
+    "test": "node bin/prepare-test-fixtures.cjs && pnpm --dir packages/sitemaps-cli exec tsc --build --force && LISTR_RENDERER=simple AWS_REGION=test AWS_EMF_ENVIRONMENT=Local NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "test:perf": "node packages/kinesis-sitemap-writer/test/perf.js 3 2 sitemapWrapper",
     "lint": "eslint .",
     "lint-and-fix": "eslint . --fix",

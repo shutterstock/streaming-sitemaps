@@ -38,10 +38,11 @@ export async function backgroundUploadSitemapWorker(
   const { sitemapAndStats, type, config, dbManager, kinesisClient, infixDirs } = opts;
   const { sitemap: currentSitemap } = sitemapAndStats;
 
-  // Wait for items to finish writing to the file
-  await currentSitemap.end();
-
   try {
+    // Wait for closure inside the cleanup boundary: a failed output pipeline
+    // also leaves a partial local file that must be removed.
+    await currentSitemap.end();
+
     // Push the file to S3 in the background
     const { s3Path } = await currentSitemap.pushToS3({
       bucketName: config.s3SitemapsBucketName,

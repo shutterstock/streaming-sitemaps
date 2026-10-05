@@ -28,6 +28,7 @@ Streaming Sitemaps is a comprehensive solution for generating and managing XML s
   - [Sitemaps CLI](#sitemaps-cli)
   - [CDK Constructs](#cdk-constructs)
     - [Example CDK Stack](#example-cdk-stack)
+- [Development](#development)
 - [License](#license)
 
 # Deployment Patterns
@@ -71,7 +72,63 @@ npm install --save-dev @shutterstock/sitemaps-cdk
 
 ### Example CDK Stack
 
-[Example CDK Stack](packages/cdk/lib/cdk-stack.ts)
+[Example CDK Stack](packages/cdk/lib/cdk-stack.ts) and
+[local synthesis instructions](packages/cdk/README.md) show both constructs
+sharing a table and bucket. The example enables `autoDeleteEverything` for
+throwaway development resources; review retention and ownership before using it
+in production. The existing Lambda default is Node 20 (deprecated); choosing a
+new runtime is a separate deployment decision through the construct props.
+
+See [OPERATIONS.md](OPERATIONS.md) for compaction, freshening, database repair,
+and CLI recipes. Libraries and the CLI retain Node >=18 support.
+
+# Development
+
+Use Node 24 and pnpm 12.7.0 for this checkout. Consumer engine support does not
+select the developer toolchain. Install once from the repository root:
+
+```sh
+nvm use
+corepack enable pnpm
+corepack prepare pnpm@12.7.0 --activate
+pnpm install --frozen-lockfile
+pnpm run build:all
+pnpm run lint
+pnpm run test
+pnpm run test:foundation
+```
+
+The root workspace contains shared models, database, metrics and XML wrappers;
+three private Kinesis handlers; private utilities; the public CLI and construct;
+and a private example CDK app. Use root commands for tests. They prepare gzip
+fixtures and compile unbundled CLI commands so AWS mocks share module instances.
+`pnpm run test --runTestsByPath packages/sitemaps-db-lib/src/batch.test.ts`
+runs a focused suite. Coverage includes unimported package source in
+`coverage/index.html` and `coverage/coverage-summary.json`. V8 reports coverage
+against TypeScript through source maps. Source command tests supplement the CLI
+integration tests with controlled failures and offline inputs. See
+[TESTING.md](TESTING.md) for measured coverage and teardown details.
+
+`pnpm run clean` removes known outputs while preserving dependencies and source.
+`pnpm run build:cli` restores CLI bundles after tests. Dependencies and their
+single root lockfile are managed by pnpm, with a seven-day minimum release age;
+do not use `npm install` inside this checkout. npm examples above are for
+consumers installing published packages.
+
+Generate the existing construct API and a local HTML page with:
+
+```sh
+pnpm run build:docs
+node bin/check-doc-links.cjs
+```
+
+This compiles the construct, runs docgen to update
+[API.md](packages/sitemaps-cdk/API.md), and stages `docs/index.html` from that API.
+Open the HTML file locally to inspect it. The docs workflow publishes this page
+on release or manual dispatch; the local command does not publish anything.
+Keep generated build outputs out of commits. Construct configuration changes
+belong in [.projenrc.ts](packages/sitemaps-cdk/.projenrc.ts); run
+`pnpm run synth:cdk` to regenerate owned files without installing dependencies.
 
 # License
 

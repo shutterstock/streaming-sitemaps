@@ -181,7 +181,7 @@ describe('batch get/write', () => {
         },
       });
 
-      expect(ddbMock.calls().length).toBe(4);
+      expect(ddbMock.calls().length).toBe(3);
 
       expect(result.UnprocessedKeys).toBeDefined();
       expect(result.UnprocessedKeys).toEqual(inputRecords.RequestItems);
@@ -245,7 +245,7 @@ describe('batch get/write', () => {
         },
       });
 
-      expect(ddbMock.calls().length).toBe(4);
+      expect(ddbMock.calls().length).toBe(3);
 
       expect(result.UnprocessedKeys).toBeDefined();
       expect(result.UnprocessedKeys).toEqual(inputRecordsRetry.RequestItems);

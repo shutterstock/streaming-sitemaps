@@ -2,13 +2,14 @@ import fs, { createWriteStream } from 'fs-extra';
 import type { WriteStream } from 'fs';
 import { IndexItem, SitemapIndexStream, SitemapItemLoose, SitemapStream } from 'sitemap';
 import zlib, { createGunzip } from 'zlib';
-import { finished, Readable } from 'stream';
+import { finished, pipeline, Readable, Writable } from 'stream';
 import { promisify } from 'util';
 import path from 'path';
 import * as s3 from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import { parseSitemapIndex, parseSitemap } from 'sitemap';
+import { XMLToSitemapIndexStream, XMLToSitemapItemStream } from 'sitemap';
 
+const pipelineAsync = promisify(pipeline);
 const finishedAsync = promisify(finished);
 let s3Client = new s3.S3Client({});
 export function SitemapWrapperOverrideAWSClients(opts: { s3Client: s3.S3Client }): void {
@@ -48,6 +49,8 @@ export class SitemapWrapperBase {
   protected readonly _filename: string;
   protected readonly _sitemapDest: WriteStream | zlib.Gzip;
   protected readonly _xmlHeaderSize = 336;
+  private _completion?: Promise<Error | undefined>;
+  private _streamError?: Error;
 
   /**
    * Asynchronous helper for SitemapStream.
@@ -87,10 +90,29 @@ export class SitemapWrapperBase {
     this._sitemapDest = this._fileStream;
     if (this._compress) {
       this._gzip = zlib.createGzip();
+      // Preserve the base destination wiring for existing subclasses that pipe
+      // their own serializer. Managed wrappers replace this with one pipeline.
       this._gzip.pipe(this._fileStream);
-
       this._sitemapDest = this._gzip!;
     }
+  }
+
+  /** Connect all output stages, forwarding errors and waiting for file closure. */
+  protected connectOutput(stream: SitemapStream | SitemapIndexStream): void {
+    this._sitemapOrIndex = stream;
+    stream.on('data', this.countBytes.bind(this));
+    this._completion = new Promise((resolve) => {
+      const complete = (error: NodeJS.ErrnoException | null) => {
+        this._streamError = error ?? undefined;
+        resolve(this._streamError);
+      };
+      if (this._gzip) {
+        this._gzip.unpipe(this._fileStream);
+        pipeline(stream, this._gzip, this._fileStream, complete);
+      } else {
+        pipeline(stream, this._fileStream, complete);
+      }
+    });
   }
 
   /**
@@ -134,6 +156,7 @@ export class SitemapWrapperBase {
     if (this._sitemapOrIndex === undefined) {
       throw new Error('cannot write to sitemap after closed');
     }
+    if (this._streamError) throw this._streamError;
 
     if (!disregardCountLimit) {
       if (this.fullCount) {
@@ -163,13 +186,15 @@ export class SitemapWrapperBase {
       }
     }
 
-    // We will add the item, increment both counts
+    // Reserve capacity before the asynchronous write so concurrent callers
+    // cannot exceed the limits. Roll back a reservation rejected by the stream.
     this._count++;
     this._writtenUncompressedBytes += bytesToWrite;
-
     return new Promise<void>((resolve, reject) => {
       this._sitemapOrIndex?.write(item, (error) => {
         if (error !== undefined && error !== null) {
+          this._count--;
+          this._writtenUncompressedBytes -= bytesToWrite;
           reject(error);
         } else {
           // Keep a copy of the item in the accumulated array
@@ -188,14 +213,34 @@ export class SitemapWrapperBase {
       throw new Error('cannot close sitemap after closed');
     }
 
-    if (this.count === 0) {
-      this._sitemapOrIndex.destroy();
-    } else {
-      this._sitemapOrIndex.end();
-      await finishedAsync(this._fileStream);
+    const empty = this.count === 0;
+    try {
+      if (empty) {
+        // Empty sitemaps have no XML to flush, but every stage must close.
+        this._sitemapOrIndex.destroy();
+        if (!this._completion) {
+          this._gzip?.destroy();
+          this._fileStream.destroy();
+        }
+      } else {
+        this._sitemapOrIndex.end();
+      }
+      const error = this._completion
+        ? await this._completion
+        : await finishedAsync(this._fileStream).then(
+            () => undefined,
+            (failure: Error) => failure,
+          );
+      if (error) {
+        if (empty && (error as NodeJS.ErrnoException).code === 'ERR_STREAM_PREMATURE_CLOSE') {
+          this._streamError = undefined;
+        } else {
+          throw error;
+        }
+      }
+    } finally {
+      delete this._sitemapOrIndex;
     }
-
-    delete this._sitemapOrIndex;
 
     return { filenameAndPath: this._filenameAndPath };
   }
@@ -215,6 +260,7 @@ export class SitemapWrapperBase {
     if (this._sitemapOrIndex !== undefined) {
       throw new Error('cannot push sitemap to s3 until closed');
     }
+    if (this._streamError) throw this._streamError;
 
     // Use up to 4 multi-part parallel uploads for items > 5 MB
     const s3Key = path.join(s3Directory, this._filename);
@@ -237,19 +283,7 @@ export class SitemapWrapperBase {
     return { filenameAndPath: this._filenameAndPath, s3Path };
   }
 
-  // our updater stream
-  // private static updateEntries = new Transform({
-  //   objectMode: true,
-  //   transform(chunk: SitemapItemLoose, encoding, callback) {
-  //     callback(undefined, chunk);
-  //   },
-  // });
-
-  /**
-   * Asynchronously hydrate from a readable
-   * @param bucketName - S3 bucket name
-   * @returns
-   */
+  /** Parse a complete input pipeline so source, gzip and XML errors settle together. */
   protected static async _fromStream({
     stream,
     type,
@@ -258,34 +292,29 @@ export class SitemapWrapperBase {
     compressed: boolean;
     stream: Readable;
     type: 'sitemap' | 'index';
-  }): Promise<{
-    items: IndexItem[] | SitemapItemLoose[];
-  }> {
-    if (stream !== undefined) {
-      // If there are contents, pipe them through into the map
-      // Hydrate map/index from the stream
-      // (result.Body as Readable)
-      //   .pipe(createGunzip(), { end: false })
-      //   .pipe(new XMLToSitemapIndexStream())
-      //   .pipe(map);
-
-      let uncompressedReadable: Readable;
-      if (compressed) {
-        uncompressedReadable = stream.pipe(createGunzip());
-      } else {
-        uncompressedReadable = stream;
-      }
-
-      if (type === 'index') {
-        const items = await parseSitemapIndex(uncompressedReadable);
-        return { items };
-      } else {
-        const items = await parseSitemap(uncompressedReadable);
-        return { items };
-      }
+  }): Promise<{ items: IndexItem[] | SitemapItemLoose[] }> {
+    if (stream === undefined) return { items: [] };
+    const items: (IndexItem | SitemapItemLoose)[] = [];
+    const parser = type === 'index' ? new XMLToSitemapIndexStream() : new XMLToSitemapItemStream();
+    const collector = new Writable({
+      objectMode: true,
+      write(item: IndexItem | SitemapItemLoose, _encoding, callback) {
+        // Preserve parseSitemapIndex's existing input bound while taking
+        // responsibility for source and decompression error propagation.
+        if (type === 'index' && items.length >= 50000) {
+          callback(new Error('Sitemap index exceeds maximum allowed entries (50000)'));
+          return;
+        }
+        items.push(item);
+        callback();
+      },
+    });
+    if (compressed) {
+      await pipelineAsync(stream, createGunzip(), parser, collector);
     } else {
-      return { items: [] };
+      await pipelineAsync(stream, parser, collector);
     }
+    return { items };
   }
 
   /**
@@ -317,32 +346,8 @@ export class SitemapWrapperBase {
       // Disregard - NoSuchKey - This just means the item definitely does not exist
     }
 
-    if (existingBody !== undefined) {
-      // If there are contents, pipe them through into the map
-      // Hydrate map/index from the stream
-      // (result.Body as Readable)
-      //   .pipe(createGunzip(), { end: false })
-      //   .pipe(new XMLToSitemapIndexStream())
-      //   .pipe(map);
-
-      // Pipe through gunzip if gzipped
-      let uncompressedReadable: Readable;
-      if (s3Key.endsWith('.gz')) {
-        uncompressedReadable = existingBody.pipe(createGunzip());
-      } else {
-        uncompressedReadable = existingBody;
-      }
-
-      if (type === 'index') {
-        const items = await parseSitemapIndex(uncompressedReadable);
-        return { items };
-      } else {
-        const items = await parseSitemap(uncompressedReadable);
-        return { items };
-      }
-    } else {
-      return { items: [] };
-    }
+    if (existingBody === undefined) return { items: [] };
+    return this._fromStream({ stream: existingBody, compressed: s3Key.endsWith('.gz'), type });
   }
 
   public async delete(): Promise<void> {

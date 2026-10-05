@@ -40,21 +40,27 @@ This guide is for consumers of the Streaming-Sitemaps project and contains the i
 
 # DynamoDB Keys
 
-- PK: filelist:[type], SK: [filename]
-  - List of all files in the sitemap index for a particular type
-  - Enables enumerating all of the records for all of the files in a sitemap index
-  - Metadata about last update time for any item in a particular file (for identifying which files need to be refreshed)
-- PK: type:[type]:id\:[id], SK: 'assetdata'
-  - Data for a particular item id in a sitemap of a particular type
-  - Metadata about item state
-  - Used to find which file a given item is in when reading the data stream
-- PK: type:[type]:file:[filename], SK: id:[id]
-  - List of items in a sitemap
-  - Metadata about item state
-  - Used to refresh the data in a given sitemap file
-- PK: type:[type]:shard:[shardid], SK: shardstate'
-  - Metadata about the state of a particular shard sitemap file writer
-  - Primarily used to track which sitemap file is being appended to by a particular shard when using multi-shard sitemap writing
+These are the keys emitted by the current database library (type, filename and
+item ID key components are lowercased):
+
+| Record | PK | SK | Purpose |
+| --- | --- | --- | --- |
+| File metadata | `fileList#type#<type>` | `fileName#<filename>` | Enumerate files and track their item count and dirtied/written times |
+| Item by ID | `itemID#<id>#type#<type>` | `itemID#<id>` | Deduplicate and identify the owning sitemap file |
+| Item by file | `fileName#<filename>#type#<type>` | `itemID#<id>` | Enumerate items while freshening a file |
+| Shard state | `shardList#type#<type>` | `shardId#<number>` | Track the current file and cumulative counts for each writer shard |
+
+An item may be `towrite`, `written`, `toremove`, or `removed`. Database repair
+must preserve the by-ID ownership of items assigned to another file; it marks
+only the stale by-file record removed. Review repair output before permitting
+writes. The freshener skips files that are still active for a writer shard.
+
+The recipes below assume the published `@shutterstock/sitemaps-cli` is installed
+and `sitemaps-cli --help` works. Local file commands need no AWS credentials;
+DynamoDB, S3, Lambda and Kinesis commands require credentials and resource
+permissions in the selected account and region. For a source checkout, use the
+[root development setup](README.md#development), then invoke
+`node packages/sitemaps-cli/bin/run.js` in place of `sitemaps-cli`.
 
 # Sitemap Writer Kinesis Stream Compaction
 
@@ -94,7 +100,7 @@ Before compacting a stream, review the below impacts to sitemap-writer processin
 - Lambda `memorySize`
   - `memorySize` determines what percent of run time can be CPU usage
   - `memorySize` of 1769 MB allocates 1 CPU core, allowing 100 ms of CPU usage per 100 ms of run time
-  - `memorySize` needs to be at least 1769 MB (and performace improves up to about 2000 MB) to avoid all delays from over-using CPU
+  - `memorySize` needs to be at least 1769 MB (and performance improves up to about 2000 MB) to avoid all delays from over-using CPU
   - When incoming records are compressed using zlib's `deflate` or `deflateSync`, CPU allocation of at least 1 CPU core (e.g. 1769 MB for `memorySize`) - see more details below
   - Setting `memorySize` to 1769 MB will not have a substantial negative impact on cost because the Lambda will run 5x faster when given 5x more CPU
     - While the cost per time unit is 5x higher, you pay it for 1/5th of the amount of time
@@ -122,7 +128,7 @@ Before compacting a stream, review the below impacts to sitemap-writer processin
     - Allows fewer Kinesis Shards (possibly even `1`) which limits the number of new Sitemap XML files being appended with new records at all times
   - Unfortunately, record decompression can increase the runtime of the sitemap-writer Lambda by 2x to 5x (depending on whether `storeItemStateInDynamoDB` is on and if the `memorySize` is 1769 MB or less)
   - If the records blocking the Kinesis stream are already compressed then they must be decompressed to proceed
-  - If the Kinesis stream regularly gets blocked then incoming record compression should probalby not be used
+  - If the Kinesis stream regularly gets blocked then incoming record compression should probably not be used
 
 ## Procedure for Sitemap Writer Kinesis Stream Compaction
 
@@ -171,29 +177,36 @@ Compaction reads all the records in the stream with a `compactVersion` either no
 # Recreating Sitemap Index XML Files from DB
 
 ```
-npx sitemaps-cli create-index --table-name=sitemaps-prod --table-item-type=widgets --sitemap-dir-url="https://www.example.com/sitemaps/widgets/" -i widgets-index
+sitemaps-cli create from-dynamodb --no-create-sitemaps --table-item-type=widgets sitemaps-prod https://www.example.com/sitemaps/widgets/ ./output widgets-index.xml
 
-npx sitemaps-cli create-index --table-name=sitemaps-prod --table-item-type=search --sitemap-dir-url="https://www.example.com/sitemaps/search/" -i search-index
+sitemaps-cli create from-dynamodb --no-create-sitemaps --table-item-type=search sitemaps-prod https://www.example.com/sitemaps/search/ ./output search-index.xml
 ```
 
 # Freshening Sitemap XML Files on S3 from DB
 
 - `--repair-db` will add missing records to the DB for items that are found in the file only
-- `--dry-run` will record metrics but not write to the DB or to S3
-  - `--no-dry-run` is required to write to the DB and to S3
+- Both `--dry-run` and `--dry-run-db` default to true.
+- `--dry-run` records metrics without writing S3 or DynamoDB.
+- `--no-dry-run --dry-run-db` writes S3 but keeps database writes disabled.
+- `--no-dry-run --no-dry-run-db` permits S3 and database writes, subject to the
+  deployed freshener configuration. Check the returned `computedDryRun` and
+  `computedDryRunDB` fields.
+- Repair examples below intentionally keep database writes disabled and redirect
+  S3 output for inspection. Remove those safeguards only after validating the
+  extracted IDs and ownership changes. `--yes` skips confirmation prompts.
 
 ### Widget
 
 #### From DB Only
 
 ```sh
-npx sitemaps-cli freshen --no-dry-run --no-dry-run-db --table-item-type widget --function-name sitemaps-sitemap-freshener
+sitemaps-cli freshen --no-dry-run --no-dry-run-db --table-item-type widget --function-name sitemaps-sitemap-freshener
 ```
 
 #### With DB Repair
 
 ```sh
-npx sitemaps-cli freshen --repair-db --no-dry-run --dry-run-db --table-item-type widget --function-name sitemaps-sitemap-freshener --s3-directory-override dry-run-db/ --itemid-regex "^https:\/\/www\.example\.com\/widget\/(.*-)?-widget-(?<ItemID>[0-9]+)$" --itemid-regex-test-url "https://www.example.com/widget/a-really-nice-widget-905143174" --itemid-regex-test-url "https://www.example.com/widget/widget-905143174"
+sitemaps-cli freshen --repair-db --no-dry-run --dry-run-db --table-item-type widget --function-name sitemaps-sitemap-freshener --s3-directory-override dry-run-db/ --itemid-regex "^https:\/\/www\.example\.com\/widget\/(.*-)?-widget-(?<ItemID>[0-9]+)$" --itemid-regex-test-url "https://www.example.com/widget/a-really-nice-widget-905143174" --itemid-regex-test-url "https://www.example.com/widget/widget-905143174"
 ```
 
 ### Search
@@ -201,13 +214,13 @@ npx sitemaps-cli freshen --repair-db --no-dry-run --dry-run-db --table-item-type
 #### From DB Only
 
 ```sh
-npx sitemaps-cli freshen --no-dry-run --no-dry-run-db --table-item-type search --function-name sitemaps-sitemap-freshener
+sitemaps-cli freshen --no-dry-run --no-dry-run-db --table-item-type search --function-name sitemaps-sitemap-freshener
 ```
 
 #### With DB Repair
 
 ```sh
-npx sitemaps-cli freshen --repair-db --no-dry-run --dry-run-db --table-item-type search --function-name sitemaps-sitemap-freshener --s3-directory-override dry-run-db/ --itemid-regex "^https:\/\/www\.example\.com\/search\/(?<ItemID>.+)" --itemid-regex-test-url "https://www.example.com/search/some-search-term" --itemid-regex-test-url "https://www.example.com/search/some%22other%22search%22term"
+sitemaps-cli freshen --repair-db --no-dry-run --dry-run-db --table-item-type search --function-name sitemaps-sitemap-freshener --s3-directory-override dry-run-db/ --itemid-regex "^https:\/\/www\.example\.com\/search\/(?<ItemID>.+)" --itemid-regex-test-url "https://www.example.com/search/some-search-term" --itemid-regex-test-url "https://www.example.com/search/some%22other%22search%22term"
 ```
 
 # Extracting HTML Sitemap Links
@@ -236,21 +249,17 @@ curl -A streaming-sitemaps https://www.example.com/ko/explore/sitemap | xmllint 
 # Downloading Sitemaps via HTTP with Sitemaps Tool
 
 ```sh
-nvm use
-npm run build
-mkdir downloads
+mkdir -p downloads
 cd downloads
-npx sitemaps-cli download --type index https://www.example.com/sitemaps/some-index.xml
+sitemaps-cli download --type index https://www.example.com/sitemaps/some-index.xml
 ```
 
 # Mirroring Sitemaps from HTTP Source to S3 Bucket with Sitemaps Tool
 
 ```sh
-nvm use
-npm run build
-mkdir downloads
+mkdir -p downloads
 cd downloads
-npx sitemaps-cli mirror-to-s3 --type index https://www.example.com/sitemaps/some-index.xml.gz s3://doc-example-bucket
+sitemaps-cli mirror-to-s3 --type index https://www.example.com/sitemaps/some-index.xml.gz s3://doc-example-bucket
 ```
 
 # Checking for Invalid UTF-8 or Non-Printable Characters in Files
@@ -285,7 +294,7 @@ ugrep -aX '[\x{0000}-\x{0008}\x{000B}-\x{000C}\x{000E}-\x{001F}\x{007F}\x{0081}-
 ## Check for Control Characters (e.g. Null, Tab, etc)
 
 ```
-ggrep --color=auto -a -P -n "[\x00-\x08\x0B-\x0C\x0F-\x1F]" sitemaps/widiget/widget-00263.format.jsonl
+ggrep --color=auto -a -P -n "[\x00-\x08\x0B-\x0C\x0F-\x1F]" sitemaps/widget/widget-00263.format.jsonl
 ```
 
 ## Check if the File Can Be Parsed as UTF-8
@@ -312,15 +321,15 @@ ggrep --color=auto -a -P -n "[\x80-\xFF]" sitemaps/widget/widget-00263.format.js
 ## Creating Sitemaps from CSV Source to Local Directory
 
 ```sh
-npx sitemaps-cli create from-csv ./data/widgets.csv https://www.example.com/sitemaps/widgets/sitemaps/ https://www.example.com/widget/ ./ sitemap-widgets-index --base-sitemap-file-name sitemap-widgets --column widget_id
+sitemaps-cli create from-csv ./data/widgets.csv https://www.example.com/sitemaps/widgets/sitemaps/ https://www.example.com/widget/ ./ sitemap-widgets-index --base-sitemap-file-name sitemap-widgets --column widget_id
 
-npx sitemaps-cli create from-csv ./data/keywords.csv https://www.example.com/sitemaps/search/sitemaps/ https://www.example.com/search/ ./ sitemap-search-index --base-sitemap-file-name sitemap-search --column search_term
+sitemaps-cli create from-csv ./data/keywords.csv https://www.example.com/sitemaps/search/sitemaps/ https://www.example.com/search/ ./ sitemap-search-index --base-sitemap-file-name sitemap-search --column search_term
 ```
 
 ## Uploading Local Sitemaps to S3
 
 ```sh
-npx sitemaps-cli upload-to-s3 --root-path ./ sitemaps/some-sitemap-index.xml s3://doc-example-bucket
+sitemaps-cli upload-to-s3 --root-path ./ sitemaps/some-sitemap-index.xml s3://doc-example-bucket
 ```
 
 # Recreate Sitemap file from DynamoDB Table
@@ -328,20 +337,20 @@ npx sitemaps-cli upload-to-s3 --root-path ./ sitemaps/some-sitemap-index.xml s3:
 ## Create all Sitemaps for Type from DynamoDB Table
 
 ```sh
-npx sitemaps-cli create from-dynamodb --table-item-type widgets --sitemap-dir-url https://www.example.com/sitemaps/widgets/sitemaps/ sitemaps-prod ./
+sitemaps-cli create from-dynamodb --table-item-type widgets sitemaps-prod https://www.example.com/sitemaps/widgets/sitemaps/ ./output
 ```
 
 # Comparing Recreated Sitemap with S3 Version of Sitemap
 
 ```sh
-npx sitemaps-cli create from-dynamodb --sitemaps-dir-url https://www.example.com/sitemaps/widgets/sitemaps/ --table-item-type widgets --table-file-name widgets-00002.xml sitemaps-prod 
+sitemaps-cli create from-dynamodb --table-item-type widgets --table-file-name widgets-00002.xml sitemaps-prod https://www.example.com/sitemaps/widgets/sitemaps/ ./recreated
 
-wget https://www.example.com/sitemaps/widgets/sitemaps/widgets-00002.xml
-xmllint --format widgets-00002.xml > widgets-00002.format.xml
-xidel widgets-00002.format.xml --xquery 'for $node in //url order by $node/loc return $node' --output-format xml > widgets-00002.sorted.xml
-npx sitemaps-cli convert widgets-00002.sorted.xml
+mkdir -p downloaded
+curl --fail https://www.example.com/sitemaps/widgets/sitemaps/widgets-00002.xml -o downloaded/widgets-00002.xml
+xmllint --format recreated/sitemaps/widgets/sitemaps/widgets-00002.xml > recreated/widgets-00002.format.xml
+xmllint --format downloaded/widgets-00002.xml > downloaded/widgets-00002.format.xml
 
-diff -u widgets-00002.sorted.xml widgets-00002.sorted.xml
+diff -u downloaded/widgets-00002.format.xml recreated/widgets-00002.format.xml
 ```
 
 # Formatting All .XML Files in Folder with xmllint

@@ -75,7 +75,7 @@ export class DynamoDBBatch {
         args.RequestItems = result.UnprocessedKeys;
 
         // Bail if out of retries
-        if (retryCount > retries) {
+        if (retryCount >= retries) {
           theResult.UnprocessedKeys = result.UnprocessedKeys;
           return theResult;
         }
