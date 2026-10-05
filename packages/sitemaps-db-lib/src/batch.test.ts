@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 //index.test.ts
 /// <reference types="jest" />
 import * as dynamodb from '@aws-sdk/client-dynamodb';

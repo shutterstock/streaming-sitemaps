@@ -3,6 +3,7 @@
 !/.projen/tasks.json
 !/.projen/deps.json
 !/.projen/files.json
+!/pnpm-workspace.yaml
 !/package.json
 !/LICENSE
 !/.npmignore
@@ -31,14 +32,14 @@ jspm_packages/
 .cache
 /dist/changelog.md
 /dist/version.txt
-!/.npmrc
 !/test/
-!/tsconfig.dev.json
+!/tsconfig.json
+!/test/tsconfig.json
 !/src/
 /lib
 /dist/
+!/projenrc/tsconfig.json
 .jsii
-tsconfig.json
 !/API.md
 /pnpm-lock.yaml
 !/.projenrc.ts

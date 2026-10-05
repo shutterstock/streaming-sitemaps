@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`convert file source succeeds converting index file 1`] = `
 "{"url":"http://www.example.com/sitemap1.xml.gz","lastmod":"2004-10-01T18:23:17+00:00"}

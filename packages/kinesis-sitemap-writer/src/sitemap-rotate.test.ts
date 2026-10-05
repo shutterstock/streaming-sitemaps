@@ -97,9 +97,7 @@ describe('sitemap-rotate', () => {
     const shardId = 123;
 
     beforeEach(() => {
-      (v4 as jest.MockedFunction<typeof v4>).mockImplementation(() => {
-        return testUUID;
-      });
+      (v4 as jest.Mock).mockReturnValue(testUUID);
     });
 
     describe('uuidv4', () => {
@@ -189,9 +187,7 @@ describe('sitemap-rotate', () => {
 
     describe('uuidv4', () => {
       beforeEach(() => {
-        (v4 as jest.MockedFunction<typeof v4>).mockImplementation(() => {
-          return testUUID;
-        });
+        (v4 as jest.Mock).mockReturnValue(testUUID);
       });
 
       it('empty state', async () => {

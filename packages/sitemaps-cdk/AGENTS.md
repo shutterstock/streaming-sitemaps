@@ -1,16 +1,16 @@
 # Construct and Projen guide
 
 Read the [root](../../AGENTS.md) and [package](../AGENTS.md) guides first.
-[.projenrc.ts](.projenrc.ts) owns package.json, tsconfig.dev.json, .npmrc,
+[.projenrc.ts](.projenrc.ts) owns package.json, portable tsconfig.json, test/tsconfig.json, projenrc/tsconfig.json,
 .gitignore, .npmignore, and metadata/tasks under .projen. Edit that source and
 run `pnpm run synth:cdk` from the repository root using locally installed Projen
-0.81.6. Bare npx may download a different Projen; do not use it here.
+0.103.27. Bare npx may download a different Projen; do not use it here.
 
 This construct belongs to the root isolated pnpm workspace. It compiles with
 jsii and bundles sibling handler source with esbuild, so a standalone island
 would lose required workspace inputs. Only the root pnpm-lock.yaml owns
-resolution. The generated local .npmrc keeps Projen's resolution policy; it does
-not change the workspace linker. Generated nested GitHub workflows are disabled
+resolution. Root pnpm-workspace.yaml owns installation policy; there is no nested lock or
+workspace configuration. Generated nested GitHub workflows are disabled
 because root workflows own repository CI/publication.
 
 Synthesis runs without post-install hooks. Reconcile dependencies explicitly at
@@ -19,18 +19,18 @@ synthesis to check for drift. The default task also suppresses dependency
 installation when invoked inside a Projen build. CI consumers must not repair
 their restored dependency trees.
 
-The retained jsii 5.4/CDK 2.117 toolchain predates Node 24 and can emit support
-warnings. Upgrade it in the dedicated construct maintenance change. Ambient
-types are narrowed to node for jsii and node/jest for the development config;
-do not delete parent node_modules types to make the older compiler succeed.
-The root lock pins downlevel-dts's wildcard compiler dependency to a compatible
-TypeScript compiler. Runtime engines and Lambda behavior remain unchanged.
+The construct uses jsii/Rosetta 6, TypeScript 6.0.3, CDK 2.271, and Node 24
+for local tooling. The public Node >=18 engine remains intact. Ambient types
+are narrowed to node for jsii and node/jest for tests; do not delete shared
+type packages. The TypeScript Projen runner uses its dedicated projenrc config.
+Runtime defaults stay at NODEJS_20_X; this deprecated Lambda runtime requires
+an explicit operator migration. See the root dependency maintenance note.
 
 `pnpm run build:cdk` runs compile and produces lib/index.js, declarations, .jsii,
 and three `lib/kinesis-*/index.js` bundles/maps. Source-mode construct tests also
-exercise CDK's local esbuild bundling against the root pnpm lock. jsii generates
-tsconfig.json and lib/.types-compat; they must remain untracked, including any
-machine-specific paths. Root solution compilation excludes this generated config.
+exercise CDK's local esbuild bundling against the root pnpm lock. Projen generates the portable tracked
+tsconfig.json; jsii compiles it without replacing it with absolute paths.
+lib/.types-compat and machine-specific paths must remain untracked. Root solution compilation excludes this generated config.
 
 `pnpm run build:docs` regenerates the existing [API.md](API.md) and stages its
 content in the root docs page. It does not imply a separate documentation source

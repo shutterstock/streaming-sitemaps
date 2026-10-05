@@ -27,20 +27,20 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "3.567.0",
-    "@aws-sdk/lib-dynamodb": "3.567.0",
-    "@types/node": "^18",
-    "@types/sinon": "^10.0.1",
-    "sinon": "^11.1.2",
+    "@aws-sdk/client-dynamodb": "3.967.0",
+    "@aws-sdk/lib-dynamodb": "3.967.0",
+    "@types/node": "^18.19.130",
+    "@types/sinon": "^22.0.0",
+    "sinon": "^22.1.0",
     "stats-lite": "^2.2.0",
-    "@types/jest": "29.5.12",
-    "aws-sdk-client-mock": "3.1.0"
+    "@types/jest": "30.0.0",
+    "aws-sdk-client-mock": "4.1.0"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.54.1",
-    "@aws-sdk/lib-dynamodb": "^3.54.1",
-    "class-transformer": "^0.4.0",
-    "sitemap": "^8.0.0",
-    "tslib": "^2.3.0"
+    "@aws-sdk/client-dynamodb": "3.967.0",
+    "@aws-sdk/lib-dynamodb": "3.967.0",
+    "class-transformer": "^0.5.1",
+    "sitemap": "^8.0.3",
+    "tslib": "^2.8.1"
   }
 }

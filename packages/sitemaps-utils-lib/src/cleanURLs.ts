@@ -60,7 +60,7 @@ export function utf8EncodePath(pathIn: string): string {
 
     // Return original path if it is valid UTF-8
     return pathIn;
-  } catch (e) {
+  } catch {
     // Try to decode with unescape
     const pathParts = pathIn.split('/');
     const pathPartsEncoded: string[] = [];

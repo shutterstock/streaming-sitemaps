@@ -270,14 +270,13 @@ describe('Sitemap Freshener index.ts', () => {
         expect(putRecords.input.Records?.length).toBe(3);
 
         {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const record = putRecords.input.Records![0];
           expect(record).toBeDefined();
           expect(record.PartitionKey).toBe(
             'operation#freshenFile#type#widget#filename#sitemap-00001.xml.gz#',
           );
           expect(record.Data).toBeDefined();
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
           const dataBuffer0 = Buffer.from(record.Data!);
           const dataStr0 = dataBuffer0.toString('utf-8');
           const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -292,14 +291,13 @@ describe('Sitemap Freshener index.ts', () => {
         }
 
         {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const record = putRecords.input.Records![1];
           expect(record).toBeDefined();
           expect(record.PartitionKey).toBe(
             'operation#freshenFile#type#widget#filename#sitemap-00002.xml.gz#',
           );
           expect(record.Data).toBeDefined();
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
           const dataBuffer0 = Buffer.from(record.Data!);
           const dataStr0 = dataBuffer0.toString('utf-8');
           const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -362,14 +360,13 @@ describe('Sitemap Freshener index.ts', () => {
       expect(putRecords.input.Records?.length).toBe(3);
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![0];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00001.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -384,14 +381,13 @@ describe('Sitemap Freshener index.ts', () => {
       }
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![1];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00002.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -503,14 +499,13 @@ describe('Sitemap Freshener index.ts', () => {
       expect(putRecords.input.Records?.length).toBe(3);
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![0];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00001.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -525,14 +520,13 @@ describe('Sitemap Freshener index.ts', () => {
       }
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![1];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00002.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -596,14 +590,13 @@ describe('Sitemap Freshener index.ts', () => {
       expect(putRecords.input.Records?.length).toBe(3);
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![0];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00001.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -618,14 +611,13 @@ describe('Sitemap Freshener index.ts', () => {
       }
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![1];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00002.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -688,14 +680,13 @@ describe('Sitemap Freshener index.ts', () => {
       expect(putRecords.input.Records?.length).toBe(3);
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![0];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00001.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -711,14 +702,13 @@ describe('Sitemap Freshener index.ts', () => {
       }
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![1];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00002.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -813,14 +803,13 @@ describe('Sitemap Freshener index.ts', () => {
       expect(putRecords.input.Records?.length).toBe(3);
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![0];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00001.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -837,14 +826,13 @@ describe('Sitemap Freshener index.ts', () => {
       }
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const record = putRecords.input.Records![1];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe(
           'operation#freshenFile#type#widget#filename#sitemap-00002.xml.gz#',
         );
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapFreshenerFreshenFileMessage;
@@ -935,7 +923,7 @@ describe('Sitemap Freshener index.ts', () => {
             awsRequestId: 'local-testing',
           } as lambda.Context,
         ),
-      ).rejects.toThrowError(
+      ).rejects.toThrow(
         '`https://www.example.com/widget-abcdefg-super-sale-50%25-off` does not match `itemIDRegex`',
       );
 

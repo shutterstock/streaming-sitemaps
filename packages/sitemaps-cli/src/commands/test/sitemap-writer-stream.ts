@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-restricted-syntax */
 
 import * as kinesis from '@aws-sdk/client-kinesis';
 import { Args, Command, Flags } from '@oclif/core';

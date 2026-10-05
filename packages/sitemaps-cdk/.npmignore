@@ -3,7 +3,7 @@
 /dist/changelog.md
 /dist/version.txt
 /test/
-/tsconfig.dev.json
+/test/tsconfig.json
 /src/
 !/lib/
 !/lib/**/*.js
@@ -15,6 +15,7 @@ dist
 /.idea/
 /.projenrc.js
 tsconfig.tsbuildinfo
+/projenrc/tsconfig.json
 !.jsii
 /AGENTS.md
 /.gitattributes

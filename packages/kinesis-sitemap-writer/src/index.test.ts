@@ -813,12 +813,12 @@ describe('Sitemap Writer index.ts', () => {
         expect(compactionRequest).toBeInstanceOf(kinesis.PutRecordsCommand);
         expect(compactionRequest.input.Records).toBeDefined();
         expect(compactionRequest.input.Records?.length).toBe(1);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const record = compactionRequest.input.Records![0];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe('2');
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapWriterItem;
@@ -981,12 +981,12 @@ describe('Sitemap Writer index.ts', () => {
         expect(compactionRequest).toBeInstanceOf(kinesis.PutRecordsCommand);
         expect(compactionRequest.input.Records).toBeDefined();
         expect(compactionRequest.input.Records?.length).toBe(1);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const record = compactionRequest.input.Records![0];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe('5');
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapWriterItem;
@@ -1075,12 +1075,12 @@ describe('Sitemap Writer index.ts', () => {
         expect(compactionRequest).toBeInstanceOf(kinesis.PutRecordsCommand);
         expect(compactionRequest.input.Records).toBeDefined();
         expect(compactionRequest.input.Records?.length).toBe(1);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const record = compactionRequest.input.Records![0];
         expect(record).toBeDefined();
         expect(record.PartitionKey).toBe('2');
         expect(record.Data).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         const dataBuffer0 = Buffer.from(record.Data!);
         const dataStr0 = dataBuffer0.toString('utf-8');
         const data0 = JSON.parse(dataStr0) as ISitemapWriterItem;
@@ -1729,13 +1729,11 @@ describe('Sitemap Writer index.ts', () => {
       let aggregatedCount = 0;
       for await (const hydratedItemsBatch of prefetcher) {
         expect(hydratedItemsBatch).toBeDefined();
-        expect(hydratedItemsBatch.error).toBeUndefined;
+        expect(hydratedItemsBatch.error).toBeUndefined();
         expect(hydratedItemsBatch.items).toBeDefined();
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         aggregatedCount += hydratedItemsBatch!.items!.length;
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         for (const item of hydratedItemsBatch!.items!) {
           expect(item).toBeDefined();
           expect(item.item).toBeDefined();
@@ -1792,13 +1790,11 @@ describe('Sitemap Writer index.ts', () => {
       let aggregatedDuplicateCount = 0;
       for await (const hydratedItemsBatch of prefetcher) {
         expect(hydratedItemsBatch).toBeDefined();
-        expect(hydratedItemsBatch.error).toBeUndefined;
+        expect(hydratedItemsBatch.error).toBeUndefined();
         expect(hydratedItemsBatch.items).toBeDefined();
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         aggregatedCount += hydratedItemsBatch!.items!.length;
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         for (const item of hydratedItemsBatch!.items!) {
           expect(item).toBeDefined();
           expect(item.item).toBeDefined();

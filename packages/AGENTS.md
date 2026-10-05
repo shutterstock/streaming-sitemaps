@@ -27,6 +27,9 @@ with ts-jest and the root package config, and collects V8 LCOV/HTML/text coverag
 There is no coverage threshold. [setupBeforeEnv.js](../setupBeforeEnv.js) starts
 jest-dynalite with the root table config. AWS clients are mocked in relevant
 suites; keep the mock's Smithy types aligned with the installed SDK.
+[setupAfterEnv.cjs](../setupAfterEnv.cjs) restores Nock's shared Node HTTP
+interceptors after each suite. Native socket fixtures temporarily disable those
+interceptors and wait for actual requests before measuring their agent.
 
 Run a focused suite after building its dependencies:
 

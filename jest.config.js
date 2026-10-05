@@ -136,6 +136,7 @@ module.exports = {
   // setupFiles: [],
   // https://github.com/freshollie/jest-dynalite
   setupFiles: ['./setupBeforeEnv.js'],
+  setupFilesAfterEnv: ['./setupAfterEnv.cjs'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   // setupFilesAfterEnv: [],
