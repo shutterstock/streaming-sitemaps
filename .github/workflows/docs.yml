@@ -1,23 +1,66 @@
 name: Publish Docs
 
 on:
-  release:
-    types: [published]
-
+  workflow_run:
+    workflows: [Package and Publish]
+    types: [completed]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Current fully published stable tag (vX.Y.Z)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
 
 env:
   npm_config_min_release_age: '7'
 
+concurrency:
+  group: npm-release-and-docs
+  queue: max
+  cancel-in-progress: false
+
 jobs:
+  select-docs:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.docs.outputs.publish }}
+      version: ${{ steps.docs.outputs.version }}
+      commit: ${{ steps.docs.outputs.commit }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Use Node 24 for dependency-free provenance guards
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '^24.0.0'
+          package-manager-cache: false
+
+      - name: Select fully published stable tag and verify release provenance
+        id: docs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node bin/release.cjs docs-select
+
   install-deps:
+    needs: select-docs
+    if: needs.select-docs.outputs.publish == 'true'
     runs-on: ubuntu-latest
     outputs:
       cache-key: ${{ steps.configure-nodejs.outputs.cache-key }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ needs.select-docs.outputs.commit }}
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Populate completed dependencies
@@ -35,15 +78,18 @@ jobs:
   build:
     permissions:
       contents: write
-    needs: install-deps
+      actions: read
+    needs: [select-docs, install-deps]
     runs-on: ubuntu-latest
     env:
       PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
+      RELEASE_VERSION: ${{ needs.select-docs.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ needs.select-docs.outputs.commit }}
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Restore completed dependencies
@@ -67,11 +113,23 @@ jobs:
           test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
           printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
 
+      - name: Inject verified stable version after strict restore
+        run: bin/version "$RELEASE_VERSION"
+
       - name: Build Docs
-        run: pnpm run build:docs
+        run: |
+          pnpm run build
+          pnpm run build:docs
+
+      - name: Recheck full stable publication and immutable source before deployment
+        id: deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node bin/release.cjs docs-verify
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        if: steps.deployment.outputs.publish == 'true'
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs

@@ -1,0 +1,4 @@
+{
+  "publicationBlocked": true,
+  "reason": "Isolated npm consumers still resolve the held SDK's fast-xml-parser 5.2.5. Require a reviewed patched-consumer strategy or an explicit compatibility-policy decision before publication; see DEPENDENCY-MODERNIZATION.md."
+}
