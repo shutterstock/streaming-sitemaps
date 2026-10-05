@@ -28,6 +28,7 @@ Streaming Sitemaps is a comprehensive solution for generating and managing XML s
   - [Sitemaps CLI](#sitemaps-cli)
   - [CDK Constructs](#cdk-constructs)
     - [Example CDK Stack](#example-cdk-stack)
+- [Packaged CLI verification](#packaged-cli-verification)
 - [License](#license)
 
 # Deployment Patterns
@@ -72,6 +73,40 @@ npm install --save-dev @shutterstock/sitemaps-cdk
 ### Example CDK Stack
 
 [Example CDK Stack](packages/cdk/lib/cdk-stack.ts)
+
+# Packaged CLI verification
+
+With Node 24 and pnpm 12.7.0, run:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm run build:all
+pnpm run test
+pnpm run build:cli
+pnpm run test:cli:packaged
+```
+
+Rebuild the CLI after unit tests, which emit unbundled commands for AWS mocks.
+The packaged check packs the CLI and its three public sibling libraries, then
+installs them with `pnpm install --prod` and hoisting disabled in a temporary
+directory outside the workspace. Bin shims cannot inject `NODE_PATH`. A read-only
+localhost registry serves only those actual sibling
+tarballs at their source/materialized versions; it never publishes or substitutes
+registry copies. External dependencies use the public npm registry and the
+seven-day release-age policy. Network access to npm is required for installation.
+
+The consumer has a fresh home, store and configuration, no credentials, source
+links, ancestor dependencies, `NODE_PATH`, or global package binaries. A separate
+tools directory supplies TypeScript and Node types without providing declaration
+dependencies. Checks cover every shipped CLI declaration with `skipLibCheck`
+disabled, the installed bin, version/help, command and plugin loading, helper
+usage, and offline XML conversion against committed output. Negative controls
+must detect missing `sitemap`, `fs-extra`, and the installed bin. Network calls
+are blocked during CLI execution; AWS services and deployment are not exercised.
+The check also verifies the root lock and dependency trees stay unchanged, restores
+the CLI README changed by pack hooks, and removes temporary fixtures/locks.
+Library source versions remain `0.0.0`; no second lockfile is committed. PR CI runs this
+check after version materialization and builds, without saving consumer caches.
 
 # License
 
