@@ -198,7 +198,7 @@ jobs:
         working-directory: packages/sitemaps-cli
         run: |
           pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-cli artifact
         uses: actions/upload-artifact@v7
@@ -211,7 +211,7 @@ jobs:
         working-directory: packages/sitemaps-db-lib
         run: |
           pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-db-lib artifact
         uses: actions/upload-artifact@v7
@@ -224,7 +224,7 @@ jobs:
         working-directory: packages/sitemaps-metrics-lib
         run: |
           pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-metrics-lib artifact
         uses: actions/upload-artifact@v7
@@ -237,7 +237,7 @@ jobs:
         working-directory: packages/sitemaps-models-lib
         run: |
           pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-models-lib artifact
         uses: actions/upload-artifact@v7
@@ -251,7 +251,7 @@ jobs:
         run: |
           # pnpm run package
           pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-cdk artifact
         uses: actions/upload-artifact@v7

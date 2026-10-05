@@ -42,7 +42,8 @@ CI retains the `install-deps`, `test`, and `build` job identifiers. The always
 running build gate fails setup/test failures instead of reporting a skipped
 required check. Coverage comments use public peter-evans actions and skip fork
 and Dependabot PRs. No-token paths still build/test/pack. Dry-run publication
-operates on `pnpm pack` tarballs without npm authentication; never add credentials
+operates on `pnpm pack` tarballs without npm authentication, using an explicit
+`ci-preview` tag so npm accepts PR prerelease versions; never add credentials
 to PR packaging checks. Upload-artifact uses a supported action version.
 
 Validate YAML/action inputs, cache input equality, and actionlint after workflow
