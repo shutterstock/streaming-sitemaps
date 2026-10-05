@@ -27,6 +27,7 @@ coverage/
 !packages/sitemaps-cli/test/commands/convert/data/*.xml
 !packages/sitemaps-cli/test/packaged/*.xml
 !packages/kinesis-sitemap-writer/src/mocks/*.xml
+!fixtures/packed-consumer/input.xml
 
 # https://unix.stackexchange.com/questions/537174/gnu-tar-not-ignoring-directories-in-gitignore-with-exclude-vcs-ignores
 # needed for tar --exclude-vcs-ignores

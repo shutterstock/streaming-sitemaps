@@ -277,6 +277,9 @@ jobs:
           path: .validation/cdk-consumer/
           if-no-files-found: ignore
 
+      - name: Verify every public tarball in isolated offline consumers
+        run: pnpm run test:packages
+
   deploy:
     # Disable for now as we have no CDK stack to deploy
     if: ${{ false }}

@@ -28,12 +28,13 @@
     "synth:cdk": "pnpm --dir packages/sitemaps-cdk exec projen --no-post",
     "test:foundation": "node --test bin/*.test.cjs",
     "test:cdk-consumer": "node bin/test-cdk-consumer.cjs",
-    "test:cli:packaged": "node bin/test-cli-packaged.cjs"
+    "test:cli:packaged": "node bin/test-cli-packaged.cjs",
+    "test:packages": "node bin/test-packages.cjs"
   },
   "files": [],
   "repository": {
     "type": "git",
-    "url": "https://github.shuttercorp.net/sreng/streaming-sitemaps.git"
+    "url": "https://github.com/shutterstock/streaming-sitemaps.git"
   },
   "devDependencies": {
     "@aws-sdk/types": "3.974.6",

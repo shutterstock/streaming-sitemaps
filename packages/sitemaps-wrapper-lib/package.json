@@ -44,15 +44,30 @@
     "@smithy/types": "^4.19.0"
   },
   "files": [
-    "dist/",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist/**/*.js.map",
+    "src/**/*.ts",
     "!dist/**/*.test.*",
-    "!dist/**/*.d.ts.map",
-    "src/",
     "!src/**/*.test.*",
+    "!dist/**/mocks/**",
+    "!src/**/mocks/**",
+    "!dist/**/__snapshots__/**",
+    "!src/**/__snapshots__/**",
     "LICENSE.md",
-    "package.json"
+    "README.md"
   ],
   "engines": {
     "node": ">=24.0.0"
+  },
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shutterstock/streaming-sitemaps.git",
+    "directory": "packages/sitemaps-wrapper-lib"
+  },
+  "homepage": "https://github.com/shutterstock/streaming-sitemaps/tree/main/packages/sitemaps-wrapper-lib",
+  "bugs": {
+    "url": "https://github.com/shutterstock/streaming-sitemaps/issues"
   }
 }

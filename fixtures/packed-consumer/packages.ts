@@ -1,0 +1,21 @@
+import { ISitemapWriterItem } from '@shutterstock/sitemaps-models-lib';
+import { ISitemapWriterItem as DeepItem } from '@shutterstock/sitemaps-models-lib/sitemap-writer-message';
+import { ISitemapWriterItem as ExplicitItem } from '@shutterstock/sitemaps-models-lib/sitemap-writer-message.js';
+import { DBManager } from '@shutterstock/sitemaps-db-lib';
+import { DBManager as DeepManager } from '@shutterstock/sitemaps-db-lib/manager';
+import { DBManager as ExplicitManager } from '@shutterstock/sitemaps-db-lib/manager.js';
+import { SitemapWriterMetrics } from '@shutterstock/sitemaps-metrics-lib';
+import { SitemapWriterMetrics as DeepMetrics } from '@shutterstock/sitemaps-metrics-lib/sitemap-writer';
+import { SitemapWriterMetrics as ExplicitMetrics } from '@shutterstock/sitemaps-metrics-lib/sitemap-writer.js';
+import { SitemapFileWrapper } from '@shutterstock/sitemaps-wrapper-lib';
+import { SitemapFileWrapper as DeepWrapper } from '@shutterstock/sitemaps-wrapper-lib/dist/sitemap-wrapper';
+
+const message: ISitemapWriterItem = { customId: '1', sitemapItem: { url: 'https://example.com' } };
+const deepMessage: DeepItem = message;
+const explicitMessage: ExplicitItem = message;
+const db: typeof DBManager = DeepManager;
+const explicitDb: typeof DBManager = ExplicitManager;
+const metric: SitemapWriterMetrics = DeepMetrics.MsgReceived;
+const explicitMetric: SitemapWriterMetrics = ExplicitMetrics.MsgReceived;
+const wrapper: typeof SitemapFileWrapper = DeepWrapper;
+void [deepMessage, explicitMessage, db, explicitDb, metric, explicitMetric, wrapper];

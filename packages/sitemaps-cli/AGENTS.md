@@ -11,6 +11,11 @@ emits declarations with tsc, and bundles commands and internal helpers with
 esbuild. oclif core/help/plugins stay external and are direct runtime dependencies.
 The private utilities package is a development input bundled into the CLI.
 The public wrapper dependency is retained for emitted helper declarations.
+Shipped helper declarations/runtime imports also require direct production
+`sitemap` and `fs-extra`. The bundle build preserves precise command types while
+referencing oclif's public `Interfaces` export, supporting both legacy and
+modern consumer type resolution. The root `test:packages` gate verifies these
+contracts with actual tarballs and negative controls.
 
 Root tests first emit unbundled commands into dist so AWS mocks share the real
 SDK module instances. A bundled SDK cannot be intercepted by those mocks.

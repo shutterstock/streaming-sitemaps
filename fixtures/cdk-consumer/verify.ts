@@ -24,6 +24,9 @@ const manifest = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'),
 assert.equal(manifest.version, process.env.CONSUMER_PACKAGE_VERSION);
 assert.ok(statSync(path.join(packageRoot, manifest.types)).isFile(), 'Missing public declarations');
 assert.ok(statSync(path.join(packageRoot, '.jsii')).isFile(), 'Missing jsii assembly');
+const jsii = JSON.parse(readFileSync(path.join(packageRoot, '.jsii'), 'utf8'));
+assert.equal(jsii.name, manifest.name, 'jsii assembly package name must match npm');
+assert.equal(jsii.version, manifest.version, 'Recompile after version injection; jsii must match npm');
 const expected = JSON.parse(readFileSync('expected-bundles.json', 'utf8')) as Record<
   string,
   string

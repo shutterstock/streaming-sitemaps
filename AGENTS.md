@@ -70,6 +70,10 @@ publication interoperability, not dependency resolution.
 | `pnpm run test:cdk-consumer <tarball>` | Install a freshly packed JavaScript construct in a disposable consumer and verify types, resource wiring, and local Lambda assets. |
 | `pnpm run clean`           | Remove known build outputs and incremental state, preserving source and installed dependencies.                |
 
+`pnpm run test:packages` packs every public workspace and checks isolated types,
+exports, offline CLI commands and all three CDK Lambda assets. See the
+[package contract](.github/PACKAGE-CONTENTS.md). Rebuild the CLI after unit tests.
+
 The optional `test:perf` harness requires local benchmark datasets in the
 writer's test/mocks directory. Those large inputs are not checked in and are
 not part of ordinary CI validation.

@@ -18,6 +18,10 @@ tsconfig.tsbuildinfo
 /projenrc/tsconfig.json
 !.jsii
 /AGENTS.md
+/lib/**/*.test.*
+/lib/**/*.tsbuildinfo
+/.agents/
+/.codex/
 /.gitattributes
 /.projenrc.ts
 /projenrc
