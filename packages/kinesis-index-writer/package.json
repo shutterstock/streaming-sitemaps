@@ -25,7 +25,10 @@
     "@types/verror": "^1.10.5",
     "rewire": "^5.0.0",
     "sinon": "^11.1.2",
-    "stats-lite": "^2.2.0"
+    "stats-lite": "^2.2.0",
+    "@types/jest": "29.5.12",
+    "aws-sdk-client-mock": "3.1.0",
+    "@smithy/types": "2.12.0"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.567.0",
@@ -51,6 +54,10 @@
     "ts-convict": "^1.1.0",
     "tslib": "^2.3.0",
     "uuid": "^8.3.2",
-    "verror": "^1.10.0"
+    "verror": "^1.10.0",
+    "@shutterstock/sitemaps-models-lib": "workspace:^",
+    "@shutterstock/sitemaps-wrapper-lib": "workspace:^",
+    "@shutterstock/sitemaps-metrics-lib": "workspace:^",
+    "@shutterstock/sitemaps-utils-lib": "workspace:^"
   }
 }

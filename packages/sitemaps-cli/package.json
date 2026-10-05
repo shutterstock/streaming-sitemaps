@@ -30,10 +30,10 @@
   },
   "scripts": {
     "clean": "shx rm -rf dist && shx rm -f tsconfig.tsbuildinfo",
-    "build": "shx rm -rf dist && ./bin/bundle.mjs",
+    "build": "pnpm run clean && tsc --build --force && ./bin/bundle.mjs",
     "lint": "eslint . --ext .ts",
     "postpack": "shx rm -f oclif.manifest.json",
-    "posttest": "npm run lint",
+    "posttest": "pnpm run lint",
     "prepack": "oclif manifest && oclif readme",
     "version": "oclif readme && git add README.md"
   },
@@ -70,11 +70,22 @@
     "shx": "^0.3.3",
     "sitemap": "^8.0.0",
     "source-map-support": "^0.5.21",
-    "traverse": "^0.6.6"
+    "traverse": "^0.6.6",
+    "aws-sdk-client-mock": "3.1.0",
+    "nock": "13.3.0",
+    "esbuild": "0.21.0",
+    "@types/jest": "29.5.12",
+    "@shutterstock/sitemaps-utils-lib": "workspace:^",
+    "ts-node": "10.9.1"
   },
   "dependencies": {
     "@oclif/core": "3.26.6",
-    "@oclif/plugin-help": "6.0.22"
+    "@oclif/plugin-help": "6.0.22",
+    "@shutterstock/sitemaps-wrapper-lib": "workspace:^",
+    "@shutterstock/sitemaps-models-lib": "workspace:^",
+    "@shutterstock/sitemaps-db-lib": "workspace:^",
+    "tslib": "^2.3.0",
+    "@oclif/plugin-plugins": "4.3.10"
   },
   "oclif": {
     "bin": "sitemaps-cli",

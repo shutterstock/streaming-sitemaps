@@ -28,5 +28,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./*": "./dist/*"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
   }
 }

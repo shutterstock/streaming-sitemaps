@@ -21,7 +21,7 @@ const {
   XMLToSitemapItemStream,
   parseSitemap,
 } = require('sitemap');
-const { SitemapFileWrapper } = require('@shutterstock/kinesis-sitemap-writer');
+const { SitemapFileWrapper } = require('@shutterstock/sitemaps-wrapper-lib');
 const finishedP = promisify(finished);
 
 const stats = require('stats-lite');
@@ -29,7 +29,7 @@ const [runs = 10, batchSize = 10, testName = 'stream', measureMemory = false] =
   process.argv.slice(2);
 const unit = measureMemory ? 'mb' : 'ms';
 console.log(
-  'npm run test:perf -- [number of runs = 10] [batch size = 10] [stream(default)|combined] [measure peak memory = false]',
+  'pnpm run test:perf -- [number of runs = 10] [batch size = 10] [stream(default)|combined] [measure peak memory = false]',
 );
 
 function resetLine() {

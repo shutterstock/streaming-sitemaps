@@ -23,7 +23,7 @@ runs:
 
     - name: Find Coverage Comment
       if: github.event_name == 'pull_request'
-      uses: synced-actions/peter-evans-find-comment@v3
+      uses: peter-evans/find-comment@v4
       id: fc
       with:
         issue-number: ${{ github.event.pull_request.number }}
@@ -31,7 +31,7 @@ runs:
         body-includes: '### 📊 ${{ inputs.title }}'
 
     - name: Post Coverage Comment
-      uses: synced-actions/peter-evans-create-or-update-comment@v4
+      uses: peter-evans/create-or-update-comment@v5
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
         edit-mode: replace

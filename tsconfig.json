@@ -15,9 +15,6 @@
       "path": "./packages/sitemaps-metrics-lib/"
     },
     {
-      "path": "./packages/sitemaps-cdk/"
-    },
-    {
       "path": "./packages/sitemaps-db-lib/"
     },
     {
@@ -40,9 +37,6 @@
     },
     {
       "path": "./packages/sitemaps-cli/"
-    },
-    {
-      "path": "./packages/cdk/"
     }
   ]
 }

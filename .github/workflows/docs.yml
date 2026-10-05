@@ -6,29 +6,72 @@ on:
 
   workflow_dispatch:
 
+env:
+  npm_config_min_release_age: '7'
+
 jobs:
   install-deps:
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.configure-nodejs.outputs.cache-key }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/configure-nodejs
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          lookup-only: 'true' # We only want to lookup from the cache - if a hit, this job does nothing
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Populate completed dependencies
+        id: configure-nodejs
+        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        with:
+          node-version: '^24.0.0'
+          package-manager: pnpm
+          working-directory: '.'
+          dependency-cache: node-modules
+          cache-mode: populate
+          cache-inputs: packages/sitemaps-cdk/.projenrc.ts
+          cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
 
   build:
+    permissions:
+      contents: write
     needs: install-deps
     runs-on: ubuntu-latest
+    env:
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
-      - uses: ./.github/actions/configure-nodejs
+      - name: Restore completed dependencies
+        id: configure-nodejs
+        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        with:
+          node-version: '^24.0.0'
+          package-manager: pnpm
+          working-directory: '.'
+          dependency-cache: node-modules
+          cache-mode: restore
+          cache-inputs: packages/sitemaps-cdk/.projenrc.ts
+          cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
+
+      - name: Require completed cache key to match the producer
+        env:
+          PRODUCER_CACHE_KEY: ${{ needs.install-deps.outputs.cache-key }}
+          CONSUMER_CACHE_KEY: ${{ steps.configure-nodejs.outputs.cache-key }}
+        run: |
+          test -n "$PRODUCER_CACHE_KEY"
+          test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
+          printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
 
       - name: Build Docs
-        run: npm run build:docs
+        run: pnpm run build:docs
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs

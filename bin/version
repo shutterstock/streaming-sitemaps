@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const glob = require('glob');
 const fs = require('fs');
 const path = require('path');
 const semver = require('semver');
@@ -25,19 +24,16 @@ if (!semver.valid(newVersion)) {
   process.exit(1);
 }
 
-glob(
-  '**/package.json',
-  { ignore: ['node_modules/**', 'dist/**', 'cdk.out/**', 'coverage/**'] },
-  (err, files) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-
-    files.forEach((file) => {
-      const pkg = JSON.parse(fs.readFileSync(file, 'utf-8'));
-      pkg.version = newVersion;
-      fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n');
-    });
-  },
-);
+// Enumerate only owned manifests. pnpm has nested dependency trees beneath
+// every package, so a recursive glob can corrupt the completed dependency cache.
+const files = ['package.json'];
+for (const entry of fs.readdirSync('packages', { withFileTypes: true })) {
+  if (!entry.isDirectory()) continue;
+  const file = path.join('packages', entry.name, 'package.json');
+  if (fs.existsSync(file)) files.push(file);
+}
+for (const file of files) {
+  const pkg = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  pkg.version = newVersion;
+  fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n');
+}
