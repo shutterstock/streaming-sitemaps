@@ -11,16 +11,35 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  npm_config_min_release_age: '7'
+
 jobs:
   install-deps:
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.configure-nodejs.outputs.cache-key }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/configure-nodejs
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          lookup-only: 'true' # We only want to lookup from the cache - if a hit, this job does nothing
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Populate completed dependencies
+        id: configure-nodejs
+        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        with:
+          node-version: '^24.0.0'
+          package-manager: pnpm
+          working-directory: '.'
+          dependency-cache: node-modules
+          cache-mode: populate
+          cache-inputs: packages/sitemaps-cdk/.projenrc.ts
+          cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
 
   publish:
+    env:
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
     needs:
       - install-deps
     runs-on: ubuntu-latest
@@ -29,62 +48,92 @@ jobs:
       packages: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
-      - uses: ./.github/actions/configure-nodejs
+      - name: Restore completed dependencies
+        id: configure-nodejs
+        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        with:
+          node-version: '^24.0.0'
+          package-manager: pnpm
+          working-directory: '.'
+          dependency-cache: node-modules
+          cache-mode: restore
+          cache-inputs: packages/sitemaps-cdk/.projenrc.ts
+          cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
 
-      # Note: We do NOT want to use `npm version` here to apply the version
-      # to the package.json files with `--workspaces`.
-      # `npm version --workspaces` will reinstall modules, defeating the purpose of caching
-      # `npm version --workspaces` will also update the package-lock.json and package.json
-      # files which will change our cache key and cause the node_modules
-      # to be saved to the cache at the end of this job, even though it didn't
-      # install the modules.
+      - name: Require completed cache key to match the producer
+        env:
+          PRODUCER_CACHE_KEY: ${{ needs.install-deps.outputs.cache-key }}
+          CONSUMER_CACHE_KEY: ${{ steps.configure-nodejs.outputs.cache-key }}
+        run: |
+          test -n "$PRODUCER_CACHE_KEY"
+          test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
+          printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
+
+      # Change owned source manifests only. Verification stays disabled in
+      # strict consumers, and no consumer saves the dependency tree.
       - name: Set version for PR or from Tag
         run: |
-          VERSION_TO_USE=$(npm version from-git --allow-same-version --no-git-tag-version)
+          VERSION_TO_USE="${GITHUB_REF_NAME##*/}"
           echo "Version is ${VERSION_TO_USE}"
-          bin/version ${VERSION_TO_USE}
+          bin/version "$VERSION_TO_USE"
 
       - name: Build
-        run: npm run build:all
+        run: pnpm run build:all
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Test
-        run: npm run test
+        run: pnpm run test
+
+      - name: Restore CLI bundles after source-mode tests
+        run: pnpm run build:cli
 
       - name: NPM registry authentication
         run: npm set //registry.npmjs.org/:_authToken ${{ secrets.NPMJSORG_PUBLISH_TOKEN }}
+
+      - name: Release supporting libraries - NPM
+        run: |
+          pnpm --dir packages/sitemaps-wrapper-lib pack
+          npm publish packages/sitemaps-wrapper-lib/*.tgz --ignore-scripts
 
       - name: Release sitemaps-cli - NPM
         id: sitemaps-cli
         working-directory: packages/sitemaps-cli
         run: |
-          npm publish
+          pnpm pack
+          npm publish ./*.tgz --ignore-scripts
 
       - name: Release sitemaps-db-lib - NPM
         id: sitemaps-db-lib
         working-directory: packages/sitemaps-db-lib
         run: |
-          npm publish
+          pnpm pack
+          npm publish ./*.tgz --ignore-scripts
 
       - name: Release sitemaps-metrics-lib - NPM
         id: sitemaps-metrics-lib
         working-directory: packages/sitemaps-metrics-lib
         run: |
-          npm publish
+          pnpm pack
+          npm publish ./*.tgz --ignore-scripts
 
       - name: Release sitemaps-models-lib - NPM
         id: sitemaps-models-lib
         working-directory: packages/sitemaps-models-lib
         run: |
-          npm publish
+          pnpm pack
+          npm publish ./*.tgz --ignore-scripts
 
       - name: Release sitemaps-cdk - NPM
         id: sitemaps-cdk
         working-directory: packages/sitemaps-cdk
         run: |
-          # npm run release
-          npm publish
+          # pnpm run release
+          pnpm pack
+          npm publish ./*.tgz --ignore-scripts

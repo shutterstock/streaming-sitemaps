@@ -2,6 +2,8 @@ oclif.manifest.json
 
 .idea/
 node_modules
+/.validation/
+/docs/index.html
 cdk.out/
 dist/
 *.tsbuildinfo
@@ -19,6 +21,11 @@ coverage/
 *index*.json
 *sitemap*.jsonl
 *index*.jsonl
+
+# Canonical test inputs; command outputs and generated gzip files stay ignored.
+!packages/sitemaps-cli/test/data/*.xml
+!packages/sitemaps-cli/test/commands/convert/data/*.xml
+!packages/kinesis-sitemap-writer/src/mocks/*.xml
 
 # https://unix.stackexchange.com/questions/537174/gnu-tar-not-ignoring-directories-in-gitignore-with-exclude-vcs-ignores
 # needed for tar --exclude-vcs-ignores

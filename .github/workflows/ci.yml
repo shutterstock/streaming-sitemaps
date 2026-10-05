@@ -21,7 +21,11 @@ on:
       - unlabeled
       - reopened
 
+permissions:
+  contents: read
+
 env:
+  npm_config_min_release_age: '7'
   AWS_REGION: 'us-east-1'
   PR_NUMBER: ${{ github.event.pull_request.number }}
   GITHUB_REPOSITORY_DASH: ${{ github.repository_owner }}-${{ github.event.repository.name }}
@@ -33,33 +37,78 @@ jobs:
     steps:
       - id: check
         run: |
-          echo "has-token-access=$(if [[ '${{ github.event.pull_request.head.repo.fork }}' != 'true' && '${{ github.actor }}' != 'dependabot[bot]' ]]; then echo 'true'; else echo 'false'; fi)" >> $GITHUB_OUTPUT
+          echo "has-token-access=$(if [[ '${{ github.event.pull_request.head.repo.fork }}' != 'true' && '${{ github.actor }}' != 'dependabot[bot]' ]]; then echo 'true'; else echo 'false'; fi)" >> "$GITHUB_OUTPUT"
 
   install-deps:
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.configure-nodejs.outputs.cache-key }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/configure-nodejs
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          lookup-only: 'true' # We only want to lookup from the cache - if a hit, this job does nothing
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Populate completed dependencies
+        id: configure-nodejs
+        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        with:
+          node-version: '^24.0.0'
+          package-manager: pnpm
+          working-directory: '.'
+          dependency-cache: node-modules
+          cache-mode: populate
+          cache-inputs: packages/sitemaps-cdk/.projenrc.ts
+          cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
 
   test:
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     needs:
       - install-deps
       - check-access
     runs-on: ubuntu-latest
+    env:
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
-      - uses: ./.github/actions/configure-nodejs
+      - name: Restore completed dependencies
+        id: configure-nodejs
+        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        with:
+          node-version: '^24.0.0'
+          package-manager: pnpm
+          working-directory: '.'
+          dependency-cache: node-modules
+          cache-mode: restore
+          cache-inputs: packages/sitemaps-cdk/.projenrc.ts
+          cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
+
+      - name: Require completed cache key to match the producer
+        env:
+          PRODUCER_CACHE_KEY: ${{ needs.install-deps.outputs.cache-key }}
+          CONSUMER_CACHE_KEY: ${{ steps.configure-nodejs.outputs.cache-key }}
+        run: |
+          test -n "$PRODUCER_CACHE_KEY"
+          test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
+          printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
 
       - name: Build All TypeScript
         run: |
-          npm run build:all
+          pnpm run build:all
+
+      - name: Test foundation helpers
+        run: pnpm run test:foundation
 
       - name: Run Node Tests
-        run: npm run test
+        run: pnpm run test
 
       - name: Upload code coverage
         if: github.event_name == 'pull_request' && needs.check-access.outputs.has-token-access == 'true'
@@ -69,31 +118,55 @@ jobs:
           title: Node.js Code Coverage Report
 
   build:
+    if: always()
     needs:
+      - test
       - install-deps
     env:
       NODE_ENV: dev
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Require dependency setup and tests to succeed
+        env:
+          INSTALL_RESULT: ${{ needs.install-deps.result }}
+          TEST_RESULT: ${{ needs.test.result }}
+        run: |
+          test "$INSTALL_RESULT" = 'success'
+          test "$TEST_RESULT" = 'success'
 
-      - uses: ./.github/actions/configure-nodejs
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Restore completed dependencies
+        id: configure-nodejs
+        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        with:
+          node-version: '^24.0.0'
+          package-manager: pnpm
+          working-directory: '.'
+          dependency-cache: node-modules
+          cache-mode: restore
+          cache-inputs: packages/sitemaps-cdk/.projenrc.ts
+          cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
+
+      - name: Require completed cache key to match the producer
+        env:
+          PRODUCER_CACHE_KEY: ${{ needs.install-deps.outputs.cache-key }}
+          CONSUMER_CACHE_KEY: ${{ steps.configure-nodejs.outputs.cache-key }}
+        run: |
+          test -n "$PRODUCER_CACHE_KEY"
+          test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
+          printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
 
       - name: Run Lint
-        run: npm run lint
+        run: pnpm run lint
 
-      - name: Build All TypeScript
-        run: |
-          npm run build:all
-
-      # Note: We do NOT want to use `npm version` here to apply the version
-      # to the package.json files with `--workspaces`.
-      # `npm version --workspaces` will reinstall modules, defeating the purpose of caching
-      # `npm version --workspaces` will also update the package-lock.json and package.json
-      # files which will change our cache key and cause the node_modules
-      # to be saved to the cache at the end of this job, even though it didn't
-      # install the modules.
+      # Change owned source manifests only. Verification stays disabled in
+      # strict consumers, and no consumer saves the dependency tree.
       - name: Set version for PR
         id: version
         if: github.event_name == 'pull_request'
@@ -102,21 +175,33 @@ jobs:
           CURRENT_VERSION=$(jq -r '.version' package.json)
           VERSION_TO_USE=${CURRENT_VERSION}-pr${PR_NUMBER}
           echo "Version is ${VERSION_TO_USE}"
-          echo "version=${VERSION_TO_USE}" >> $GITHUB_OUTPUT
-          bin/version ${VERSION_TO_USE}
+          echo "version=${VERSION_TO_USE}" >> "$GITHUB_OUTPUT"
+          bin/version "$VERSION_TO_USE"
 
-      - name: NPM registry authentication
-        run: npm set //registry.npmjs.org/:_authToken ${{ secrets.NPMJSORG_PUBLISH_TOKEN }}
+      - name: Build All TypeScript
+        run: |
+          pnpm run build:all
+
+      - name: Pack supporting libraries without registry credentials
+        run: |
+          pnpm --dir packages/sitemaps-wrapper-lib pack
+
+      - name: Upload supporting libraries
+        uses: actions/upload-artifact@v7
+        with:
+          name: sitemaps-supporting-libraries
+          path: |
+            packages/sitemaps-wrapper-lib/*.tgz
 
       - name: Release sitemaps-cli - NPM - Dry Run
         id: sitemaps-cli
         working-directory: packages/sitemaps-cli
         run: |
-          npm pack
-          npm publish --dry-run
+          pnpm pack
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-cli artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: sitemaps-cli
           path: packages/sitemaps-cli/*.tgz
@@ -125,11 +210,11 @@ jobs:
         id: sitemaps-db-lib
         working-directory: packages/sitemaps-db-lib
         run: |
-          npm pack
-          npm publish --dry-run
+          pnpm pack
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-db-lib artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: sitemaps-db-lib
           path: packages/sitemaps-db-lib/*.tgz
@@ -138,11 +223,11 @@ jobs:
         id: sitemaps-metrics-lib
         working-directory: packages/sitemaps-metrics-lib
         run: |
-          npm pack
-          npm publish --dry-run
+          pnpm pack
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-metrics-lib artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: sitemaps-metrics-lib
           path: packages/sitemaps-metrics-lib/*.tgz
@@ -151,11 +236,11 @@ jobs:
         id: sitemaps-models-lib
         working-directory: packages/sitemaps-models-lib
         run: |
-          npm pack
-          npm publish --dry-run
+          pnpm pack
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-models-lib artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: sitemaps-models-lib
           path: packages/sitemaps-models-lib/*.tgz
@@ -164,19 +249,19 @@ jobs:
         id: sitemaps-cdk
         working-directory: packages/sitemaps-cdk
         run: |
-          # npm run package
-          npm pack
-          npm publish --dry-run
+          # pnpm run package
+          pnpm pack
+          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
 
       - name: Upload sitemaps-cdk artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: sitemaps-cdk
           path: packages/sitemaps-cdk/*.tgz
 
   deploy:
     # Disable for now as we have no CDK stack to deploy
-    if: false
+    if: ${{ false }}
     permissions:
       id-token: write
       contents: read
@@ -185,31 +270,55 @@ jobs:
       cancel-in-progress: false
     env:
       NODE_ENV: ${{ vars.NODE_ENV }}
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
     needs:
       - build
+      - install-deps
     environment: dev
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
       - if: github.event_name == 'pull_request'
         name: Set Hotswap Flag on Pre-Switch
-        run: echo 'CDK_HOTSWAP_PRS=--hotswap' >> $GITHUB_ENV
+        run: echo 'CDK_HOTSWAP_PRS=--hotswap' >> "$GITHUB_ENV"
 
       - name: Compute PR Suffix
         run: |
           if [ -n "${PR_NUMBER}" ]; then
-            echo 'PR_SUFFIX='-pr-${PR_NUMBER} >> $GITHUB_ENV
+            echo "PR_SUFFIX=-pr-${PR_NUMBER}" >> "$GITHUB_ENV"
           else
-            echo 'PR_SUFFIX=' >> $GITHUB_ENV
+            echo 'PR_SUFFIX=' >> "$GITHUB_ENV"
           fi
 
-      - uses: ./.github/actions/configure-nodejs
+      - name: Restore completed dependencies
+        id: configure-nodejs
+        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        with:
+          node-version: '^24.0.0'
+          package-manager: pnpm
+          working-directory: '.'
+          dependency-cache: node-modules
+          cache-mode: restore
+          cache-inputs: packages/sitemaps-cdk/.projenrc.ts
+          cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
+
+      - name: Require completed cache key to match the producer
+        env:
+          PRODUCER_CACHE_KEY: ${{ needs.install-deps.outputs.cache-key }}
+          CONSUMER_CACHE_KEY: ${{ steps.configure-nodejs.outputs.cache-key }}
+        run: |
+          test -n "$PRODUCER_CACHE_KEY"
+          test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
+          printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
 
       - name: Build All TypeScript
         run: |
-          npm run build:all
+          pnpm run build:all
 
       # TODO: Use build role
       # - name: Use Build Role
@@ -218,12 +327,14 @@ jobs:
       - name: Deploy CDK Stack
         env:
           AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-        run: npx cdk deploy ${CDK_HOTSWAP_PRS} --require-approval never sitemaps
+        run: |
+          # shellcheck disable=SC2086
+          pnpm exec cdk deploy ${CDK_HOTSWAP_PRS} --require-approval never sitemaps
 
       - name: Compute Stack Output Name
         run: |
-          echo "S3_SITEMAPS_BUCKET_ARN_EXPORT=s3SitemapsBucketArn-${NODE_ENV}${PR_SUFFIX}" >> $GITHUB_ENV
-          echo "S3_SITEMAPS_BUCKET_NAME_EXPORT=s3SitemapsBucketName-${NODE_ENV}${PR_SUFFIX}" >> $GITHUB_ENV
+          echo "S3_SITEMAPS_BUCKET_ARN_EXPORT=s3SitemapsBucketArn-${NODE_ENV}${PR_SUFFIX}" >> "$GITHUB_ENV"
+          echo "S3_SITEMAPS_BUCKET_NAME_EXPORT=s3SitemapsBucketName-${NODE_ENV}${PR_SUFFIX}" >> "$GITHUB_ENV"
 
       - name: Check Stack Outputs
         run: |

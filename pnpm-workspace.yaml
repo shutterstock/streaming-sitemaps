@@ -1,0 +1,35 @@
+packages:
+  - packages/*
+
+# Seven days, in minutes. Keep this policy when resolving new dependencies.
+minimumReleaseAge: 10080
+
+# Prefer APFS clones; fall back to hard links/copies on other filesystems.
+packageImportMethod: auto
+nodeLinker: isolated
+
+# Corepack owns the pin; use one Dependabot-readable v9 lock document.
+pmOnFail: ignore
+
+# This test helper's declarations import Smithy types without declaring them.
+# Match the existing AWS SDK 3.567.0 graph instead of accepting ambient copies.
+packageExtensions:
+  aws-sdk-client-mock@3.1.0:
+    dependencies:
+      '@smithy/smithy-client': 2.5.1
+      '@smithy/types': 2.12.0
+
+# The broad X-Ray type range otherwise selects Smithy 3 types for Smithy 2
+# clients. Keep the existing runtime release and align only its type dependency.
+overrides:
+  aws-xray-sdk-core@3.3.4>@aws-sdk/types: 3.567.0
+  # downlevel-dts declares '*'; TypeScript 7 lacks the compiler API it uses.
+  downlevel-dts@0.11.0>typescript: 5.4.5
+
+# Native tooling required by the existing esbuild/dynalite toolchain.
+allowBuilds:
+  '@swc/core': false
+  aws-sdk: false
+  esbuild: true
+  leveldown: true
+  yarn: false

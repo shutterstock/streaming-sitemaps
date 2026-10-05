@@ -10,7 +10,11 @@ const project = new awscdk.AwsCdkConstructLibrary({
   license: 'MIT',
   copyrightPeriod: '2021-2024',
   keywords: ['aws', 'cdk', 'sitemap', 'kinesis', 'xml'],
-  packageManager: NodePackageManager.NPM,
+  packageManager: NodePackageManager.PNPM,
+  pnpmVersion: '12.7.0',
+  projenCommand: 'pnpm exec projen',
+  workflowNodeVersion: '24',
+  github: false,
   minNodeVersion: '18.0.0',
   cdkVersion: '2.117.0',
   constructsVersion: '10.1.244',
@@ -25,13 +29,25 @@ const project = new awscdk.AwsCdkConstructLibrary({
   // Jest is installed in the monorepo root
   jest: false,
 
-  devDeps: ['esbuild'],
+  devDeps: ['esbuild@0.21.0', '@types/jest@29.5.12', 'tslib@^2.3.0'],
+  // Avoid ambient monorepo types leaking into the older jsii compiler.
+  tsconfig: { compilerOptions: { types: ['node'] } },
+  tsconfigDev: { compilerOptions: { types: ['node', 'jest'] } },
 
   // deps: [],                /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   // devDeps: [],             /* Build dependencies for this module. */
   // packageName: undefined,  /* The "name" in package.json. */
 });
+
+// The construct bundles sibling workspace sources; one root install/lock owns
+// the whole graph. Generated nested workflows are not runnable from repo root.
+project.package.addField('packageManager', 'pnpm@12.7.0');
+project.gitignore.addPatterns('/pnpm-lock.yaml');
+project.npmignore?.exclude('/AGENTS.md');
+// Synthesis describes the workspace; dependency installation belongs to the
+// root lock owner and is an explicit separate step, including in CI builds.
+project.defaultTask?.env('PROJEN_DISABLE_POST', 'true');
 
 //
 // Setup tasks
