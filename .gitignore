@@ -25,6 +25,7 @@ coverage/
 # Canonical test inputs; command outputs and generated gzip files stay ignored.
 !packages/sitemaps-cli/test/data/*.xml
 !packages/sitemaps-cli/test/commands/convert/data/*.xml
+!packages/sitemaps-cli/test/packaged/*.xml
 !packages/kinesis-sitemap-writer/src/mocks/*.xml
 
 # https://unix.stackexchange.com/questions/537174/gnu-tar-not-ignoring-directories-in-gitignore-with-exclude-vcs-ignores

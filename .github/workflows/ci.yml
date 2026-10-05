@@ -245,6 +245,9 @@ jobs:
           name: sitemaps-models-lib
           path: packages/sitemaps-models-lib/*.tgz
 
+      - name: Verify clean-room packaged CLI consumption
+        run: pnpm run test:cli:packaged
+
       - name: Release sitemaps-cdk - NPM - Dry Run
         id: sitemaps-cdk
         working-directory: packages/sitemaps-cdk
