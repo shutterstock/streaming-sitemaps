@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`mirror-to-s3 mirrors file while decompressing and breaking file links 1`] = `"<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>http://www.example.com/data/sitemaps/sitemap1.xml</loc><lastmod>2004-10-01T18:23:17.000Z</lastmod></sitemap><sitemap><loc>http://www.example.com/data/sitemaps/sitemap2.xml</loc><lastmod>2005-01-01T00:00:00.000Z</lastmod></sitemap></sitemapindex>"`;
 

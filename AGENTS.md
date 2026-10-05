@@ -4,19 +4,19 @@ This workspace contains Kinesis sitemap handlers, shared libraries, a CDK
 construct, a CLI, and an example CDK application. Read the focused guide before
 editing its area:
 
-| Area | Guide |
-| --- | --- |
-| Package boundaries and tests | [packages/AGENTS.md](packages/AGENTS.md) |
-| Projen and construct packaging | [packages/sitemaps-cdk/AGENTS.md](packages/sitemaps-cdk/AGENTS.md) |
+| Area                                | Guide                                                              |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| Package boundaries and tests        | [packages/AGENTS.md](packages/AGENTS.md)                           |
+| Projen and construct packaging      | [packages/sitemaps-cdk/AGENTS.md](packages/sitemaps-cdk/AGENTS.md) |
 | CLI builds, fixtures, and packaging | [packages/sitemaps-cli/AGENTS.md](packages/sitemaps-cli/AGENTS.md) |
-| CI, caching, docs, and releases | [.github/AGENTS.md](.github/AGENTS.md) |
+| CI, caching, docs, and releases     | [.github/AGENTS.md](.github/AGENTS.md)                             |
 
 ## Compatibility and scope
 
 Preserve public exports, emitted types, CLI flags and output, handler message
 formats, and construct defaults. Compatible maintenance does not authorize a
 breaking change. The Node 24 developer toolchain does not change the existing
-Node >=18 package engines, ES2018 library target, or Node 18 Lambda settings.
+Node >=18 package engines, ES2018 library target, or Node 20 Lambda defaults.
 CDK, jsii, and application upgrades require their own review. Never install or
 recommend compound-engineering here.
 
@@ -40,9 +40,10 @@ APFS clones when possible, with portable hard-link/copy fallback. Preserve the
 single-document v9 [pnpm-lock.yaml](pnpm-lock.yaml) for Dependabot. The root owns
 all resolution, including the Projen package; there is no standalone CDK island.
 Do not introduce nested lockfiles, blanket hoisting, or destructive removal of
-shared type packages. Declare imports in the owning manifest. The narrow Smithy
-extensions/override and downlevel-dts compiler pin repair existing tool dependency
-incompatibilities without upgrading the runtime SDK or CDK.
+shared type packages. Declare imports in the owning manifest. Smithy extensions align SDK mocks with runtime clients. The SDK and XML parser
+overrides preserve Node 18 consumer compatibility while patching the workspace
+graph. See [.github/DEPENDENCY-MODERNIZATION.md](.github/DEPENDENCY-MODERNIZATION.md)
+for version holds, audit findings, and the limits of published transitive fixes.
 
 After editing a manifest or workspace policy, reconcile the root lock with
 `pnpm install`, respecting the release-age policy, then verify a frozen install.
@@ -53,18 +54,18 @@ publication interoperability, not dependency resolution.
 
 ## Commands and verification
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm run build` | Compile ordinary workspace libraries, handlers, and CLI types using the solution config. |
-| `pnpm run build:all` | Build ordinary packages, run jsii and sibling-handler bundles, compile the example app, then bundle the CLI. |
-| `pnpm run build:cli` | Clean, emit CLI types, and produce its bundled distribution. |
-| `pnpm run synth:cdk` | Run locally installed Projen with dependency installation disabled. |
-| `pnpm run build:docs` | Build the construct, regenerate its existing API.md, and stage an HTML API page in docs/index.html. |
-| `pnpm run lint` | Check TypeScript, including the construct, with root ESLint. |
-| `pnpm run test` | Prepare compressed fixtures, emit unbundled CLI commands for mocks, then run all Jest suites with V8 coverage. |
-| `pnpm run test:foundation` | Verify cleanup and version materialization preserve source and dependency trees. |
+| Command                    | Purpose                                                                                                        |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `pnpm run build`           | Compile ordinary workspace libraries, handlers, and CLI types using the solution config.                       |
+| `pnpm run build:all`       | Build ordinary packages, run jsii and sibling-handler bundles, compile the example app, then bundle the CLI.   |
+| `pnpm run build:cli`       | Clean, emit CLI types, and produce its bundled distribution.                                                   |
+| `pnpm run synth:cdk`       | Run locally installed Projen with dependency installation disabled.                                            |
+| `pnpm run build:docs`      | Build the construct, regenerate its existing API.md, and stage an HTML API page in docs/index.html.            |
+| `pnpm run lint`            | Check TypeScript, including the construct, with root ESLint.                                                   |
+| `pnpm run test`            | Prepare compressed fixtures, emit unbundled CLI commands for mocks, then run all Jest suites with V8 coverage. |
+| `pnpm run test:foundation` | Verify cleanup and version materialization preserve source and dependency trees.                               |
 | `pnpm run test:cdk-consumer <tarball>` | Install a freshly packed JavaScript construct in a disposable consumer and verify types, resource wiring, and local Lambda assets. |
-| `pnpm run clean` | Remove known build outputs and incremental state, preserving source and installed dependencies. |
+| `pnpm run clean`           | Remove known build outputs and incremental state, preserving source and installed dependencies.                |
 
 The optional `test:perf` harness requires local benchmark datasets in the
 writer's test/mocks directory. Those large inputs are not checked in and are

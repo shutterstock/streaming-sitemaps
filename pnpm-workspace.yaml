@@ -12,24 +12,36 @@ nodeLinker: isolated
 pmOnFail: ignore
 
 # This test helper's declarations import Smithy types without declaring them.
-# Match the existing AWS SDK 3.567.0 graph instead of accepting ambient copies.
+# Match the runtime SDK's Smithy 4 graph instead of accepting ambient copies.
 packageExtensions:
-  aws-sdk-client-mock@3.1.0:
+  aws-sdk-client-mock@4.1.0:
     dependencies:
-      '@smithy/smithy-client': 2.5.1
-      '@smithy/types': 2.12.0
+      '@smithy/smithy-client': ^4.9.8
+      '@smithy/types': ^4.9.0
 
-# The broad X-Ray type range otherwise selects Smithy 3 types for Smithy 2
-# clients. Keep the existing runtime release and align only its type dependency.
 overrides:
-  aws-xray-sdk-core@3.3.4>@aws-sdk/types: 3.567.0
+  # SDK releases starting at 3.968 require Node 20. Preserve Node 18 consumers.
+  '@aws-sdk/types': 3.965.0
+  '@aws-sdk/client-dynamodb': 3.967.0
+  '@aws-sdk/client-kinesis': 3.967.0
+  '@aws-sdk/client-lambda': 3.967.0
+  '@aws-sdk/client-s3': 3.967.0
+  '@aws-sdk/credential-providers': 3.967.0
+  '@aws-sdk/lib-dynamodb': 3.967.0
+  '@aws-sdk/lib-storage': 3.967.0
+  # Protocol XML remains on major 5; SDK's older exact pin has fixed advisories.
+  fast-xml-parser: 5.11.1
+  # DynamoDB's development-only v2 SDK uses the compatible CommonJS v4 API.
+  aws-sdk>uuid: 11.1.1
   # downlevel-dts declares '*'; TypeScript 7 lacks the compiler API it uses.
-  downlevel-dts@0.11.0>typescript: 5.4.5
+  downlevel-dts@0.11.0>typescript: 6.0.3
 
 # Native tooling required by the existing esbuild/dynalite toolchain.
 allowBuilds:
+  '@parcel/watcher': true
   '@swc/core': false
   aws-sdk: false
   esbuild: true
   leveldown: true
+  unrs-resolver: true
   yarn: false

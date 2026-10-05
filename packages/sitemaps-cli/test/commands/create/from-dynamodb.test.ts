@@ -10,7 +10,6 @@ import path from 'path';
 jest.mock('@shutterstock/sitemaps-db-lib');
 
 describe('create:from-dynamodb', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let dynamoDBClient: AwsClientStub<dynamodb.DynamoDBClient>;
   const outputDir = path.join(__dirname, 'data');
   const originalCwd: string = process.cwd();

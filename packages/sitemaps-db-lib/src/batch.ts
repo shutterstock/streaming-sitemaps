@@ -70,7 +70,6 @@ export class DynamoDBBatch {
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (result.UnprocessedKeys !== undefined && Object.keys(result.UnprocessedKeys).length > 0) {
         // Setup records for next call
         args.RequestItems = result.UnprocessedKeys;
@@ -87,7 +86,6 @@ export class DynamoDBBatch {
       }
     } while (doAgain);
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return theResult!;
   }
 

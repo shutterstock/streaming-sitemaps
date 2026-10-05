@@ -14,7 +14,7 @@
   "private": false,
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^18"
+    "@types/node": "^18.19.130"
   },
   "files": [
     "dist/",
@@ -30,6 +30,6 @@
     "./*": "./dist/*"
   },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": "^2.8.1"
   }
 }

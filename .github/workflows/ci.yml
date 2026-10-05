@@ -9,8 +9,6 @@ on:
       - '**'
       - '!cf/**'
   pull_request:
-    branches:
-      - main
     paths:
       - '**'
       - '!cf/**'
@@ -106,6 +104,9 @@ jobs:
 
       - name: Test foundation helpers
         run: pnpm run test:foundation
+
+      - name: Lint TypeScript
+        run: pnpm run lint
 
       - name: Run Node Tests
         run: pnpm run test

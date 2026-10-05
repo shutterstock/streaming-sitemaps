@@ -64,7 +64,7 @@ describe('SitemapFileAndStats', () => {
         },
         { dbManager, key: { Type: type } },
       ),
-    ).rejects.toThrowError('some weird s3 failure');
+    ).rejects.toThrow('some weird s3 failure');
   });
 
   it('fromS3 - throws on S3 NoSuchKey', async () => {
@@ -85,7 +85,7 @@ describe('SitemapFileAndStats', () => {
         },
         { dbManager, key: { Type: type } },
       ),
-    ).rejects.toThrowError(
+    ).rejects.toThrow(
       'SitemapFileAndStats.fromS3 - File not found on S3 - This function cannot be called on non-existing files',
     );
   });
@@ -143,6 +143,6 @@ describe('SitemapFileAndStats', () => {
         },
         { dbManager, key: { Type: type } },
       ),
-    ).rejects.toThrowError('FileRecord.loadOne failed for image, sitemap-tests2.xml');
+    ).rejects.toThrow('FileRecord.loadOne failed for image, sitemap-tests2.xml');
   });
 });

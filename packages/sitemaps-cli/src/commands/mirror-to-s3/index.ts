@@ -1,8 +1,6 @@
 #!/usr/bin/env node
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable max-classes-per-file */
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-restricted-syntax */
 
 import path from 'path';
 import https from 'https';
