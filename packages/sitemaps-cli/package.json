@@ -51,7 +51,7 @@
     "@aws-sdk/client-lambda": "^3.567.0",
     "@aws-sdk/client-s3": "^3.567.0",
     "@aws-sdk/credential-providers": "^3.567.0",
-    "@oclif/test": "3.2.13",
+    "@oclif/test": "5.0.0",
     "@shutterstock/chunker": "^1.0.11",
     "@shutterstock/kinesis-helpers": "^1.0.15",
     "@types/cli-progress": "^3.11.5",
