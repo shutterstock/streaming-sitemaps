@@ -74,8 +74,13 @@ its version after restore and recheck registry/source immediately before Pages.
 Failed or partial publication cannot update docs. Infrastructure stays disabled.
 For automatic docs after manual publication, use the successful run attempt's
 validated publication receipt for the built tag commit; dispatch `head_sha`
-identifies main's workflow source. Missing/mismatched receipts require owner
-review or explicitly authorized manual docs repair, never a provenance bypass.
+identifies main's workflow source. Docs accept only publication `workflow_run`
+events. For an explicitly authorized docs repair, verify and rerun that reviewed
+docs attempt for the current stable publication within GitHub's 30-day rerun
+window; all receipt/registry/source guards still apply. Missing/mismatched
+receipts or an ineligible attempt require owner review and separately authorized
+immutable publication recovery when needed, never a direct docs dispatch or
+provenance bypass. See [docs recovery](../../../.github/RELEASING.md#stable-documentation).
 
 Report actual gates, readiness and remaining owner blockers. PR dry runs do not
 establish npm OIDC owner settings, real publication or Pages behavior. Preserve

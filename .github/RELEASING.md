@@ -171,8 +171,9 @@ across six packages.
 
 ## Stable documentation
 
-[docs.yml](workflows/docs.yml) runs after successful publication or an explicitly
-authorized manual repair from current main naming the current stable tag.
+[docs.yml](workflows/docs.yml) runs after successful publication through
+`workflow_run`. Direct manual docs dispatch is disabled so release checkout code
+cannot write to main's cache scope through a dispatch run.
 Require all six npm `latest` versions to agree and contain published integrity
 metadata, then verify the corresponding stable GitHub release/tag/main ancestry.
 Automatic docs also checks the real completed run's path/event/conclusion,
@@ -182,16 +183,23 @@ tag: docs select the receipt's published tag commit instead, even when main has
 advanced. The receipt must match the exact successful run attempt and all six
 stable registry archive hashes. Superseded/prerelease publication receipts are
 skipped. Build the exact stable tag, never unreleased main.
-Missing, expired, tampered or mismatched receipts stop automatic docs. Owners
-can use the separately authorized manual docs repair from current main with
-the current stable tag; the registry/source/construct-integrity guards still apply.
+Missing, expired, tampered or mismatched receipts stop docs for owner review.
+For an explicitly authorized docs repair, locate this reviewed workflow's
+existing `workflow_run` attempt for the current stable publication, verify its
+source/event and retained publication receipt, then rerun the whole docs attempt
+with `gh run rerun <docs-run-id> --repo shutterstock/streaming-sitemaps`.
+[GitHub reruns preserve the original event ref and SHA](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs).
+The registry/source/construct-integrity guards all run again. Reruns are available
+only within GitHub's supported 30-day window. If no eligible attempt or valid
+receipt remains, stop for owner review; obtaining a new publication receipt
+requires separately authorized immutable publication recovery, not a docs bypass.
 
 After strict restore, inject the verified stable version and run the actual
 `pnpm run build` first to emit workspace inputs required by handler bundling,
 then `pnpm run build:docs` (construct compile/docgen, existing HTML staging).
 Recheck stable registry and immutable source immediately before Pages, and
 require the rebuilt construct archive's integrity to match the published version.
-This binds API/handler source to registry bytes even for manual repair; differing
+This binds API/handler source to registry bytes even for authorized reruns; differing
 rebuilds stop for owner review. Partial/failed
 publication cannot deploy docs and superseded docs cannot overwrite stable
 content. The release checkout builds with a read-only token and retains static

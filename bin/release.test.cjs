@@ -460,7 +460,7 @@ test('OIDC requirements and the reviewed publication hold cannot fall back to to
     assert.throws(() => publisherGuard({ ...options, ...patch }));
 });
 
-test('docs gating checks publication workflow identity, successful immutable source and manual main', () => {
+test('docs gating accepts verified publication runs and rejects direct manual dispatch', () => {
   const release = { version: '1.2.3', tag: 'v1.2.3', commit: 'a'.repeat(40), channel: 'latest' };
   const entries = packages.map((name) => ({
     name: `@shutterstock/${name}`,
@@ -544,7 +544,7 @@ test('docs gating checks publication workflow identity, successful immutable sou
     sha: 'main',
     remoteMain: 'main',
   };
-  assert.equal(docsProvenance(manual), true);
+  assert.throws(() => docsProvenance(manual), /Unsupported docs event/);
   for (const patch of [
     { ref: 'refs/tags/v1.2.3' },
     { sha: 'old-main' },
@@ -688,6 +688,9 @@ test('docs selection downloads this attempt receipt and selects the tag after ma
     }
     fs.rmSync(path.join(cwd, 'receipt.json'));
     await assert.rejects(docsSelection(), /gh failed/);
+    process.env.GITHUB_EVENT_NAME = 'workflow_dispatch';
+    global.fetch = async () => assert.fail('Rejected dispatch must not contact the registry');
+    await assert.rejects(docsSelection(), /Unsupported docs event/);
   } finally {
     global.fetch = beforeFetch;
     process.chdir(beforeCwd);

@@ -303,21 +303,15 @@ function validatePublicationRecord(record, actualRun) {
 
 function docsProvenance({
   eventName,
-  ref,
-  sha,
   event,
   actualRun,
   release,
-  remoteMain,
   head,
   finalVersion,
   publication,
   states,
 }) {
-  if (eventName === 'workflow_dispatch') {
-    if (ref !== 'refs/heads/main' || event.inputs?.tag !== release.tag || sha !== remoteMain)
-      throw new Error('Manual docs must run from current main and name the current stable tag');
-  } else if (eventName === 'workflow_run') {
+  if (eventName === 'workflow_run') {
     const workflow = event.workflow_run;
     if (workflow?.conclusion !== 'success' || workflow.head_repository?.full_name !== repository)
       throw new Error('Docs require a successful publication in this repository');

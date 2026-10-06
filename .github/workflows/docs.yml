@@ -4,12 +4,6 @@ on:
   workflow_run:
     workflows: [Package and Publish]
     types: [completed]
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: Current fully published stable tag (vX.Y.Z)
-        required: true
-        type: string
 
 permissions:
   contents: read
@@ -25,7 +19,7 @@ concurrency:
 
 jobs:
   select-docs:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
       publish: ${{ steps.docs.outputs.publish }}

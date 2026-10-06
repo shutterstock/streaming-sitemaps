@@ -6,7 +6,7 @@ Projen's nested construct workflows are disabled at their source.
 | Workflow | Behavior |
 | --- | --- |
 | [ci.yml](workflows/ci.yml) | Push/PR to main: populate dependencies, build/test, lint/build/pack; build remains an always-running gate on setup and test success. Deployment stays disabled. |
-| [docs.yml](workflows/docs.yml) | Successful publication or explicit manual repair: verify all six stable registry versions and immutable tag/source, restore, inject stable version, build the existing API page and gate Pages publication. |
+| [docs.yml](workflows/docs.yml) | Successful publication only, including authorized reruns of that docs attempt: verify all six stable registry versions and immutable tag/source, restore, inject stable version, build the existing API page and gate Pages publication. |
 | [publish.yml](workflows/publish.yml) | Published release or explicit manual recovery from current main: verify tag/release provenance, strictly restore, inject explicit version, build/lint/test/verify consumers, and publish six ordered archives with npm OIDC, subject to the reviewed publication hold. |
 
 ## Completed dependency caching

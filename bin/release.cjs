@@ -142,6 +142,8 @@ function readPublication(actualRun) {
 
 async function docsSelection(final = false) {
   checkContext('docs.yml');
+  if (process.env.GITHUB_EVENT_NAME !== 'workflow_run')
+    throw new Error('Unsupported docs event; rerun a verified publication-triggered docs attempt');
   const payload = event();
   const manifests = publicManifests(process.cwd(), final ? process.env.RELEASE_VERSION : '0.0.0');
   const states = await Promise.all(manifests.map(({ name }) => registryState(name)));
@@ -161,16 +163,11 @@ async function docsSelection(final = false) {
   if (
     !docsProvenance({
       eventName: process.env.GITHUB_EVENT_NAME,
-      ref: process.env.GITHUB_REF,
-      sha: process.env.GITHUB_SHA,
       event: payload,
       actualRun,
       publication: actualRun ? readPublication(actualRun) : undefined,
       states,
       release,
-      remoteMain: run('git', ['ls-remote', '--exit-code', 'origin', 'refs/heads/main']).split(
-        /\s+/,
-      )[0],
       head: run('git', ['rev-parse', 'HEAD']),
       finalVersion: final ? process.env.RELEASE_VERSION : undefined,
     })
