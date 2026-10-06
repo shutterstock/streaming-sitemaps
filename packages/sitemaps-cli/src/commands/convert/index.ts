@@ -131,6 +131,10 @@ export default class Convert extends Command {
 
             // Turn the XML into JSON items
             const outputFile = createWriteStream(indexFileLocal);
+            let outputOpened = false;
+            outputFile.once('open', () => {
+              outputOpened = true;
+            });
 
             // Save the index file to disk
             const errors: string[] = [];
@@ -162,7 +166,9 @@ export default class Convert extends Command {
               await pipelineAsync(stages);
               if (errors.length > 0) this.error(errors.join('\n'));
             } catch (error) {
-              await fs.rm(indexFileLocal, { force: true });
+              // An open failure can refer to an existing destination that this
+              // invocation never touched. Remove only successfully opened output.
+              if (outputOpened) await fs.rm(indexFileLocal, { force: true });
               throw error;
             }
           },

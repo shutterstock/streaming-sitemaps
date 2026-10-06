@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 import fs from 'fs/promises';
+import nativeFS from 'fs';
 import os from 'os';
 import path from 'path';
 import zlib from 'zlib';
@@ -87,6 +88,35 @@ describe('source CLI behavior without cloud calls', () => {
     await fs.writeFile('bad.xml.gz', 'not gzip');
     await expect(Convert.run(['bad.xml.gz'], cliRoot)).rejects.toThrow('incorrect header');
     expect(await fs.readdir(directory)).toEqual(['bad.xml.gz']);
+  });
+
+  it('preserves an existing destination when opening it fails', async () => {
+    const previousOutput = 'previous conversion\n';
+    await fs.writeFile('input.xml', sitemapXML);
+    await fs.writeFile('input.jsonl', previousOutput);
+    await fs.chmod('input.jsonl', 0o444);
+    const failure = Object.assign(new Error('EACCES: permission denied, open input.jsonl'), {
+      code: 'EACCES',
+    });
+    const originalOpen = nativeFS.open;
+    // Inject the OS error at the actual output-open boundary so this is
+    // deterministic even when the tests run with elevated filesystem access.
+    const opening = jest.spyOn(nativeFS, 'open').mockImplementation((filename, flags, ...rest) => {
+      if (filename === 'input.jsonl') {
+        const callback = rest[rest.length - 1] as (
+          error: NodeJS.ErrnoException | null,
+          fd: number,
+        ) => void;
+        queueMicrotask(() => callback(failure, -1));
+      } else originalOpen(filename, flags, ...rest);
+    });
+    try {
+      await expect(Convert.run(['input.xml'], cliRoot)).rejects.toThrow('EACCES');
+    } finally {
+      opening.mockRestore();
+    }
+    expect(await fs.readFile('input.jsonl', 'utf8')).toBe(previousOutput);
+    expect(await fs.readdir(directory)).toEqual(['input.jsonl', 'input.xml']);
   });
 
   it('rejects the wrong XML type and removes misleading output', async () => {

@@ -28,16 +28,17 @@ baseline and resulting report are:
 
 | Metric | Before | After |
 | --- | --- | --- |
-| Passing tests / suites | 197 / 32 | 270 / 41 |
+| Passing tests / suites | 197 / 32 | 271 / 41 |
 | Skipped tests | 7 | 7 |
-| Lines/statements | 9,968 / 12,055 (82.68%) | 10,240 / 12,052 (84.96%) |
-| Branches | 757 / 1,038 (72.92%) | 887 / 1,155 (76.79%) |
+| Lines/statements | 9,968 / 12,055 (82.68%) | 10,246 / 12,058 (84.97%) |
+| Branches | 757 / 1,038 (72.92%) | 889 / 1,157 (76.83%) |
 | Functions | 278 / 339 (82.00%) | 294 / 343 (85.71%) |
 
 Source changes alter denominators, and V8 branch counts can grow when additional
 paths execute. These measurements include compatible fixes as well as new tests;
 they are not a claim of percentage gains from tests alone. The 44 existing
-snapshots remain unchanged. Representative line/branch coverage:
+snapshots remain unchanged. The after values include the follow-up
+destination-open failure regression. Representative line/branch coverage:
 
 | Source | Before lines / branches | After lines / branches |
 | --- | --- | --- |
@@ -45,7 +46,7 @@ snapshots remain unchanged. Representative line/branch coverage:
 | Index wrapper | 72.24% / 100.00% | 98.00% / 94.44% |
 | DB batch | 91.89% / 76.00% | 100.00% / 100.00% |
 | DB repair planner | 92.76% / 72.22% | 100.00% / 100.00% |
-| CLI conversion | 94.73% / 77.77% | 98.91% / 92.59% |
+| CLI conversion | 94.73% / 77.77% | 98.95% / 93.10% |
 | CLI rotation | 80.15% / 75.00% | 100.00% / 100.00% |
 
 Tests gate downstream callbacks and finalization to observe backpressure and
