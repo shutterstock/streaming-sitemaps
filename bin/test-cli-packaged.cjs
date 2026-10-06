@@ -9,6 +9,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawn, spawnSync } = require('node:child_process');
 const { createRequire, builtinModules } = require('node:module');
+const { readFingerprintFile } = require('./read-fingerprint-file.cjs');
 
 const root = path.resolve(__dirname, '..');
 const fixtures = path.join(root, 'packages/sitemaps-cli/test/packaged');
@@ -58,14 +59,21 @@ function dependencyFingerprint() {
   const hash = crypto.createHash('sha256');
   function visit(dir) {
     if (!fs.existsSync(dir)) return;
-    for (const entry of fs.readdirSync(dir).sort()) {
-      const file = path.join(dir, entry);
-      const stat = fs.lstatSync(file);
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    entries.sort((a, b) => a.name.localeCompare(b.name));
+    for (const entry of entries) {
+      const file = path.join(dir, entry.name);
+      const fingerprint = entry.isFile()
+        ? readFingerprintFile(
+            file,
+            /package\.json$|lock|\.modules\.yaml$|workspace-state/.test(file),
+          )
+        : { stat: fs.lstatSync(file) };
+      const { stat, contents } = fingerprint;
       hash.update(`${file}:${stat.mode}:${stat.size}:${stat.mtimeMs}\n`);
+      if (contents) hash.update(contents);
       if (stat.isSymbolicLink()) hash.update(fs.readlinkSync(file));
       else if (stat.isDirectory()) visit(file);
-      else if (/package\.json$|lock|\.modules\.yaml$|workspace-state/.test(file))
-        hash.update(fs.readFileSync(file));
     }
   }
   visit(path.join(root, 'node_modules'));
