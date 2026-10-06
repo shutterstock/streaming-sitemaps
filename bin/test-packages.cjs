@@ -53,14 +53,31 @@ function dependencyFingerprint() {
   const hash = crypto.createHash('sha256');
   function visit(dir) {
     if (!fs.existsSync(dir)) return;
-    for (const entry of fs.readdirSync(dir).sort()) {
-      const file = path.join(dir, entry);
-      const stat = fs.lstatSync(file);
-      hash.update(`${file}:${stat.mode}:${stat.size}:${stat.mtimeMs}\n`);
-      if (stat.isSymbolicLink()) hash.update(fs.readlinkSync(file));
-      else if (stat.isDirectory()) visit(file);
-      else if (/package\.json$|lock|\.modules\.yaml$|workspace-state/.test(file))
-        hash.update(fs.readFileSync(file));
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+      const file = path.join(dir, entry.name);
+      if (entry.isFile() && /package\.json$|lock|\.modules\.yaml$|workspace-state/.test(file)) {
+        // Open before checking metadata; never follow a replacement symlink.
+        // Both metadata and content come from the same descriptor.
+        const fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+        try {
+          const stat = fs.fstatSync(fd);
+          assert(stat.isFile(), `Expected regular file: ${file}`);
+          hash.update(`${file}:${stat.mode}:${stat.size}:${stat.mtimeMs}\n`);
+          const identity = ({ dev, ino, mode, size, mtimeMs, ctimeMs }) => ({
+            dev, ino, mode, size, mtimeMs, ctimeMs,
+          });
+          hash.update(fs.readFileSync(fd));
+          assert.deepEqual(identity(fs.fstatSync(fd)), identity(stat), `File changed: ${file}`);
+        } finally {
+          fs.closeSync(fd);
+        }
+      } else {
+        const stat = fs.lstatSync(file);
+        hash.update(`${file}:${stat.mode}:${stat.size}:${stat.mtimeMs}\n`);
+        if (stat.isSymbolicLink()) hash.update(fs.readlinkSync(file));
+        else if (stat.isDirectory()) visit(file);
+      }
     }
   }
   visit(path.join(root, 'node_modules'));
