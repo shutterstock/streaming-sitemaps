@@ -39,7 +39,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.54.1",
     "@aws-sdk/lib-dynamodb": "^3.54.1",
-    "class-transformer": "^0.4.0",
+    "class-transformer": "^0.5.1",
     "sitemap": "^8.0.0",
     "tslib": "^2.3.0"
   }
