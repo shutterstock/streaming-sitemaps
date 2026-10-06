@@ -422,6 +422,11 @@ async function main() {
             .replace(/\.d\.ts$/, '');
           const subpath = pkg.manifest.exports ? module : `${directory}/${module}`;
           libraryImports.push(`import '${name}/${subpath}';`);
+          if (pkg.manifest.exports) {
+            libraryImports.push(
+              `import type * as Declaration${declarations.length} from '${name}/${subpath}.d.ts';`,
+            );
+          }
         }
       }
     }
@@ -469,10 +474,12 @@ async function main() {
         `TypeScript resolved outside consumer/tools: ${file}`,
       );
     }
-    const modernTypeArgs = [...typeArgs];
-    modernTypeArgs[modernTypeArgs.indexOf('--module') + 1] = 'Node16';
-    modernTypeArgs[modernTypeArgs.indexOf('--moduleResolution') + 1] = 'Node16';
-    await run(process.execPath, modernTypeArgs, consumer, env);
+    for (const resolution of ['Node16', 'NodeNext']) {
+      const modernTypeArgs = [...typeArgs];
+      modernTypeArgs[modernTypeArgs.indexOf('--module') + 1] = resolution;
+      modernTypeArgs[modernTypeArgs.indexOf('--moduleResolution') + 1] = resolution;
+      await run(process.execPath, modernTypeArgs, consumer, env);
+    }
     console.log(
       `Strict consumer types passed for ${declarations.length} shipped public declarations (skipLibCheck=false)`,
     );

@@ -36,6 +36,7 @@
       "default": "./dist/index.js"
     },
     "./package.json": "./package.json",
+    "./*.d.ts": "./dist/*.d.ts",
     "./*.js": {
       "types": "./dist/*.d.ts",
       "default": "./dist/*.js"

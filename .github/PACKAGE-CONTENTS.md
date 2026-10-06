@@ -23,7 +23,8 @@ unnecessary (unlike the former declaration examined in PR #6).
 
 All entries retain CommonJS. Models, database, and metrics accept both
 extensionless deep imports (for example `sitemaps-db-lib/manager`) and explicit
-`.js` imports. Their type maps support legacy and modern TypeScript resolution.
+`.js` imports, plus existing explicit `.d.ts` type-only imports. Their type maps
+support legacy and modern TypeScript resolution.
 The wrapper and CLI retain unrestricted `dist/...` deep paths. The CLI build
 replaces inferred private oclif interface references with the identical types
 exposed through its public `Interfaces` namespace; command and flag types remain
@@ -76,7 +77,8 @@ registry access for external packages and inherit the seven-day release policy.
 Subsequent runtime commands deny network connections entirely.
 
 The gate checks all public declarations with `skipLibCheck=false`, legacy and
-Node16 resolution, every library's CommonJS/native ESM entries and deep modules,
+Node16/NodeNext resolution (including all explicitly suffixed declaration
+subpaths), every library's CommonJS/native ESM entries and deep modules,
 CLI bin/version/help and plugin/command loading, and XML-to-JSONL conversion
 against committed output. A synthetic S3 transport exercises the published
 SDK's XML error deserialization without AWS or network calls. CDK synthesis
