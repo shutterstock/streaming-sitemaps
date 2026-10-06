@@ -15,9 +15,11 @@ const {
   publishPackages,
   integrity,
   publisherGuard,
+  publicationRecord,
+  validatePublicationRecord,
   docsProvenance,
 } = require('./release-lib.cjs');
-const { readPlan } = require('./release.cjs');
+const { readPlan, docsSelection } = require('./release.cjs');
 const packages = require('./public-packages.cjs');
 
 function fixture(t) {
@@ -422,8 +424,18 @@ test('OIDC requirements and the reviewed publication hold cannot fall back to to
 });
 
 test('docs gating checks publication workflow identity, successful immutable source and manual main', () => {
-  const release = { version: '1.2.3', tag: 'v1.2.3', commit: 'a'.repeat(40) };
+  const release = { version: '1.2.3', tag: 'v1.2.3', commit: 'a'.repeat(40), channel: 'latest' };
+  const entries = packages.map((name) => ({
+    name: `@shutterstock/${name}`,
+    integrity: integrity(Buffer.from(name)),
+  }));
+  const publication = publicationRecord(release, entries, {
+    GITHUB_RUN_ID: '17',
+    GITHUB_RUN_ATTEMPT: '2',
+    GITHUB_SHA: release.commit,
+  });
   const workflow = {
+    id: 17,
     conclusion: 'success',
     head_sha: release.commit,
     head_repository: { full_name: 'shutterstock/streaming-sitemaps' },
@@ -433,7 +445,10 @@ test('docs gating checks publication workflow identity, successful immutable sou
     eventName: 'workflow_run',
     event: { workflow_run: workflow },
     actualRun: { ...workflow, path: '.github/workflows/publish.yml', event: 'release' },
+    publication,
+    states: entries.map((entry) => state(release.version, 'latest', entry.integrity)),
   };
+  options.actualRun.run_attempt = 2;
   assert.equal(docsProvenance(options), true);
   for (const patch of [
     { actualRun: { ...options.actualRun, path: '.github/workflows/ci.yml' } },
@@ -442,11 +457,47 @@ test('docs gating checks publication workflow identity, successful immutable sou
     { event: { workflow_run: { ...workflow, head_repository: { full_name: 'fork/repo' } } } },
     { finalVersion: '1.2.2', head: release.commit },
     { finalVersion: release.version, head: 'wrong' },
+    { publication: undefined },
+    { publication: { ...publication, runId: '18' } },
+    { publication: { ...publication, runAttempt: '1' } },
+    { publication: { ...publication, workflowSha: 'b'.repeat(40) } },
+    { publication: { ...publication, commit: 'b'.repeat(40) } },
+    {
+      states: entries.map(() =>
+        state(release.version, 'latest', integrity(Buffer.from('different source'))),
+      ),
+    },
   ])
     assert.throws(() => docsProvenance({ ...options, ...patch }));
   assert.equal(
-    docsProvenance({ ...options, release: { ...release, commit: 'superseded' } }),
+    docsProvenance({
+      ...options,
+      release: { ...release, version: '1.2.4', tag: 'v1.2.4', commit: 'b'.repeat(40) },
+    }),
     false,
+  );
+  // Manual publication runs use main's source SHA while building an older tag.
+  const sourceSha = 'b'.repeat(40);
+  const recovered = {
+    ...options,
+    event: { workflow_run: { ...workflow, head_sha: sourceSha } },
+    actualRun: { ...options.actualRun, event: 'workflow_dispatch', head_sha: sourceSha },
+    publication: { ...publication, workflowSha: sourceSha },
+    head: release.commit,
+    finalVersion: release.version,
+  };
+  assert.equal(docsProvenance(recovered), true);
+  assert.throws(
+    () =>
+      docsProvenance({
+        ...recovered,
+        publication: { ...recovered.publication, commit: sourceSha },
+      }),
+    /verified stable release/,
+  );
+  assert.throws(
+    () => docsProvenance({ ...recovered, actualRun: { ...recovered.actualRun, id: 18 } }),
+    /workflow provenance/,
   );
   const manual = {
     release,
@@ -464,6 +515,148 @@ test('docs gating checks publication workflow identity, successful immutable sou
     { eventName: 'release' },
   ])
     assert.throws(() => docsProvenance({ ...manual, ...patch }));
+});
+
+test('publication receipts bind exact run attempt, source, version/channel and immutable package set', () => {
+  const release = { version: '1.2.3', tag: 'v1.2.3', commit: 'a'.repeat(40), channel: 'latest' };
+  const entries = packages.map((name) => ({
+    name: `@shutterstock/${name}`,
+    integrity: integrity(Buffer.from(name)),
+  }));
+  const record = publicationRecord(release, entries, {
+    GITHUB_RUN_ID: '17',
+    GITHUB_RUN_ATTEMPT: '2',
+    GITHUB_SHA: 'b'.repeat(40),
+  });
+  const run = { id: 17, run_attempt: 2, head_sha: 'b'.repeat(40) };
+  assert.doesNotThrow(() => validatePublicationRecord(record, run));
+  for (const patch of [
+    { schema: 2 },
+    { repository: 'fork/repo' },
+    { tag: 'v1.2.4' },
+    { channel: 'next' },
+    { entries: entries.toReversed() },
+    { entries: entries.slice(1) },
+    { entries: entries.map((entry) => ({ ...entry, integrity: 'sha512-missing' })) },
+  ])
+    assert.throws(() => validatePublicationRecord({ ...record, ...patch }, run));
+  const pre = publicationRecord(
+    { ...release, version: '1.3.0-rc.1', tag: 'v1.3.0-rc.1', channel: 'next' },
+    entries,
+    { GITHUB_RUN_ID: '17', GITHUB_RUN_ATTEMPT: '2', GITHUB_SHA: release.commit },
+  );
+  const workflow = {
+    id: 17,
+    head_sha: release.commit,
+    conclusion: 'success',
+    head_repository: { full_name: 'shutterstock/streaming-sitemaps' },
+  };
+  assert.equal(
+    docsProvenance({
+      eventName: 'workflow_run',
+      event: { workflow_run: workflow },
+      actualRun: {
+        ...workflow,
+        event: 'release',
+        path: '.github/workflows/publish.yml',
+        run_attempt: 2,
+      },
+      publication: pre,
+      release,
+    }),
+    false,
+  );
+});
+
+test('docs selection downloads this attempt receipt and selects the tag after manual recovery from newer main', async (t) => {
+  const { cwd, commit, release, git } = fixture(t);
+  fs.writeFileSync(path.join(cwd, 'later-main'), 'advanced main');
+  git('add', '.');
+  git('commit', '-m', 'advance main');
+  git('push', 'origin', 'main');
+  const main = git('rev-parse', 'HEAD');
+  assert.notEqual(main, commit);
+  const stable = { version: '1.2.3', tag: 'v1.2.3', commit, channel: 'latest' };
+  const entries = packages.map((name) => ({
+    name: `@shutterstock/${name}`,
+    integrity: integrity(Buffer.from(name)),
+  }));
+  const receipt = publicationRecord(stable, entries, {
+    GITHUB_RUN_ID: '17',
+    GITHUB_RUN_ATTEMPT: '2',
+    GITHUB_SHA: main,
+  });
+  const actual = {
+    id: 17,
+    run_attempt: 2,
+    path: '.github/workflows/publish.yml',
+    event: 'workflow_dispatch',
+    head_sha: main,
+    conclusion: 'success',
+    head_repository: { full_name: 'shutterstock/streaming-sitemaps' },
+  };
+  const files = {
+    'release.json': release,
+    'run.json': actual,
+    'receipt.json': receipt,
+    'event.json': { workflow_run: actual },
+  };
+  for (const [name, data] of Object.entries(files))
+    fs.writeFileSync(path.join(cwd, name), JSON.stringify(data));
+  const tools = path.join(cwd, 'fake-tools');
+  fs.mkdirSync(tools);
+  const fakeGh = `#!${process.execPath}\nconst fs = require('node:fs'); const path = require('node:path'); const args = process.argv.slice(2);\nif (args[0] === 'api') { const file = args[1].includes('/releases/tags/') ? 'release.json' : 'run.json'; process.stdout.write(fs.readFileSync(file)); }\nelse if (args[0] === 'run' && args[1] === 'download') { if (JSON.stringify(args.slice(0,8)) !== JSON.stringify(['run','download','17','--repo','shutterstock/streaming-sitemaps','--name','publication-2','--dir'])) throw Error('Wrong artifact run/attempt'); fs.copyFileSync('receipt.json',path.join(args[8],'publication.json')); }\nelse throw Error('Unexpected gh command');\n`;
+  fs.writeFileSync(path.join(tools, 'gh'), fakeGh, { mode: 0o755 });
+  const beforeCwd = process.cwd();
+  const beforeEnv = { ...process.env };
+  const beforeFetch = global.fetch;
+  try {
+    process.chdir(cwd);
+    Object.assign(process.env, {
+      PATH: `${tools}${path.delimiter}${process.env.PATH}`,
+      GITHUB_REPOSITORY: 'shutterstock/streaming-sitemaps',
+      GITHUB_WORKFLOW_REF:
+        'shutterstock/streaming-sitemaps/.github/workflows/docs.yml@refs/heads/main',
+      GITHUB_EVENT_NAME: 'workflow_run',
+      GITHUB_EVENT_PATH: path.join(cwd, 'event.json'),
+      GITHUB_SHA: main,
+      GITHUB_OUTPUT: path.join(cwd, 'output'),
+    });
+    global.fetch = async (url) => {
+      const name = decodeURIComponent(new URL(url).pathname.slice(1));
+      const entry = entries.find((entry) => entry.name === name);
+      assert(entry, 'Unexpected registry request');
+      return {
+        ok: true,
+        json: async () => ({ name, ...state(stable.version, 'latest', entry.integrity) }),
+      };
+    };
+    await docsSelection();
+    const result = fs.readFileSync(process.env.GITHUB_OUTPUT, 'utf8');
+    assert(result.includes('publish=true\n'));
+    assert(result.includes(`commit=${commit}\n`));
+    assert(!result.includes(`commit=${main}\n`));
+    for (const patch of [
+      { runAttempt: '1' },
+      { commit: main },
+      {
+        entries: entries.map((entry) => ({
+          ...entry,
+          integrity: integrity(Buffer.from('tampered')),
+        })),
+      },
+    ]) {
+      fs.writeFileSync(path.join(cwd, 'receipt.json'), JSON.stringify({ ...receipt, ...patch }));
+      await assert.rejects(docsSelection());
+    }
+    fs.rmSync(path.join(cwd, 'receipt.json'));
+    await assert.rejects(docsSelection(), /gh failed/);
+  } finally {
+    global.fetch = beforeFetch;
+    process.chdir(beforeCwd);
+    for (const key of Object.keys(process.env)) if (!(key in beforeEnv)) delete process.env[key];
+    Object.assign(process.env, beforeEnv);
+  }
 });
 
 test('archive plan enforces version, commit, exact package order and bytes', (t) => {

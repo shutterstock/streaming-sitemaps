@@ -139,7 +139,7 @@ jobs:
       - name: Retain validated immutable archives for recovery investigation
         uses: actions/upload-artifact@v7
         with:
-          name: release-packages-${{ needs.select-release.outputs.version }}
+          name: release-packages-${{ needs.select-release.outputs.version }}-${{ github.run_attempt }}
           path: release-packages
           if-no-files-found: error
 
@@ -149,3 +149,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node bin/release.cjs publish release-packages
+
+      - name: Retain verified publication source for this successful attempt
+        uses: actions/upload-artifact@v7
+        with:
+          name: publication-${{ github.run_attempt }}
+          path: release-packages/publication.json
+          if-no-files-found: error

@@ -247,6 +247,52 @@ function publisherGuard({ policy, nodeVersion, npmVersion, env }) {
     throw new Error('GitHub Actions OIDC permission required');
 }
 
+function publicationRecord(release, entries, env) {
+  const record = {
+    schema: 1,
+    repository,
+    runId: env.GITHUB_RUN_ID,
+    runAttempt: env.GITHUB_RUN_ATTEMPT,
+    workflowSha: env.GITHUB_SHA,
+    tag: release.tag,
+    version: release.version,
+    commit: release.commit,
+    channel: release.channel,
+    entries: entries.map(({ name, integrity }) => ({ name, integrity })),
+  };
+  validatePublicationRecord(record, {
+    id: env.GITHUB_RUN_ID,
+    run_attempt: env.GITHUB_RUN_ATTEMPT,
+    head_sha: env.GITHUB_SHA,
+  });
+  return record;
+}
+
+function validatePublicationRecord(record, actualRun) {
+  if (
+    !record ||
+    record.schema !== 1 ||
+    record.repository !== repository ||
+    !/^[1-9][0-9]*$/.test(record.runId) ||
+    !/^[1-9][0-9]*$/.test(record.runAttempt) ||
+    record.runId !== String(actualRun.id) ||
+    record.runAttempt !== String(actualRun.run_attempt) ||
+    !/^[0-9a-f]{40}$/.test(record.workflowSha) ||
+    record.workflowSha !== actualRun.head_sha ||
+    !/^[0-9a-f]{40}$/.test(record.commit)
+  )
+    throw new Error('Publication receipt does not match this workflow run/attempt/source');
+  const version = parseTag(record.tag);
+  if (
+    version.version !== record.version ||
+    record.channel !== (version.prerelease ? 'next' : 'latest') ||
+    JSON.stringify(record.entries?.map((entry) => entry.name)) !==
+      JSON.stringify(packages.map((name) => `@shutterstock/${name}`)) ||
+    record.entries.some((entry) => !/^sha512-[A-Za-z0-9+/]{86}==$/.test(entry.integrity))
+  )
+    throw new Error('Invalid publication receipt version/channel/package set');
+}
+
 function docsProvenance({
   eventName,
   ref,
@@ -257,6 +303,8 @@ function docsProvenance({
   remoteMain,
   head,
   finalVersion,
+  publication,
+  states,
 }) {
   if (eventName === 'workflow_dispatch') {
     if (ref !== 'refs/heads/main' || event.inputs?.tag !== release.tag || sha !== remoteMain)
@@ -270,10 +318,27 @@ function docsProvenance({
       actualRun.path !== '.github/workflows/publish.yml' ||
       actualRun.conclusion !== 'success' ||
       !['release', 'workflow_dispatch'].includes(actualRun.event) ||
-      actualRun.head_sha !== workflow.head_sha
+      actualRun.head_sha !== workflow.head_sha ||
+      actualRun.id !== workflow.id
     )
       throw new Error('Unexpected publication workflow provenance');
-    if (actualRun.head_sha !== release.commit) return false;
+    validatePublicationRecord(publication, actualRun);
+    // A dispatch run's head_sha identifies its main workflow source; the
+    // immutable package source is the tag commit recorded after publication.
+    if (actualRun.event === 'release' && publication.commit !== actualRun.head_sha)
+      throw new Error('Release event and published source disagree');
+    if (publication.channel !== 'latest' || publication.version !== release.version) return false;
+    if (publication.tag !== release.tag || publication.commit !== release.commit)
+      throw new Error('Published source does not match the verified stable release');
+    if (
+      !states ||
+      states.length !== packages.length ||
+      publication.entries.some(
+        (entry, index) =>
+          entry.integrity !== states[index].versions?.[release.version]?.dist?.integrity,
+      )
+    )
+      throw new Error('Publication receipt differs from the stable registry archives');
   } else throw new Error('Unsupported docs event');
   if (finalVersion !== undefined && (release.version !== finalVersion || head !== release.commit))
     throw new Error('Docs source was superseded or checkout changed');
@@ -335,6 +400,8 @@ module.exports = {
   publicationDecision,
   stableVersion,
   publisherGuard,
+  publicationRecord,
+  validatePublicationRecord,
   docsProvenance,
   integrity,
   registryState,

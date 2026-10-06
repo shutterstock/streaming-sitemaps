@@ -124,6 +124,15 @@ each sequential publication. Publish exact archives with scripts disabled and an
 explicit channel. Verify observed registry integrity/channel before continuing.
 The workflow retains archives plus a commit/version/integrity plan for failure
 investigation. PR CI dry runs have no npm credentials or publication permission.
+Archive artifact names include the run attempt, so recovery retains each
+attempt independently instead of replacing an earlier immutable artifact.
+CLI prepack canonicalizes the asynchronously discovered command map without
+changing command/flag metadata or array order under the same toolchain/runner. The packed-consumer gate packs
+the real CLI twice and requires identical bytes and recovery integrity.
+After all six registry versions are verified, the publisher writes a receipt
+and uploads it as `publication-<run attempt>`, bound to the repository, exact
+run/attempt, workflow source SHA, verified tag commit/version/channel and six
+archive hashes. Failed or incomplete publication produces no successful receipt.
 
 ## Independent npm owner settings
 
@@ -167,8 +176,15 @@ authorized manual repair from current main naming the current stable tag.
 Require all six npm `latest` versions to agree and contain published integrity
 metadata, then verify the corresponding stable GitHub release/tag/main ancestry.
 Automatic docs also checks the real completed run's path/event/conclusion,
-repository and matching stable commit; superseded/prerelease source commits are
+repository and its verified publication receipt. A manual publication's
+`head_sha` identifies the dispatch workflow's main commit, not the checked-out
+tag: docs select the receipt's published tag commit instead, even when main has
+advanced. The receipt must match the exact successful run attempt and all six
+stable registry archive hashes. Superseded/prerelease publication receipts are
 skipped. Build the exact stable tag, never unreleased main.
+Missing, expired, tampered or mismatched receipts stop automatic docs. Owners
+can use the separately authorized manual docs repair from current main with
+the current stable tag; the registry/source/construct-integrity guards still apply.
 
 After strict restore, inject the verified stable version and run the actual
 `pnpm run build` first to emit workspace inputs required by handler bundling,

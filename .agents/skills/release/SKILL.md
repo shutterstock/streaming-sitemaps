@@ -72,6 +72,10 @@ release/tag/source. Emit ordinary workspace inputs with `pnpm run build`, then
 build that exact commit with `pnpm run build:docs`, inject
 its version after restore and recheck registry/source immediately before Pages.
 Failed or partial publication cannot update docs. Infrastructure stays disabled.
+For automatic docs after manual publication, use the successful run attempt's
+validated publication receipt for the built tag commit; dispatch `head_sha`
+identifies main's workflow source. Missing/mismatched receipts require owner
+review or explicitly authorized manual docs repair, never a provenance bypass.
 
 Report actual gates, readiness and remaining owner blockers. PR dry runs do not
 establish npm OIDC owner settings, real publication or Pages behavior. Preserve

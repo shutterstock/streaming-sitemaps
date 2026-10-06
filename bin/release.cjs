@@ -12,6 +12,8 @@ const {
   validateRelease,
   stableVersion,
   publisherGuard,
+  publicationRecord,
+  publicationDecision,
   docsProvenance,
   integrity,
   registryState,
@@ -113,6 +115,31 @@ function readPlan(directory, release) {
   return plan;
 }
 
+function readPublication(actualRun) {
+  if (
+    !/^[1-9][0-9]*$/.test(String(actualRun.id)) ||
+    !/^[1-9][0-9]*$/.test(String(actualRun.run_attempt))
+  )
+    throw new Error('Invalid publication run identity');
+  const destination = fs.mkdtempSync(path.join(os.tmpdir(), 'sitemaps-publication-receipt-'));
+  try {
+    run('gh', [
+      'run',
+      'download',
+      String(actualRun.id),
+      '--repo',
+      repository,
+      '--name',
+      `publication-${actualRun.run_attempt}`,
+      '--dir',
+      destination,
+    ]);
+    return JSON.parse(fs.readFileSync(path.join(destination, 'publication.json'), 'utf8'));
+  } finally {
+    fs.rmSync(destination, { recursive: true, force: true });
+  }
+}
+
 async function docsSelection(final = false) {
   checkContext('docs.yml');
   const payload = event();
@@ -138,6 +165,8 @@ async function docsSelection(final = false) {
       sha: process.env.GITHUB_SHA,
       event: payload,
       actualRun,
+      publication: actualRun ? readPublication(actualRun) : undefined,
+      states,
       release,
       remoteMain: run('git', ['ls-remote', '--exit-code', 'origin', 'refs/heads/main']).split(
         /\s+/,
@@ -211,6 +240,7 @@ async function main() {
       env: process.env,
     });
     const plan = readPlan(version, release);
+    const receipt = publicationRecord(release, plan.entries, process.env);
     await publishPackages({
       entries: plan.entries,
       version: release.version,
@@ -231,6 +261,19 @@ async function main() {
           ]),
         ),
     });
+    verify(true);
+    readPlan(version, release);
+    for (const entry of plan.entries) {
+      if (
+        publicationDecision(release.version, await registryState(entry.name), entry.integrity)
+          .action !== 'skip'
+      )
+        throw new Error('Publication is incomplete; no successful receipt may be written');
+    }
+    fs.writeFileSync(
+      path.join(version, 'publication.json'),
+      JSON.stringify(receipt, null, 2) + '\n',
+    );
     output({ channel: release.channel });
   } else if (command === 'docs-select' || command === 'docs-verify') {
     await docsSelection(command === 'docs-verify');

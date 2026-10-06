@@ -173,6 +173,35 @@ async function main() {
         `${source.name.replace('@', '').replace('/', '-')}-${source.version}.tgz`,
       );
       assert(fs.existsSync(archive), `Missing freshly packed ${archive}`);
+      if (directory === 'sitemaps-cli') {
+        const repack = path.join(temp, 'cli-repack');
+        fs.mkdirSync(repack);
+        await runPnpm(
+          ['--dir', `packages/${directory}`, 'pack', '--pack-destination', repack],
+          root,
+          { ...process.env, PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false' },
+        );
+        assert.deepEqual(
+          fs.readFileSync(path.join(repack, path.basename(archive))),
+          fs.readFileSync(archive),
+          'Consecutive real CLI archives must be byte-identical for immutable recovery',
+        );
+        const { integrity, publicationDecision } = require('./release-lib.cjs');
+        const hash = integrity(fs.readFileSync(archive));
+        const channel = source.version.includes('-') ? 'next' : 'latest';
+        assert.equal(
+          publicationDecision(
+            source.version,
+            {
+              'dist-tags': { [channel]: source.version },
+              versions: { [source.version]: { dist: { integrity: hash } } },
+            },
+            integrity(fs.readFileSync(path.join(repack, path.basename(archive)))),
+          ).action,
+          'skip',
+        );
+        console.log('Consecutive real CLI archives have identical bytes and registry integrity');
+      }
       const extracted = path.join(temp, directory);
       fs.mkdirSync(extracted);
       await run('tar', ['-xzf', archive, '-C', extracted], root, process.env);
