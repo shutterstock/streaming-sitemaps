@@ -624,13 +624,13 @@ importers:
         version: 1.0.6(aws-embedded-metrics@2.0.4)
       '@shutterstock/chunker':
         specifier: ^1.0.11
-        version: 1.0.11(@shutterstock/p-map-iterable@1.0.11(aggregate-error@3.1.0))
+        version: 1.0.11(@shutterstock/p-map-iterable@1.0.11(aggregate-error@5.0.0))
       '@shutterstock/kinesis-helpers':
         specifier: ^1.0.15
-        version: 1.0.15(@aws-sdk/client-kinesis@3.567.0(@aws-sdk/client-sso-oidc@3.576.0)(@aws-sdk/client-sts@3.576.0))(aggregate-error@3.1.0)
+        version: 1.0.15(@aws-sdk/client-kinesis@3.567.0(@aws-sdk/client-sso-oidc@3.576.0)(@aws-sdk/client-sts@3.576.0))(aggregate-error@5.0.0)
       '@shutterstock/p-map-iterable':
         specifier: ^1.0.11
-        version: 1.0.11(aggregate-error@3.1.0)
+        version: 1.0.11(aggregate-error@5.0.0)
       '@shutterstock/sitemaps-db-lib':
         specifier: workspace:^
         version: link:../sitemaps-db-lib
@@ -647,8 +647,8 @@ importers:
         specifier: workspace:^
         version: link:../sitemaps-wrapper-lib
       aggregate-error:
-        specifier: 3.1.0
-        version: 3.1.0
+        specifier: 5.0.0
+        version: 5.0.0
       aws-embedded-metrics:
         specifier: ^2.0.4
         version: 2.0.4
@@ -2783,6 +2783,10 @@ packages:
     resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
     engines: {node: '>=8'}
 
+  aggregate-error@5.0.0:
+    resolution: {integrity: sha512-gOsf2YwSlleG6IjRYG2A7k0HmBMEo6qVNk9Bp/EaLgAJT5ngH6PXbqa4ItvnEwCm/velL5jAnQgsHsWnjhGmvw==}
+    engines: {node: '>=18'}
+
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
@@ -3113,6 +3117,10 @@ packages:
   clean-stack@3.0.1:
     resolution: {integrity: sha512-lR9wNiMRcVQjSB3a7xXGLuz4cr4wJuuXlaAEbRutGowQTmlp7R72/DOgN21e8jdwblMWl9UOJMJXarX94pzKdg==}
     engines: {node: '>=10'}
+
+  clean-stack@5.3.0:
+    resolution: {integrity: sha512-9ngPTOhYGQqNVSfeJkYXHmF7AGWp4/nN5D/QqNQs3Dvxd1Kk/WpjHfNujKHYUQ/5CoGyOyFNoWSPk5afzP0QVg==}
+    engines: {node: '>=14.16'}
 
   cli-cursor@3.1.0:
     resolution: {integrity: sha512-I/zHAwsKf9FqGoXM4WWRACob9+SNukZTd94DWF57E4toouRulbCxcUh6RKUEOQlYTHJnzkPMySvPNaaSLNfLZw==}
@@ -3596,6 +3604,10 @@ packages:
   escape-string-regexp@4.0.0:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
+
+  escape-string-regexp@5.0.0:
+    resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
+    engines: {node: '>=12'}
 
   eslint-config-prettier@9.1.0:
     resolution: {integrity: sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==}
@@ -4124,6 +4136,10 @@ packages:
   indent-string@4.0.0:
     resolution: {integrity: sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==}
     engines: {node: '>=8'}
+
+  indent-string@5.0.0:
+    resolution: {integrity: sha512-m6FAo/spmsW2Ab2fU35JTYwtOKa2yAwXSwgjSv1TJzh4Mh7mC3lzAOVLBprb72XsTrgkEIsl7YrFNAiDiRhIGg==}
+    engines: {node: '>=12'}
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
@@ -7867,7 +7883,7 @@ snapshots:
       chalk: 4.1.2
       convert-source-map: 2.0.0
       fast-json-stable-stringify: 2.1.0
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.9
       jest-haste-map: 29.7.0
       jest-regex-util: 29.6.3
       jest-util: 29.7.0
@@ -7883,7 +7899,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.4
       '@types/istanbul-reports': 3.0.1
-      '@types/node': 18.19.33
+      '@types/node': 20.10.4
       '@types/yargs': 17.0.22
       chalk: 4.1.2
 
@@ -8019,6 +8035,10 @@ snapshots:
     dependencies:
       '@shutterstock/p-map-iterable': 1.0.11(aggregate-error@3.1.0)
 
+  '@shutterstock/chunker@1.0.11(@shutterstock/p-map-iterable@1.0.11(aggregate-error@5.0.0))':
+    dependencies:
+      '@shutterstock/p-map-iterable': 1.0.11(aggregate-error@5.0.0)
+
   '@shutterstock/kinesis-helpers@1.0.15(@aws-sdk/client-kinesis@3.567.0(@aws-sdk/client-sso-oidc@3.576.0)(@aws-sdk/client-sts@3.576.0))(aggregate-error@3.1.0)':
     dependencies:
       '@aws-sdk/client-kinesis': 3.567.0(@aws-sdk/client-sso-oidc@3.576.0)(@aws-sdk/client-sts@3.576.0)
@@ -8026,9 +8046,20 @@ snapshots:
     transitivePeerDependencies:
       - aggregate-error
 
+  '@shutterstock/kinesis-helpers@1.0.15(@aws-sdk/client-kinesis@3.567.0(@aws-sdk/client-sso-oidc@3.576.0)(@aws-sdk/client-sts@3.576.0))(aggregate-error@5.0.0)':
+    dependencies:
+      '@aws-sdk/client-kinesis': 3.567.0(@aws-sdk/client-sso-oidc@3.576.0)(@aws-sdk/client-sts@3.576.0)
+      '@shutterstock/p-map-iterable': 1.0.11(aggregate-error@5.0.0)
+    transitivePeerDependencies:
+      - aggregate-error
+
   '@shutterstock/p-map-iterable@1.0.11(aggregate-error@3.1.0)':
     dependencies:
       aggregate-error: 3.1.0
+
+  '@shutterstock/p-map-iterable@1.0.11(aggregate-error@5.0.0)':
+    dependencies:
+      aggregate-error: 5.0.0
 
   '@sinclair/typebox@0.27.8': {}
 
@@ -9059,6 +9090,11 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
+  aggregate-error@5.0.0:
+    dependencies:
+      clean-stack: 5.3.0
+      indent-string: 5.0.0
+
   ajv@6.12.6:
     dependencies:
       fast-deep-equal: 3.1.3
@@ -9245,7 +9281,7 @@ snapshots:
       babel-plugin-istanbul: 6.1.1(supports-color@8.1.1)
       babel-preset-jest: 29.6.3(@babel/core@7.24.5(supports-color@8.1.1))
       chalk: 4.1.2
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.9
       slash: 3.0.0
     transitivePeerDependencies:
       - supports-color
@@ -9454,6 +9490,10 @@ snapshots:
   clean-stack@3.0.1:
     dependencies:
       escape-string-regexp: 4.0.0
+
+  clean-stack@5.3.0:
+    dependencies:
+      escape-string-regexp: 5.0.0
 
   cli-cursor@3.1.0:
     dependencies:
@@ -10034,6 +10074,8 @@ snapshots:
   escape-string-regexp@2.0.0: {}
 
   escape-string-regexp@4.0.0: {}
+
+  escape-string-regexp@5.0.0: {}
 
   eslint-config-prettier@9.1.0(eslint@8.57.0(supports-color@8.1.1)):
     dependencies:
@@ -10666,6 +10708,8 @@ snapshots:
 
   indent-string@4.0.0: {}
 
+  indent-string@5.0.0: {}
+
   inflight@1.0.6:
     dependencies:
       once: 1.4.0
@@ -10993,10 +11037,10 @@ snapshots:
     dependencies:
       '@jest/types': 29.6.3
       '@types/graceful-fs': 4.1.9
-      '@types/node': 18.19.33
+      '@types/node': 20.10.4
       anymatch: 3.1.3
       fb-watchman: 2.0.2
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.9
       jest-regex-util: 29.6.3
       jest-util: 29.7.0
       jest-worker: 29.7.0
@@ -11169,7 +11213,7 @@ snapshots:
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 18.19.33
+      '@types/node': 20.10.4
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
