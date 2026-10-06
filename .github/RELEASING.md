@@ -194,7 +194,12 @@ require the rebuilt construct archive's integrity to match the published version
 This binds API/handler source to registry bytes even for manual repair; differing
 rebuilds stop for owner review. Partial/failed
 publication cannot deploy docs and superseded docs cannot overwrite stable
-content. The existing infrastructure deployment remains disabled.
+content. The release checkout builds with a read-only token and retains static
+docs only after these checks pass. A separate Pages job checks out the main
+workflow source, rechecks provenance and registry state against the built version
+and commit, and downloads only this run attempt's verified docs. That job has
+the write token and never runs release scripts or code from the docs artifact.
+The existing infrastructure deployment remains disabled.
 
 ## Verification limits
 

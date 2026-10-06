@@ -8,6 +8,14 @@ const packages = require('./public-packages.cjs');
 
 const repository = 'shutterstock/streaming-sitemaps';
 const registry = 'https://registry.npmjs.org';
+// URLs come only from the source-controlled public package set. Manifest or
+// archive-plan bytes can select an existing URL, never become request data.
+const registryUrls = new Map(
+  packages.map((name) => [
+    `@shutterstock/${name}`,
+    `${registry}/${encodeURIComponent(`@shutterstock/${name}`)}`,
+  ]),
+);
 const integer = '(0|[1-9][0-9]*)';
 const identifier = '(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)';
 const versionPattern = new RegExp(
@@ -348,7 +356,9 @@ function docsProvenance({
 const integrity = (bytes) => `sha512-${crypto.createHash('sha512').update(bytes).digest('base64')}`;
 
 async function registryState(name) {
-  const response = await fetch(`${registry}/${encodeURIComponent(name)}`, {
+  const url = registryUrls.get(name);
+  if (!url) throw new Error('Registry reads require a known public package');
+  const response = await fetch(url, {
     signal: AbortSignal.timeout(30000),
     headers: { accept: 'application/json' },
   });

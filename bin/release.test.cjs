@@ -18,9 +18,46 @@ const {
   publicationRecord,
   validatePublicationRecord,
   docsProvenance,
+  registryState,
 } = require('./release-lib.cjs');
 const { readPlan, docsSelection } = require('./release.cjs');
 const packages = require('./public-packages.cjs');
+
+test('registry reads use only fixed public-package URLs and reject arbitrary file data', async () => {
+  const original = global.fetch;
+  const requests = [];
+  let expectedName;
+  global.fetch = async (url) => {
+    requests.push(url);
+    return { ok: true, json: async () => ({ name: expectedName }) };
+  };
+  try {
+    for (const name of packages) {
+      expectedName = `@shutterstock/${name}`;
+      assert.equal((await registryState(expectedName)).name, expectedName);
+      assert.equal(
+        requests.at(-1),
+        `https://registry.npmjs.org/${encodeURIComponent(expectedName)}`,
+      );
+    }
+    for (const invalid of [
+      '@shutterstock/sitemaps-utils-lib',
+      '@shutterstock/sitemaps-cli?token=private-file-data',
+      '@shutterstock/sitemaps-cli/../../other',
+      'https://attacker.invalid/',
+      '',
+      undefined,
+    ])
+      await assert.rejects(registryState(invalid), /known public package/);
+    assert.equal(requests.length, packages.length);
+    global.fetch = async () => ({ ok: false, status: 404 });
+    await assert.rejects(registryState(expectedName), /HTTP 404/);
+    global.fetch = async () => ({ ok: true, json: async () => ({ name: 'other' }) });
+    await assert.rejects(registryState(expectedName), /different package/);
+  } finally {
+    global.fetch = original;
+  }
+});
 
 function fixture(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'sitemaps-release-test-'));

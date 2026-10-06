@@ -77,10 +77,12 @@ jobs:
 
   build:
     permissions:
-      contents: write
+      contents: read
       actions: read
     needs: [select-docs, install-deps]
     runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.deployment.outputs.publish }}
     env:
       PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
       RELEASE_VERSION: ${{ needs.select-docs.outputs.version }}
@@ -127,9 +129,65 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node bin/release.cjs docs-verify
 
-      - name: Deploy to GitHub Pages
+      - name: Retain docs only after source and registry verification
         if: steps.deployment.outputs.publish == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: verified-stable-docs-${{ github.run_attempt }}
+          path: ./docs
+          if-no-files-found: error
+
+  deploy:
+    needs: [select-docs, build]
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      # Privileged publication executes only workflow-source code from main,
+      # never release checkout scripts or downloaded artifact code.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '^24.0.0'
+          package-manager-cache: false
+
+      - name: Recheck publication provenance and current stable registry source
+        id: stable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node bin/release.cjs docs-select
+
+      - name: Require the current stable source to match the verified build
+        if: steps.stable.outputs.publish == 'true'
+        env:
+          BUILT_VERSION: ${{ needs.select-docs.outputs.version }}
+          BUILT_COMMIT: ${{ needs.select-docs.outputs.commit }}
+          CURRENT_VERSION: ${{ steps.stable.outputs.version }}
+          CURRENT_COMMIT: ${{ steps.stable.outputs.commit }}
+        run: |
+          test -n "$CURRENT_VERSION"
+          test -n "$CURRENT_COMMIT"
+          test "$BUILT_VERSION" = "$CURRENT_VERSION"
+          test "$BUILT_COMMIT" = "$CURRENT_COMMIT"
+
+      - name: Download this attempt's verified static docs
+        if: steps.stable.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download "$GITHUB_RUN_ID" --repo shutterstock/streaming-sitemaps \
+            --name "verified-stable-docs-${GITHUB_RUN_ATTEMPT}" --dir docs-published
+
+      - name: Deploy to GitHub Pages
+        if: steps.stable.outputs.publish == 'true'
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./docs-published
