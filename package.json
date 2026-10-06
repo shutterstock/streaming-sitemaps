@@ -36,7 +36,7 @@
     "url": "https://github.shuttercorp.net/sreng/streaming-sitemaps.git"
   },
   "devDependencies": {
-    "@aws-sdk/types": "3.567.0",
+    "@aws-sdk/types": "3.974.6",
     "@types/jest": "29.5.12",
     "@types/node-fetch": "^2.6.11",
     "@types/sinon": "^10.0.4",

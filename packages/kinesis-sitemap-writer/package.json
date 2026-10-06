@@ -34,11 +34,11 @@
     "@smithy/types": "2.12.0"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.567.0",
-    "@aws-sdk/client-kinesis": "3.567.0",
-    "@aws-sdk/client-s3": "3.567.0",
-    "@aws-sdk/lib-dynamodb": "3.567.0",
-    "@aws-sdk/lib-storage": "3.567.0",
+    "@aws-sdk/client-dynamodb": "3.1142.0",
+    "@aws-sdk/client-kinesis": "3.1142.0",
+    "@aws-sdk/client-s3": "3.1142.0",
+    "@aws-sdk/lib-dynamodb": "3.1142.0",
+    "@aws-sdk/lib-storage": "3.1142.0",
     "@shutterstock/aws-embedded-metrics-flatten": "^1.0.6",
     "@shutterstock/chunker": "^1.0.11",
     "@shutterstock/kinesis-helpers": "^1.0.15",
