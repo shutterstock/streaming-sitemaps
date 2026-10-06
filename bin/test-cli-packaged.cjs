@@ -10,6 +10,7 @@ const path = require('node:path');
 const { spawn, spawnSync } = require('node:child_process');
 const { createRequire, builtinModules } = require('node:module');
 const { readFingerprintFile } = require('./read-fingerprint-file.cjs');
+const { listenLocalRegistry } = require('./listen-local-registry.cjs');
 
 const root = path.resolve(__dirname, '..');
 const fixtures = path.join(root, 'packages/sitemaps-cli/test/packaged');
@@ -276,7 +277,7 @@ async function main() {
         }),
       );
     });
-    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+    await listenLocalRegistry(server);
     // Public external dependencies use npmjs. The sibling scope only serves the
     // actual versions in the freshly packed archives; no overrides or hooks.
     const policy = `nodeLinker: isolated\nhoist: false\nextendNodePath: false\nminimumReleaseAge: 10080\npackageImportMethod: auto\nverifyDepsBeforeRun: false\n`;
