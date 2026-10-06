@@ -43,7 +43,7 @@
     "@shutterstock/chunker": "^1.0.11",
     "@shutterstock/kinesis-helpers": "^1.0.15",
     "@shutterstock/p-map-iterable": "^1.0.11",
-    "aws-embedded-metrics": "^2.0.4",
+    "aws-embedded-metrics": "^4.2.1",
     "aws-xray-sdk-core": "^3.3.3",
     "convict": "^6.1.0",
     "convict-format-with-validator": "^6.0.1",
