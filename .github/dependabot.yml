@@ -1,0 +1,67 @@
+version: 2
+
+updates:
+  # One root pnpm v9 lock owns every packages/* manifest, including Projen.
+  # No separate CDK lockfile or maintenance branch exists in this checkout.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: America/New_York
+    open-pull-requests-limit: 10
+    versioning-strategy: increase-if-necessary
+    commit-message:
+      prefix: chore
+      include: scope
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
+    groups:
+      aws-sdk:
+        patterns: ['@aws-sdk/*', '@smithy/*', 'aws-sdk', 'aws-xray-sdk*']
+        update-types: [minor, patch]
+      cdk-projen-jsii:
+        patterns: ['aws-cdk', 'aws-cdk-lib', '@aws-cdk/*', 'constructs', 'projen', 'jsii*', '@jsii/*', 'downlevel-dts']
+        update-types: [minor, patch]
+      lint-typescript:
+        patterns: ['eslint*', '@eslint/*', '@typescript-eslint/*', 'typescript', 'prettier', '@types/node', 'ts-node']
+        update-types: [minor, patch]
+      testing:
+        patterns: ['jest*', '@jest/*', '@types/jest', 'ts-jest', 'sinon*', '@types/sinon*', 'nock', 'aws-sdk-client-mock*', 'lcov-parse']
+        update-types: [minor, patch]
+      other-minor-patch:
+        patterns: ['*']
+        update-types: [minor, patch]
+      # Security fixes are not delayed by cooldown. Major fixes need review too.
+      security-updates:
+        applies-to: security-updates
+        patterns: ['*']
+    # Majors remain individual PRs after 14 days; review Node >=18, CJS,
+    # jsii/CDK and CLI compatibility before accepting any migration.
+
+  - package-ecosystem: github-actions
+    # The workflow scan does not follow uses: ./.github/actions/... references.
+    directories:
+      - /
+      - /.github/actions/coverage-report
+    schedule:
+      interval: weekly
+      day: tuesday
+      time: '09:00'
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    cooldown:
+      default-days: 7
+    groups:
+      # Do not ignore minor/patch bumps: immutable commit pins need both.
+      actions-minor-patch:
+        patterns: ['*']
+        update-types: [minor, patch]
+      actions-security:
+        applies-to: security-updates
+        patterns: ['*']

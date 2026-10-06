@@ -26,7 +26,8 @@
     "build:app": "pnpm --dir packages/cdk exec tsc --build",
     "build:docs": "pnpm run build:cdk && pnpm --dir packages/sitemaps-cdk run docgen && node bin/stage-docs.cjs",
     "synth:cdk": "pnpm --dir packages/sitemaps-cdk exec projen --no-post",
-    "test:foundation": "node --test bin/*.test.cjs"
+    "test:foundation": "node --test bin/*.test.cjs",
+    "test:cdk-consumer": "node bin/test-cdk-consumer.cjs"
   },
   "files": [],
   "repository": {

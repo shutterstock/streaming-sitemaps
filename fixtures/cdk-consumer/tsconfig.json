@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "strict": true,
+    "skipLibCheck": false,
+    "types": ["node"],
+    "outDir": "dist"
+  },
+  "include": ["*.ts"]
+}

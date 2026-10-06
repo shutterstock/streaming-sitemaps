@@ -51,6 +51,13 @@ changes. The intentionally disabled deploy job's constant false condition is an
 expected actionlint diagnostic; do not enable deployment to remove that warning.
 Local build/test results do not establish hosted cache or GitHub event behavior.
 
+The build job verifies the freshly packed construct tarball with
+`pnpm run test:cdk-consumer <tarball>` after version materialization/build/pack.
+This explicit disposable consumer install uses its own temporary store/cache
+outside the workspace; it must never install into or save the restored tree.
+The `sitemaps-cdk-consumer` artifact contains diagnostics and local synthesis,
+separate from multilingual packaging and deployment.
+
 [bin/version](../bin/version) materializes only owned versions, preserving
 workspace protocols until pnpm pack rewrites them. Public wrapper, database,
 models, metrics, CLI, and construct tarballs are publishable; private utilities
