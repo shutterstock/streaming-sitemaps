@@ -851,6 +851,12 @@ importers:
       '@shutterstock/sitemaps-wrapper-lib':
         specifier: workspace:^
         version: link:../sitemaps-wrapper-lib
+      fs-extra:
+        specifier: ^11.2.0
+        version: 11.2.0
+      sitemap:
+        specifier: ^8.0.0
+        version: 8.0.0
       tslib:
         specifier: ^2.3.0
         version: 2.6.2
@@ -915,9 +921,6 @@ importers:
       esbuild:
         specifier: 0.21.0
         version: 0.21.0
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.2.0
       it-batch:
         specifier: ^1.0.9
         version: 1.0.9
@@ -936,9 +939,6 @@ importers:
       shx:
         specifier: ^0.3.3
         version: 0.3.4
-      sitemap:
-        specifier: ^8.0.0
-        version: 8.0.0
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -1063,6 +1063,9 @@ importers:
       '@aws-sdk/lib-storage':
         specifier: ^3.567.0
         version: 3.567.0(@aws-sdk/client-s3@3.567.0(@aws-sdk/client-sso-oidc@3.576.0)(@aws-sdk/client-sts@3.576.0))
+      '@types/fs-extra':
+        specifier: ^9.0.12
+        version: 9.0.13
       fs-extra:
         specifier: ^10.0.0
         version: 10.1.0
@@ -1082,9 +1085,6 @@ importers:
       '@smithy/types':
         specifier: 2.12.0
         version: 2.12.0
-      '@types/fs-extra':
-        specifier: ^9.0.12
-        version: 9.0.13
       '@types/jest':
         specifier: 29.5.12
         version: 29.5.12
