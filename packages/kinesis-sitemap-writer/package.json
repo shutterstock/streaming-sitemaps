@@ -68,7 +68,7 @@
     "@shutterstock/sitemaps-models-lib": "workspace:^",
     "graceful-fs": "4.2.9",
     "@shutterstock/sitemaps-metrics-lib": "workspace:^",
-    "aggregate-error": "3.1.0",
+    "aggregate-error": "5.0.0",
     "@shutterstock/sitemaps-utils-lib": "workspace:^"
   }
 }
