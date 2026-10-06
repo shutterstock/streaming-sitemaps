@@ -76,7 +76,7 @@
     "esbuild": "0.21.0",
     "@types/jest": "29.5.12",
     "@shutterstock/sitemaps-utils-lib": "workspace:^",
-    "ts-node": "10.9.1"
+    "ts-node": "10.9.2"
   },
   "dependencies": {
     "@oclif/core": "3.26.6",
