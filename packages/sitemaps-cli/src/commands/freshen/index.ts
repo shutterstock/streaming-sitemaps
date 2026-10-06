@@ -300,6 +300,10 @@ ${JSON.stringify(ctx.message, undefined, 2)}`;
               }),
             );
 
+            if (response.FunctionError !== undefined) {
+              this.error(`Lambda function returned an error (${response.FunctionError})`);
+            }
+
             if (response.$metadata.httpStatusCode === 200 && response.Payload !== undefined) {
               const responseBuff = Buffer.from(response.Payload);
               const responseStr = responseBuff.toString('utf-8');

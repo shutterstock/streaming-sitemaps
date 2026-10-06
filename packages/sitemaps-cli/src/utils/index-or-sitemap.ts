@@ -9,28 +9,37 @@ export enum SitemapType {
 }
 
 export async function getSitemapType(filePath: string): Promise<SitemapType | undefined> {
+  const limit = 10240;
   const pipelineAsync = promisify(pipeline);
-  const readStream = createReadStream(filePath, { end: 10240 }); // Read up to 10 KB
+  // Limit decompressed bytes, not compressed input: truncating a .gz file at
+  // 10 KB makes valid larger files fail with an unexpected EOF.
+  const readStream = createReadStream(filePath);
   let data = '';
-
-  const transformStream = new Transform({
-    transform(chunk, encoding, callback) {
-      data += chunk.toString();
-      callback();
+  let bytes = 0;
+  const inspected = new Error('sitemap header inspected');
+  const inspect = new Transform({
+    transform(chunk: Buffer, _encoding, callback) {
+      const portion = chunk.subarray(0, limit - bytes);
+      data += portion.toString();
+      bytes += portion.length;
+      if (bytes >= limit || data.includes('<urlset') || data.includes('<sitemapindex')) {
+        // Intentional early completion: pipeline closes input and gzip too.
+        callback(inspected);
+      } else callback();
     },
   });
 
-  if (filePath.endsWith('.gz')) {
-    await pipelineAsync(readStream, zlib.createGunzip(), transformStream);
-  } else {
-    await pipelineAsync(readStream, transformStream);
+  try {
+    if (filePath.endsWith('.gz')) {
+      await pipelineAsync(readStream, zlib.createGunzip(), inspect);
+    } else {
+      await pipelineAsync(readStream, inspect);
+    }
+  } catch (error) {
+    if (error !== inspected) throw error;
   }
 
-  if (data.includes('<urlset')) {
-    return SitemapType.Sitemap;
-  } else if (data.includes('<sitemapindex')) {
-    return SitemapType.Index;
-  } else {
-    return;
-  }
+  if (data.includes('<urlset')) return SitemapType.Sitemap;
+  if (data.includes('<sitemapindex')) return SitemapType.Index;
+  return undefined;
 }

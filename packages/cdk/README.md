@@ -1,14 +1,21 @@
-# Welcome to your CDK TypeScript project
+# Example CDK application
 
-This is a blank project for CDK development with TypeScript.
+[cdk-stack.ts](lib/cdk-stack.ts) creates a sitemap writer, index writer, and
+freshener sharing a DynamoDB table and S3 bucket. [bin/cdk.ts](bin/cdk.ts) creates
+an environment-agnostic `SitemapsExampleStack`.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+From the repository root, use the Node 24 / pnpm 12.7.0 setup in the
+[root README](../../README.md#development), then:
 
-## Useful commands
+```sh
+pnpm run build:all
+pnpm --dir packages/cdk exec cdk synth
+```
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+Synthesis bundles local handlers and emits templates in `packages/cdk/cdk.out`;
+it does not deploy resources. The example uses `autoDeleteEverything: true` and
+is intended for disposable development resources. For production, manage durable
+tables and buckets separately and pass them to the constructs. Review the
+[construct API](../sitemaps-cdk/API.md) and [operations guide](../../OPERATIONS.md)
+before deployment. The existing Node 20 Lambda default is deprecated; select a
+runtime explicitly as part of an operator-reviewed migration.
