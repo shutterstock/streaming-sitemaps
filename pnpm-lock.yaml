@@ -194,8 +194,8 @@ importers:
         specifier: ^7.8.0
         version: 7.8.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.4.5)
       aws-cdk:
-        specifier: 2.117.0
-        version: 2.117.0
+        specifier: 2.1143.0
+        version: 2.1143.0
       aws-sdk-client-mock:
         specifier: 3.1.0
         version: 3.1.0
@@ -251,11 +251,11 @@ importers:
   packages/cdk:
     dependencies:
       aws-cdk-lib:
-        specifier: 2.117.0
-        version: 2.117.0(constructs@10.1.244)
+        specifier: 2.271.0
+        version: 2.271.0(constructs@10.8.1)
       constructs:
         specifier: ^10.0.0
-        version: 10.1.244
+        version: 10.8.1
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -270,8 +270,8 @@ importers:
         specifier: 20.10.4
         version: 20.10.4
       aws-cdk:
-        specifier: 2.117.0
-        version: 2.117.0
+        specifier: 2.1143.0
+        version: 2.1143.0
       typescript:
         specifier: ~5.3.3
         version: 5.3.3
@@ -792,11 +792,11 @@ importers:
         specifier: ^18
         version: 18.19.33
       aws-cdk-lib:
-        specifier: 2.117.0
-        version: 2.117.0(constructs@10.1.244)
+        specifier: 2.271.0
+        version: 2.271.0(constructs@10.8.1)
       constructs:
-        specifier: 10.1.244
-        version: 10.1.244
+        specifier: 10.8.1
+        version: 10.8.1
       esbuild:
         specifier: 0.21.0
         version: 0.21.0
@@ -805,19 +805,19 @@ importers:
         version: 5.4.15(supports-color@8.1.1)
       jsii-diff:
         specifier: ^1.98.0
-        version: 1.98.0(supports-color@8.1.1)
+        version: 1.140.0(supports-color@8.1.1)
       jsii-docgen:
         specifier: ^10.4.9
-        version: 10.4.9(jsii-rosetta@5.4.17(supports-color@8.1.1))
+        version: 10.12.6(jsii-rosetta@5.4.17(supports-color@8.1.1))
       jsii-pacmak:
         specifier: ^1.98.0
-        version: 1.98.0(jsii-rosetta@5.4.17(supports-color@8.1.1))
+        version: 1.140.0(jsii-rosetta@5.4.17(supports-color@8.1.1))
       jsii-rosetta:
         specifier: ~5.4.0
         version: 5.4.17(supports-color@8.1.1)
       projen:
-        specifier: 0.81.6
-        version: 0.81.6(constructs@10.1.244)
+        specifier: 0.103.27
+        version: 0.103.27(constructs@10.8.1)
       standard-version:
         specifier: ^9
         version: 9.5.0
@@ -1110,14 +1110,18 @@ packages:
     resolution: {integrity: sha512-qRmjj8nj9qmLTQXXmaR1cck3UXSRMPrbsLJAasZpF+t3riI71BXed5ebIOYwQntykeZuhjsdweEc9BxH5Jc26w==}
     engines: {node: '>=6.0.0'}
 
-  '@aws-cdk/asset-awscli-v1@2.2.202':
-    resolution: {integrity: sha512-JqlF0D4+EVugnG5dAsNZMqhu3HW7ehOXm5SDMxMbXNDMdsF0pxtQKNHRl52z1U9igsHmaFpUgSGjbhAJ+0JONg==}
+  '@aws-cdk/asset-awscli-v1@2.2.292':
+    resolution: {integrity: sha512-d4aMFsAFj19FtxVyw8IzlUKv5Zu4sIvgnEjI2IU6IWBJgVbJ4aFnadANqYa+6MwB1CQbGOg0jh8WE77M+Nb/9A==}
 
-  '@aws-cdk/asset-kubectl-v20@2.1.2':
-    resolution: {integrity: sha512-3M2tELJOxQv0apCIiuKQ4pAbncz9GuLwnKFqxifWfe77wuMxyTRPmxssYHs42ePqzap1LT6GDcPygGs+hHstLg==}
+  '@aws-cdk/asset-node-proxy-agent-v6@2.1.3':
+    resolution: {integrity: sha512-98We1QWfin9vtuuQtNFhIIAEWb8CreyYTAP0Vn8HqSBoNiFJM9nZgifJeQawT9Wq0NX1HCNFlxCyTccIrK1PSA==}
 
-  '@aws-cdk/asset-node-proxy-agent-v6@2.0.3':
-    resolution: {integrity: sha512-twhuEG+JPOYCYPx/xy5uH2+VUsIEhPTzDY0F1KuB+ocjWWB/KEDiOVL19nHvbPCB6fhWnkykXEMJ4HHcKvjtvg==}
+  '@aws-cdk/cloud-assembly-schema@54.25.0':
+    resolution: {integrity: sha512-aZkzPqWLg1Oozm53NeyrBZPguTq3e6v7NpQ3QOGULj0IIrodLzGPM7fmAvjcJcHzjtuZU9IP1gIY92nKIM+Bvw==}
+    engines: {node: '>= 18.0.0'}
+    bundledDependencies:
+      - jsonschema
+      - semver
 
   '@aws-crypto/crc32@3.0.0':
     resolution: {integrity: sha512-IzSgsrxUcsrejQbPVilIKy16kAT52EwB6zSaI+M3xxIhKh5+aldEyvI+z6erM7TCLB2BJsFrtHjp6/4/sr+3dA==}
@@ -1952,8 +1956,16 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
+  '@jsii/check-node@1.140.0':
+    resolution: {integrity: sha512-NTiY2Nd9ZtACPZjaU+k9+oiaD191Yw0FoiUR7bB+NoOtB5nMEhrLKn5O/PYmCIZGK0G1JaJs+PmLcyj68J6RKw==}
+    engines: {node: '>= 14.17.0'}
+
   '@jsii/check-node@1.98.0':
     resolution: {integrity: sha512-hI53TMW/fylHyY3CrJvqWvfSPJvBL82GSAB1m2CKNC0yHb0pZHCdBZnLrrr4rgTCQx8kIJjcUc0rQ/Ba3w+GaA==}
+    engines: {node: '>= 14.17.0'}
+
+  '@jsii/spec@1.140.0':
+    resolution: {integrity: sha512-1rGS+iJtejQ3ybSJfV0if9PzZuSQmORbVF3MkqE0csatF//Rj8raCqptZLMX6rkdfZ8C2Jsw5hU4PrmuCzBk6A==}
     engines: {node: '>= 14.17.0'}
 
   '@jsii/spec@1.98.0':
@@ -2565,9 +2577,6 @@ packages:
   '@types/fs-extra@9.0.13':
     resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
 
-  '@types/glob@8.1.0':
-    resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==}
-
   '@types/graceful-fs@4.1.9':
     resolution: {integrity: sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==}
 
@@ -2609,9 +2618,6 @@ packages:
 
   '@types/memorystream@0.3.0':
     resolution: {integrity: sha512-gzh6mqZcLryYHn4g2MuMWjo9J1+Py/XYwITyZmUxV7ZoBIi7bTbBgSiuC5tcm3UL3gmaiYssQFDlXr/3fK94cw==}
-
-  '@types/minimatch@5.1.2':
-    resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==}
 
   '@types/minimist@1.2.5':
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
@@ -2909,13 +2915,15 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  aws-cdk-lib@2.117.0:
-    resolution: {integrity: sha512-My5T4hn34H6+tnZxKK2VlcvGI2N5SjqGt9lXWADcahdobuUcNizYrls7h/vcQ3BfwcZ5/tHTKtivkNyL8I1LDg==}
-    engines: {node: '>= 14.15.0'}
+  aws-cdk-lib@2.271.0:
+    resolution: {integrity: sha512-VdLda/mCneNUZkfKIYiTYSCbDdGaTmH9uhfGs5TYIfvIqKuyUcZK6S7+LaF+pRhkNnbTGgKqvCqRIMemZOvCnA==}
+    engines: {node: '>= 20.0.0'}
     peerDependencies:
-      constructs: ^10.0.0
+      constructs: ^10.5.0
     bundledDependencies:
+      - '@aws/cloudformation-validate'
       - '@balena/dockerignore'
+      - '@aws-cdk/cloud-assembly-api'
       - case
       - fs-extra
       - ignore
@@ -2923,12 +2931,12 @@ packages:
       - minimatch
       - punycode
       - semver
-      - table
       - yaml
+      - mime-types
 
-  aws-cdk@2.117.0:
-    resolution: {integrity: sha512-uuWT646vSRXZ/6don+wfK4kelV1aL4WOTduaihltRlXw4etHoMV3wJYBO30E6e8hAU+0HkLT7Fv58po50b12Sg==}
-    engines: {node: '>= 14.15.0'}
+  aws-cdk@2.1143.0:
+    resolution: {integrity: sha512-bTbgEmNuN6UMDAyhGFWOAnriafSu7j0cAjaFKRw1/WEs6RE5g062D2v2+YE8Dw6qw7RgNGQPH5Nv47TsK5kZSQ==}
+    engines: {node: '>= 18.0.0'}
     hasBin: true
 
   aws-embedded-metrics@2.0.4:
@@ -3160,8 +3168,8 @@ packages:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
     engines: {iojs: '>= 1.0.0', node: '>= 0.12.0'}
 
-  codemaker@1.98.0:
-    resolution: {integrity: sha512-UAeICTmY7lJXf4OPnDTwKWg/DU87u67nyxuTjMON+vO8yo8C+EcPWnmmOmWtZm3wWLPsPuxyYIQxIIi/4OZ9TA==}
+  codemaker@1.140.0:
+    resolution: {integrity: sha512-/EPlxI+2i9ji7aZac2kLEUyjzfgHWBl8hDZ98T6BnED9mTLRInCNToA0vqgZPcTotiP6g6YNeZo7cBAc90Ok9A==}
     engines: {node: '>= 14.17.0'}
 
   collect-v8-coverage@1.0.2:
@@ -3194,12 +3202,12 @@ packages:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
 
-  commonmark@0.30.0:
-    resolution: {integrity: sha512-j1yoUo4gxPND1JWV9xj5ELih0yMv1iCWDG6eEQIPLSWLxzCXiFoyS7kvB+WwU+tZMf4snwJMMtaubV0laFpiBA==}
-    hasBin: true
-
   commonmark@0.31.0:
     resolution: {integrity: sha512-nuDsQ34gjmgAqjyIz6mbRWBW/XPE9wsBempAMBk2V/AA88ekztjTM46oi07J6c6Y/2Y8TdYCZi9L0pIBt/oMZw==}
+    hasBin: true
+
+  commonmark@0.31.2:
+    resolution: {integrity: sha512-2fRLTyb9r/2835k5cwcAwOj0DEc44FARnMp5veGsJ+mEAZdi52sNopLu07ZyElQUz058H43whzlERDIaaSw4rg==}
     hasBin: true
 
   compare-func@2.0.0:
@@ -3214,9 +3222,8 @@ packages:
   constant-case@3.0.4:
     resolution: {integrity: sha512-I2hSBi7Vvs7BEuJDr5dDHfzb/Ruj3FyvFyh7KLilAjNQw3Be+xgqUBA2W6scVEcL0hL1dwPRtIqEPVUCKkSsyQ==}
 
-  constructs@10.1.244:
-    resolution: {integrity: sha512-oJBy6JoiwocEwKxY3yMXfbClT5ocKmX5qXUDpcxW4SRjlRvB8X2pR/lNqg74JVm9qAEUBesI0FLLqc2Ke1I2QA==}
-    engines: {node: '>= 14.17.0'}
+  constructs@10.8.1:
+    resolution: {integrity: sha512-98yGXYyhePqPYh3cYu8nzBERmAhC0DONe3UD03okK0nehZ7hYP4wgZuf02a04+uOWxnTJ5Rpp5m0GRNpwyLGGA==}
 
   content-type@1.0.5:
     resolution: {integrity: sha512-nTjqfcBFEipKdXCv4YDQWCfmcLZKm81ldF0pAopTvyrFGVbcR6P/VAAd5G7N+0tTr8QqiU0tFadD6FK4NtJwOA==}
@@ -3535,9 +3542,6 @@ packages:
     resolution: {integrity: sha512-yjNnPr315/FjS4zIsUxYguYUPP2e1NK4d7E7ZOLiyYCcbFBiTMyID+2wvm2w6+pZ/odMA7cRkjhsPbltwBOrLg==}
     engines: {node: '>=8.6'}
 
-  entities@2.0.3:
-    resolution: {integrity: sha512-MyoZ0jgnLvB2X3Lg5HqpFmn1kybDiIfEQmKzTb5apr51Rb+T3KdmMiqa70T+bhGnyv7bQ6WMj2QMHpGMmlrUYQ==}
-
   entities@3.0.1:
     resolution: {integrity: sha512-WiyBqoomrwMdFG1e0kqvASYfnlb0lp8M5o5Fw2OFq1hNZxxcNk8Ik0Xm7LxzBhuidnZB/UtBqVCgUz3kBOP51Q==}
     engines: {node: '>=0.12'}
@@ -3758,6 +3762,10 @@ packages:
     resolution: {integrity: sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==}
     engines: {node: '>=8.6.0'}
 
+  fast-glob@3.3.3:
+    resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
+    engines: {node: '>=8.6.0'}
+
   fast-json-stable-stringify@2.1.0:
     resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
 
@@ -3949,19 +3957,8 @@ packages:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
 
-  glob-promise@6.0.5:
-    resolution: {integrity: sha512-uUzvxo60yo/vMLXZHCNAlfdM5U5A07jCnUO8xTK44Z0Vc58poGDXhDx8ju1DmPdprOORh+4Lpog64hl+AJ5piA==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      glob: ^8.0.3
-
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-
-  glob@8.1.0:
-    resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
-    engines: {node: '>=12'}
     deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   globals@11.12.0:
@@ -4488,26 +4485,26 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  jsii-diff@1.98.0:
-    resolution: {integrity: sha512-jyRhxkEehIt/zK3xeGbIlb0m2f+G1dZxbyQ7DB4iHOHPcgx6SPiRIzhGnbN/EnB7dQ1hAk0vFzvFryiM6TmUAQ==}
+  jsii-diff@1.140.0:
+    resolution: {integrity: sha512-nK6y3X08YDt7hrkgl45gn9uzQFioqeBLXwj/OZ1AyeejvvPQJvaNuIogRdrfjBuNuksjnQlW/RJk8ocgzaXCvA==}
     engines: {node: '>= 14.17.0'}
     hasBin: true
 
-  jsii-docgen@10.4.9:
-    resolution: {integrity: sha512-wyMW25pEhPEsIMMwFO6GcRXKZbnDwgn5GKV/AlTLuTUKHbTSnWDzy6e0MU6U9zVgjt4frJl7vZDl/4UlIcptrg==}
+  jsii-docgen@10.12.6:
+    resolution: {integrity: sha512-MShAZLUkLLO2B8UG4rm7nlLRaBY7ePdZVagl1I4d0r9qnResexL7cqJN4qEmxB7qsRZhpCY2tLhb3wlpZlH3cg==}
     hasBin: true
     peerDependencies:
-      jsii-rosetta: ^1.85.0 || ~5.0.14 || ~5.1.2 || ~5.2.0 || ~5.3.0 || ~5.4.0
+      jsii-rosetta: ^1.85.0 || ~5.0.14 || ~5.1.2 || ~5.2.0 || ~5.3.0 || ~5.4.0 || ~5.5.0 || ~5.6.0 || ~5.7.0 || ~5.8.0 || ~5.9.1 || ~6.0.0
 
-  jsii-pacmak@1.98.0:
-    resolution: {integrity: sha512-p2H8IbiI3RNIUg+oRcJ9Xu1I7CgJUxCMpUl5IPzWAjz1qzhIKOzlkaAMGJfJZJQtib5kWI2OmZ6xBZScWg16+Q==}
+  jsii-pacmak@1.140.0:
+    resolution: {integrity: sha512-BHv63POC099uGm08UM7L5UZUanN3rfESzWv54xpwhamiIJ+zlw0+6Sj790LP2skRkezTdTj8Qj6mhU5Kxfko7g==}
     engines: {node: '>= 14.17.0'}
     hasBin: true
     peerDependencies:
-      jsii-rosetta: ^1.98.0 || ~5.2.0 || ~5.3.0 || ~5.4.0
+      jsii-rosetta: '>=5.9.0'
 
-  jsii-reflect@1.98.0:
-    resolution: {integrity: sha512-HulKk6pQOk0zkqJXRaweV5PezvAghZAX4cuB7i0sBA0/kz1ypqB1KFhBiZ1PLeeMzAfb1/WmCF2UTu9xzQit4w==}
+  jsii-reflect@1.140.0:
+    resolution: {integrity: sha512-8bRD6WSQfWrB6/31sz92bi21HWaMVzvxZUgaJt/IiT3RqGKc57dO+idekn8WNpTBneE9vVhj24UDExHH8YfJAQ==}
     engines: {node: '>= 14.17.0'}
     hasBin: true
 
@@ -4538,6 +4535,10 @@ packages:
 
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
+
+  json-stream-stringify@3.1.7:
+    resolution: {integrity: sha512-F4MWetLtY42YMaAKw5cV4e47zMD5aOT+tjjQWjX18ACtdkQ5Y/vrcfbcQ107Rh+MXjOCIx4KhW0wPmOvG8iQ5w==}
+    engines: {node: '>=7.10.1'}
 
   json-stringify-safe@5.0.1:
     resolution: {integrity: sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==}
@@ -4760,6 +4761,10 @@ packages:
 
   micromatch@4.0.4:
     resolution: {integrity: sha512-pRmzw/XUcwXGpD9aI9q/0XOwLNygjETJ8y0ao0wdqprrzDa4YnxLcz7fQRZr8voh8V10kGhABbNcHVk5wHgWwg==}
+    engines: {node: '>=8.6'}
+
+  micromatch@4.0.8:
+    resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
 
   mime-db@1.52.0:
@@ -5017,8 +5022,8 @@ packages:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
 
-  oo-ascii-tree@1.98.0:
-    resolution: {integrity: sha512-+GE7ywhtS6MctbfcO+vZzqIxcFzucZCwmawcwCVo89DxQDakV1JFfFViTXG4A90UzTAsU4tQteGmwDtwOlOXLw==}
+  oo-ascii-tree@1.140.0:
+    resolution: {integrity: sha512-swJJN43RwwtZAtNQu03W8rqNtTUvq9T4eGU4KupRq7I9/R3exHobbF/OOm5sl6tGcumsQrNU97NBx7x+LEIPgA==}
     engines: {node: '>= 14.17.0'}
 
   optionator@0.8.3:
@@ -5145,6 +5150,10 @@ packages:
     resolution: {integrity: sha512-lY1Q/PiJGC2zOv/z391WOTD+Z02bCgsFfvxoXXf6h7kv9o+WmsmzYqrAwY63sNgOxE4xEdq0WyUnXfKeBrSvYw==}
     engines: {node: '>=8.6'}
 
+  picomatch@2.3.2:
+    resolution: {integrity: sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==}
+    engines: {node: '>=8.6'}
+
   pify@2.3.0:
     resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
     engines: {node: '>=0.10.0'}
@@ -5193,23 +5202,25 @@ packages:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
 
-  projen@0.81.6:
-    resolution: {integrity: sha512-uvyZqCKHbG7++KBcFUgvVqWkMVbpZHs7oaNWSKbxPw//vHIOytjYklIq/tnPXq8V6eOx6+hWXAvn9QMfJszQag==}
+  projen@0.103.27:
+    resolution: {integrity: sha512-dtcvFZOIhQ+AYOeOhSDSReKCgcYbrAFsKZMM+JzlA9v0icegQAolZDHhdNTDaSYODfRSgVzE+U/B2jfdImSsNQ==}
     engines: {node: '>= 16.0.0'}
     hasBin: true
     peerDependencies:
-      constructs: ^10.0.0
+      constructs: ^10.5.0
     bundledDependencies:
       - '@iarna/toml'
       - case
       - chalk
       - comment-json
       - conventional-changelog-config-spec
+      - dax
+      - fast-glob
       - fast-json-patch
-      - glob
       - ini
+      - parse-conflict-json
+      - properties-file
       - semver
-      - shx
       - xmlbuilder2
       - yaml
       - yargs
@@ -5431,6 +5442,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.8.5:
+    resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   sentence-case@3.0.4:
     resolution: {integrity: sha512-8LS0JInaQMCRoQ7YUytAo/xUu5W2XnQxV2HI/6uM6U7CITS1RqPElr30V6uIqyMKM9lJGRVFy5/4CuzcixNYSg==}
 
@@ -5564,6 +5580,10 @@ packages:
   spdx-license-ids@3.0.17:
     resolution: {integrity: sha512-sh8PWc/ftMqAAdFiBu6Fy6JUOYjqDJBJvIhpfDMyHrr0Rbp5liZqd4TjtQ/RgfLjKFZb+LMx5hpml5qOWy0qvg==}
 
+  spdx-license-list@6.12.0:
+    resolution: {integrity: sha512-+nUYqm3aZMSHbjsthK+i/HHI2okTElCvqwUd4k8QcSk+FTGgjq+fsdFj2wZOaX6XmR2JdWhf/NeflNnvKOjcnQ==}
+    engines: {node: '>=8'}
+
   spdx-license-list@6.9.0:
     resolution: {integrity: sha512-L2jl5vc2j6jxWcNCvcVj/BW9A8yGIG02Dw+IUw0ZxDM70f7Ylf5Hq39appV1BI9yxyWQRpq2TQ1qaXvf+yjkqA==}
     engines: {node: '>=8'}
@@ -5621,9 +5641,6 @@ packages:
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
     engines: {node: '>=8'}
-
-  string.prototype.repeat@0.2.0:
-    resolution: {integrity: sha512-1BH+X+1hSthZFW+X+JaUkjkkUPwIlLEMJBLANN3hOob3RhEk5snLWNECDnYbgn/m5c5JV7Ersu1Yubaf+05cIA==}
 
   string.prototype.repeat@1.0.0:
     resolution: {integrity: sha512-0u/TldDbKD8bFCQ/4f5+mNRrXwZ8hg2w7ZR8wa16e8z9XpePWl3eGEcUD0OXpEH/VJH/2G3gjUtR3ZOiBe2S/w==}
@@ -6069,8 +6086,16 @@ packages:
     resolution: {integrity: sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==}
     engines: {node: '>=10'}
 
+  yargs@16.2.2:
+    resolution: {integrity: sha512-Nt9ZJjXTv5R8MHbqby/wXQ6Gi0Bb3TcYZkR1bzuL4yB2OxWPkXknz513gEF0GoA6tn00UpbPvERW8rzCuWCA6w==}
+    engines: {node: '>=10'}
+
   yargs@17.7.2:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
+    engines: {node: '>=12'}
+
+  yargs@17.7.3:
+    resolution: {integrity: sha512-GZtjxm/J/4TSxuL3FNYjCmLktBTnIw/rVmKSIyKeYAZpmJB2ig9VauCC5xsa82GNKVKDAqpOn3KVzNt0zmrU0g==}
     engines: {node: '>=12'}
 
   yarn@1.22.22:
@@ -6093,11 +6118,11 @@ snapshots:
       '@jridgewell/gen-mapping': 0.1.1
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@aws-cdk/asset-awscli-v1@2.2.202': {}
+  '@aws-cdk/asset-awscli-v1@2.2.292': {}
 
-  '@aws-cdk/asset-kubectl-v20@2.1.2': {}
+  '@aws-cdk/asset-node-proxy-agent-v6@2.1.3': {}
 
-  '@aws-cdk/asset-node-proxy-agent-v6@2.0.3': {}
+  '@aws-cdk/cloud-assembly-schema@54.25.0': {}
 
   '@aws-crypto/crc32@3.0.0':
     dependencies:
@@ -7867,11 +7892,11 @@ snapshots:
       chalk: 4.1.2
       convert-source-map: 2.0.0
       fast-json-stable-stringify: 2.1.0
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.9
       jest-haste-map: 29.7.0
       jest-regex-util: 29.6.3
       jest-util: 29.7.0
-      micromatch: 4.0.4
+      micromatch: 4.0.8
       pirates: 4.0.5
       slash: 3.0.0
       write-file-atomic: 4.0.2
@@ -7883,7 +7908,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.4
       '@types/istanbul-reports': 3.0.1
-      '@types/node': 18.19.33
+      '@types/node': 20.10.4
       '@types/yargs': 17.0.22
       chalk: 4.1.2
 
@@ -7914,10 +7939,17 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
 
+  '@jsii/check-node@1.140.0':
+    dependencies:
+      chalk: 4.1.2
+      semver: 7.8.5
+
   '@jsii/check-node@1.98.0':
     dependencies:
       chalk: 4.1.2
       semver: 7.6.2
+
+  '@jsii/spec@1.140.0': {}
 
   '@jsii/spec@1.98.0':
     dependencies:
@@ -8816,11 +8848,6 @@ snapshots:
     dependencies:
       '@types/node': 18.19.33
 
-  '@types/glob@8.1.0':
-    dependencies:
-      '@types/minimatch': 5.1.2
-      '@types/node': 18.19.33
-
   '@types/graceful-fs@4.1.9':
     dependencies:
       '@types/node': 18.19.33
@@ -8863,8 +8890,6 @@ snapshots:
   '@types/memorystream@0.3.0':
     dependencies:
       '@types/node': 18.19.33
-
-  '@types/minimatch@5.1.2': {}
 
   '@types/minimist@1.2.5': {}
 
@@ -9098,7 +9123,7 @@ snapshots:
   anymatch@3.1.3:
     dependencies:
       normalize-path: 3.0.0
-      picomatch: 2.3.0
+      picomatch: 2.3.2
 
   arg@4.1.3: {}
 
@@ -9194,16 +9219,14 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.0.0
 
-  aws-cdk-lib@2.117.0(constructs@10.1.244):
+  aws-cdk-lib@2.271.0(constructs@10.8.1):
     dependencies:
-      '@aws-cdk/asset-awscli-v1': 2.2.202
-      '@aws-cdk/asset-kubectl-v20': 2.1.2
-      '@aws-cdk/asset-node-proxy-agent-v6': 2.0.3
-      constructs: 10.1.244
+      '@aws-cdk/asset-awscli-v1': 2.2.292
+      '@aws-cdk/asset-node-proxy-agent-v6': 2.1.3
+      '@aws-cdk/cloud-assembly-schema': 54.25.0
+      constructs: 10.8.1
 
-  aws-cdk@2.117.0:
-    optionalDependencies:
-      fsevents: 2.3.2
+  aws-cdk@2.1143.0: {}
 
   aws-embedded-metrics@2.0.4: {}
 
@@ -9245,7 +9268,7 @@ snapshots:
       babel-plugin-istanbul: 6.1.1(supports-color@8.1.1)
       babel-preset-jest: 29.6.3(@babel/core@7.24.5(supports-color@8.1.1))
       chalk: 4.1.2
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.9
       slash: 3.0.0
     transitivePeerDependencies:
       - supports-color
@@ -9501,7 +9524,7 @@ snapshots:
 
   co@4.6.0: {}
 
-  codemaker@1.98.0:
+  codemaker@1.140.0:
     dependencies:
       camelcase: 6.3.0
       decamelize: 5.0.1
@@ -9537,19 +9560,18 @@ snapshots:
     dependencies:
       delayed-stream: 1.0.0
 
-  commonmark@0.30.0:
-    dependencies:
-      entities: 2.0.3
-      mdurl: 1.0.1
-      minimist: 1.2.8
-      string.prototype.repeat: 0.2.0
-
   commonmark@0.31.0:
     dependencies:
       entities: 3.0.1
       mdurl: 1.0.1
       minimist: 1.2.8
       string.prototype.repeat: 1.0.0
+
+  commonmark@0.31.2:
+    dependencies:
+      entities: 3.0.1
+      mdurl: 1.0.1
+      minimist: 1.2.8
 
   compare-func@2.0.0:
     dependencies:
@@ -9571,7 +9593,7 @@ snapshots:
       tslib: 2.6.2
       upper-case: 2.0.2
 
-  constructs@10.1.244: {}
+  constructs@10.8.1: {}
 
   content-type@1.0.5: {}
 
@@ -9913,8 +9935,6 @@ snapshots:
   enquirer@2.3.6:
     dependencies:
       ansi-colors: 4.1.1
-
-  entities@2.0.3: {}
 
   entities@3.0.1: {}
 
@@ -10284,6 +10304,14 @@ snapshots:
       merge2: 1.4.1
       micromatch: 4.0.4
 
+  fast-glob@3.3.3:
+    dependencies:
+      '@nodelib/fs.stat': 2.0.5
+      '@nodelib/fs.walk': 1.2.8
+      glob-parent: 5.1.2
+      merge2: 1.4.1
+      micromatch: 4.0.8
+
   fast-json-stable-stringify@2.1.0: {}
 
   fast-levenshtein@2.0.6: {}
@@ -10481,11 +10509,6 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob-promise@6.0.5(glob@8.1.0):
-    dependencies:
-      '@types/glob': 8.1.0
-      glob: 8.1.0
-
   glob@7.2.3:
     dependencies:
       fs.realpath: 1.0.0
@@ -10494,14 +10517,6 @@ snapshots:
       minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
-
-  glob@8.1.0:
-    dependencies:
-      fs.realpath: 1.0.0
-      inflight: 1.0.6
-      inherits: 2.0.4
-      minimatch: 5.1.6
-      once: 1.4.0
 
   globals@11.12.0: {}
 
@@ -10993,14 +11008,14 @@ snapshots:
     dependencies:
       '@jest/types': 29.6.3
       '@types/graceful-fs': 4.1.9
-      '@types/node': 18.19.33
+      '@types/node': 20.10.4
       anymatch: 3.1.3
       fb-watchman: 2.0.2
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.9
       jest-regex-util: 29.6.3
       jest-util: 29.7.0
       jest-worker: 29.7.0
-      micromatch: 4.0.4
+      micromatch: 4.0.8
       walker: 1.0.8
     optionalDependencies:
       fsevents: 2.3.2
@@ -11169,7 +11184,7 @@ snapshots:
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 18.19.33
+      '@types/node': 20.10.4
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -11201,53 +11216,53 @@ snapshots:
 
   jsesc@2.5.2: {}
 
-  jsii-diff@1.98.0(supports-color@8.1.1):
+  jsii-diff@1.140.0(supports-color@8.1.1):
     dependencies:
-      '@jsii/check-node': 1.98.0
-      '@jsii/spec': 1.98.0
+      '@jsii/check-node': 1.140.0
+      '@jsii/spec': 1.140.0
       fs-extra: 10.1.0
-      jsii-reflect: 1.98.0
+      jsii-reflect: 1.140.0
       log4js: 6.9.1(supports-color@8.1.1)
-      yargs: 16.2.0
+      yargs: 17.7.3
     transitivePeerDependencies:
       - supports-color
 
-  jsii-docgen@10.4.9(jsii-rosetta@5.4.17(supports-color@8.1.1)):
+  jsii-docgen@10.12.6(jsii-rosetta@5.4.17(supports-color@8.1.1)):
     dependencies:
-      '@jsii/spec': 1.98.0
+      '@jsii/spec': 1.140.0
       case: 1.6.3
+      fast-glob: 3.3.3
       fs-extra: 10.1.0
-      glob: 8.1.0
-      glob-promise: 6.0.5(glob@8.1.0)
-      jsii-reflect: 1.98.0
+      jsii-reflect: 1.140.0
       jsii-rosetta: 5.4.17(supports-color@8.1.1)
-      semver: 7.6.2
-      yargs: 16.2.0
+      json-stream-stringify: 3.1.7
+      semver: 7.8.5
+      yargs: 16.2.2
 
-  jsii-pacmak@1.98.0(jsii-rosetta@5.4.17(supports-color@8.1.1)):
+  jsii-pacmak@1.140.0(jsii-rosetta@5.4.17(supports-color@8.1.1)):
     dependencies:
-      '@jsii/check-node': 1.98.0
-      '@jsii/spec': 1.98.0
+      '@jsii/check-node': 1.140.0
+      '@jsii/spec': 1.140.0
       clone: 2.1.2
-      codemaker: 1.98.0
-      commonmark: 0.30.0
+      codemaker: 1.140.0
+      commonmark: 0.31.2
       escape-string-regexp: 4.0.0
       fs-extra: 10.1.0
-      jsii-reflect: 1.98.0
+      jsii-reflect: 1.140.0
       jsii-rosetta: 5.4.17(supports-color@8.1.1)
-      semver: 7.6.2
-      spdx-license-list: 6.9.0
+      semver: 7.8.5
+      spdx-license-list: 6.12.0
       xmlbuilder: 15.1.1
-      yargs: 16.2.0
+      yargs: 17.7.3
 
-  jsii-reflect@1.98.0:
+  jsii-reflect@1.140.0:
     dependencies:
-      '@jsii/check-node': 1.98.0
-      '@jsii/spec': 1.98.0
+      '@jsii/check-node': 1.140.0
+      '@jsii/spec': 1.140.0
       chalk: 4.1.2
       fs-extra: 10.1.0
-      oo-ascii-tree: 1.98.0
-      yargs: 16.2.0
+      oo-ascii-tree: 1.140.0
+      yargs: 17.7.3
 
   jsii-rosetta@5.4.17(supports-color@8.1.1):
     dependencies:
@@ -11296,6 +11311,8 @@ snapshots:
   json-schema-traverse@1.0.0: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
+
+  json-stream-stringify@3.1.7: {}
 
   json-stringify-safe@5.0.1: {}
 
@@ -11528,6 +11545,11 @@ snapshots:
       braces: 3.0.3
       picomatch: 2.3.0
 
+  micromatch@4.0.8:
+    dependencies:
+      braces: 3.0.3
+      picomatch: 2.3.2
+
   mime-db@1.52.0: {}
 
   mime-types@2.1.35:
@@ -11736,7 +11758,7 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
-  oo-ascii-tree@1.98.0: {}
+  oo-ascii-tree@1.140.0: {}
 
   optionator@0.8.3:
     dependencies:
@@ -11860,6 +11882,8 @@ snapshots:
 
   picomatch@2.3.0: {}
 
+  picomatch@2.3.2: {}
+
   pify@2.3.0: {}
 
   pify@3.0.0: {}
@@ -11892,9 +11916,9 @@ snapshots:
 
   progress@2.0.3: {}
 
-  projen@0.81.6(constructs@10.1.244):
+  projen@0.103.27(constructs@10.8.1):
     dependencies:
-      constructs: 10.1.244
+      constructs: 10.8.1
 
   prompts@2.4.2:
     dependencies:
@@ -12089,6 +12113,8 @@ snapshots:
 
   semver@7.6.2: {}
 
+  semver@7.8.5: {}
+
   sentence-case@3.0.4:
     dependencies:
       no-case: 3.0.4
@@ -12261,6 +12287,8 @@ snapshots:
 
   spdx-license-ids@3.0.17: {}
 
+  spdx-license-list@6.12.0: {}
+
   spdx-license-list@6.9.0: {}
 
   split2@3.2.2:
@@ -12342,8 +12370,6 @@ snapshots:
       emoji-regex: 8.0.0
       is-fullwidth-code-point: 3.0.0
       strip-ansi: 6.0.1
-
-  string.prototype.repeat@0.2.0: {}
 
   string.prototype.repeat@1.0.0:
     dependencies:
@@ -12805,7 +12831,27 @@ snapshots:
       y18n: 5.0.8
       yargs-parser: 20.2.9
 
+  yargs@16.2.2:
+    dependencies:
+      cliui: 7.0.4
+      escalade: 3.1.2
+      get-caller-file: 2.0.5
+      require-directory: 2.1.1
+      string-width: 4.2.3
+      y18n: 5.0.8
+      yargs-parser: 20.2.9
+
   yargs@17.7.2:
+    dependencies:
+      cliui: 8.0.1
+      escalade: 3.1.2
+      get-caller-file: 2.0.5
+      require-directory: 2.1.1
+      string-width: 4.2.3
+      y18n: 5.0.8
+      yargs-parser: 21.1.1
+
+  yargs@17.7.3:
     dependencies:
       cliui: 8.0.1
       escalade: 3.1.2
