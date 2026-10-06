@@ -37,7 +37,7 @@
     "@aws-sdk/lib-dynamodb": "3.567.0",
     "@aws-sdk/lib-storage": "3.567.0",
     "@shutterstock/aws-embedded-metrics-flatten": "^1.0.5",
-    "aws-embedded-metrics": "^2.0.4",
+    "aws-embedded-metrics": "^4.2.1",
     "aws-xray-sdk-core": "^3.3.3",
     "convict": "^6.1.0",
     "convict-format-with-validator": "^6.0.1",
