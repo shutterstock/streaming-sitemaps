@@ -74,6 +74,47 @@ npm install --save-dev @shutterstock/sitemaps-cdk
 
 [Example CDK Stack](packages/cdk/lib/cdk-stack.ts)
 
+### Verify the JavaScript package locally
+
+Use Node 24 and pnpm 12.7.0 with the root frozen installation, then run:
+
+```sh
+export PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false
+pnpm run build:cdk
+pnpm --dir packages/sitemaps-cdk pack
+pnpm run test:cdk-consumer packages/sitemaps-cdk/shutterstock-sitemaps-cdk-0.0.0.tgz
+```
+
+If you materialized a release/PR version with `bin/version`, use that version in
+the tarball filename. Pack after building; the test compares installed handlers
+with the fresh build. The environment setting prevents pnpm from implicitly
+reinstalling the root workspace after version materialization; install frozen
+dependencies explicitly before running these commands. CI runs this verification
+on the same tarball uploaded by the build job, after version materialization and
+compilation.
+
+The [consumer fixture](fixtures/cdk-consumer/app.ts) compiles against the installed
+public exports and declarations with full library type checking, asserts resource
+wiring, and synthesizes a local CloudFormation assembly. It checks all three real
+bundled Lambda handlers, parses their JavaScript without executing it, and verifies
+the assembly's Lambda code references match the packaged bytes. Missing bundles,
+declarations, dummy assets, and accidental workspace resolution fail the check.
+
+The runner creates an explicit disposable pnpm installation outside the workspace
+and cached dependency trees, with its own store/cache and no install scripts or
+lockfile. It derives CDK/constructs/compiler versions and the seven-day release-age
+policy from the root-owned toolchain. Dependency downloads require registry access;
+no credentials, account lookups, or AWS calls are needed. It never repairs or saves
+the root dependency tree. The fixture is outside `packages/*` and compiled by its
+isolated compiler; root ESLint excludes it from the workspace TypeScript project.
+
+Diagnostics, compiler resolution paths, and the local assembly are saved under
+`.validation/cdk-consumer/` (CI artifact: `sitemaps-cdk-consumer`). An optional second
+argument chooses another output directory. Temporary installations are removed on
+success or failure. This JavaScript package smoke check is separate from Projen's
+full multilingual packaging, which needs additional language toolchains, and from
+deployment. It neither deploys resources nor publishes packages.
+
 # Packaged CLI verification
 
 With Node 24 and pnpm 12.7.0, run:

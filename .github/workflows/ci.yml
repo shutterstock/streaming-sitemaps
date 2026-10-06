@@ -262,6 +262,19 @@ jobs:
           name: sitemaps-cdk
           path: packages/sitemaps-cdk/*.tgz
 
+      - name: Verify the packed JavaScript CDK package in an isolated consumer
+        run: |
+          VERSION=$(node -p "require('./packages/sitemaps-cdk/package.json').version")
+          pnpm run test:cdk-consumer "packages/sitemaps-cdk/shutterstock-sitemaps-cdk-${VERSION}.tgz"
+
+      - name: Upload CDK consumer diagnostics and local assembly
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: sitemaps-cdk-consumer
+          path: .validation/cdk-consumer/
+          if-no-files-found: ignore
+
   deploy:
     # Disable for now as we have no CDK stack to deploy
     if: ${{ false }}
