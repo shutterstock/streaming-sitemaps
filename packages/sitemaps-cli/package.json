@@ -34,7 +34,7 @@
     "lint": "eslint .",
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",
-    "prepack": "oclif manifest && oclif readme",
+    "prepack": "NODE_ENV=production oclif manifest && NODE_ENV=production oclif readme",
     "version": "oclif readme && git add README.md"
   },
   "license": "MIT",
