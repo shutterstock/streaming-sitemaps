@@ -34,8 +34,8 @@
     "@types/fs-extra": "^9.0.12"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "3.567.0",
-    "@aws-sdk/lib-storage": "3.567.0",
+    "@aws-sdk/client-s3": "3.1142.0",
+    "@aws-sdk/lib-storage": "3.1142.0",
     "@types/lodash": "^4.14.171",
     "uuid": "^8.3.2",
     "@types/jest": "29.5.12",
