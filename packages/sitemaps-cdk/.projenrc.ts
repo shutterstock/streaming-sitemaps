@@ -15,11 +15,13 @@ const project = new awscdk.AwsCdkConstructLibrary({
   projenCommand: 'pnpm exec projen',
   workflowNodeVersion: '24',
   github: false,
-  minNodeVersion: '18.0.0',
-  cdkVersion: '2.117.0',
-  constructsVersion: '10.1.244',
+  minNodeVersion: '24.0.0',
+  cdkVersion: '2.271.0',
+  constructsVersion: '10.8.1',
   defaultReleaseBranch: 'main',
-  jsiiVersion: '~5.4.0',
+  jsiiVersion: '~6.0.16',
+  projenVersion: '0.103.27',
+  typescriptVersion: '6.0.3',
   name: '@shutterstock/sitemaps-cdk',
   projenrcTs: true,
   repositoryUrl: 'git@github.shuttercorp.net:sreng/streaming-sitemaps.git',
@@ -29,8 +31,17 @@ const project = new awscdk.AwsCdkConstructLibrary({
   // Jest is installed in the monorepo root
   jest: false,
 
-  devDeps: ['esbuild@0.21.0', '@types/jest@29.5.12', 'tslib@^2.3.0'],
-  // Avoid ambient monorepo types leaking into the older jsii compiler.
+  devDeps: [
+    'esbuild@0.28.2',
+    '@types/jest@30.0.0',
+    '@types/node@24.19.0',
+    'tslib@^2.8.1',
+    'ts-node@10.9.2',
+    'jsii-diff@1.140.0',
+    'jsii-docgen@10.12.6',
+    'jsii-pacmak@1.140.0',
+  ],
+  // Keep unrelated ambient workspace types out of the jsii compiler.
   tsconfig: { compilerOptions: { types: ['node'] } },
   tsconfigDev: { compilerOptions: { types: ['node', 'jest'] } },
 
@@ -39,6 +50,15 @@ const project = new awscdk.AwsCdkConstructLibrary({
   // devDeps: [],             /* Build dependencies for this module. */
   // packageName: undefined,  /* The "name" in package.json. */
 });
+
+// Rosetta is independently released; Projen's jsii-derived default can lag.
+project.addDevDeps(
+  'jsii-rosetta@~6.0.17',
+  'jsii-diff@1.140.0',
+  'jsii-pacmak@1.140.0',
+  'commit-and-tag-version@13.2.1',
+);
+project.tsconfigDev.file.addOverride('compilerOptions.ignoreDeprecations', '6.0');
 
 // The construct bundles sibling workspace sources; one root install/lock owns
 // the whole graph. Generated nested workflows are not runnable from repo root.
@@ -54,13 +74,13 @@ project.defaultTask?.env('PROJEN_DISABLE_POST', 'true');
 //
 
 project.compileTask.exec(
-  'esbuild ../kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-index-writer/index.js',
+  'esbuild ../kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-index-writer/index.js',
 );
 project.compileTask.exec(
-  'esbuild ../kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-sitemap-freshener/index.js',
+  'esbuild ../kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-sitemap-freshener/index.js',
 );
 project.compileTask.exec(
-  'esbuild ../kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-sitemap-writer/index.js',
+  'esbuild ../kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-sitemap-writer/index.js',
 );
 
 project.synth();

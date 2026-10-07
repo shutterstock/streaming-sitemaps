@@ -12,7 +12,7 @@ $ npm install -g @shutterstock/sitemaps-cli
 $ sitemaps-cli COMMAND
 running command...
 $ sitemaps-cli (--version)
-@shutterstock/sitemaps-cli/0.0.0 darwin-arm64 node-v20.13.1
+@shutterstock/sitemaps-cli/0.0.0 darwin-arm64 node-v24.21.0
 $ sitemaps-cli --help [COMMAND]
 USAGE
   $ sitemaps-cli COMMAND
@@ -30,6 +30,16 @@ USAGE
 * [`sitemaps-cli freshen`](#sitemaps-cli-freshen)
 * [`sitemaps-cli help [COMMAND]`](#sitemaps-cli-help-command)
 * [`sitemaps-cli mirror-to-s3 INDEX-URL S3-BUCKET-URL`](#sitemaps-cli-mirror-to-s3-index-url-s3-bucket-url)
+* [`sitemaps-cli plugins`](#sitemaps-cli-plugins)
+* [`sitemaps-cli plugins add PLUGIN`](#sitemaps-cli-plugins-add-plugin)
+* [`sitemaps-cli plugins:inspect PLUGIN...`](#sitemaps-cli-pluginsinspect-plugin)
+* [`sitemaps-cli plugins install PLUGIN`](#sitemaps-cli-plugins-install-plugin)
+* [`sitemaps-cli plugins link PATH`](#sitemaps-cli-plugins-link-path)
+* [`sitemaps-cli plugins remove [PLUGIN]`](#sitemaps-cli-plugins-remove-plugin)
+* [`sitemaps-cli plugins reset`](#sitemaps-cli-plugins-reset)
+* [`sitemaps-cli plugins uninstall [PLUGIN]`](#sitemaps-cli-plugins-uninstall-plugin)
+* [`sitemaps-cli plugins unlink [PLUGIN]`](#sitemaps-cli-plugins-unlink-plugin)
+* [`sitemaps-cli plugins update`](#sitemaps-cli-plugins-update)
 * [`sitemaps-cli test`](#sitemaps-cli-test)
 * [`sitemaps-cli test sitemap-writer-stream STREAM-NAME`](#sitemaps-cli-test-sitemap-writer-stream-stream-name)
 * [`sitemaps-cli upload-to-s3 FILE S3-BUCKET`](#sitemaps-cli-upload-to-s3-file-s3-bucket)
@@ -88,13 +98,13 @@ USAGE
     [--column <value>] [--escape-percent] [-f <value>]
 
 ARGUMENTS
-  DATA-FILE         Path to the local data file used to generate the URLs
-  SITEMAP-DIR-URL   Sitemap directory URL for the sitemap files, used to write links in the sitemap-index file (e.g.
-                    `https://www.example.com/sitemaps/`)
-  BASE-URL          Base URL to prefix in front of each keyword (e.g. https://www.example.com/search/)
-  OUTPUT-DIRECTORY  [default: ./] Directory to contain all output, the entire sitemap-dir-url structure will be created
-                    here, with the index file one directory up from the sitemap files
-  INDEX-FILE-NAME   [default: index.xml] Filename for the sitemap index file - will gzip if .gz extension is present
+  DATA-FILE           Path to the local data file used to generate the URLs
+  SITEMAP-DIR-URL     Sitemap directory URL for the sitemap files, used to write links in the sitemap-index file (e.g.
+                      `https://www.example.com/sitemaps/`)
+  BASE-URL            Base URL to prefix in front of each keyword (e.g. https://www.example.com/search/)
+  [OUTPUT-DIRECTORY]  [default: ./] Directory to contain all output, the entire sitemap-dir-url structure will be
+                      created here, with the index file one directory up from the sitemap files
+  [INDEX-FILE-NAME]   [default: index.xml] Filename for the sitemap index file - will gzip if .gz extension is present
 
 FLAGS
   -c, --compress                        Create .xml.gz files if true
@@ -121,12 +131,12 @@ USAGE
     [--consistency-check] [--table-item-type <value>] [--table-file-name <value>] [--create-sitemaps]
 
 ARGUMENTS
-  TABLE-NAME        Name of the DynamoDB table to use for the data
-  SITEMAP-DIR-URL   Sitemap directory URL for the sitemap files, used to write links in the sitemap-index file (e.g.
-                    `https://www.example.com/sitemaps/`)
-  OUTPUT-DIRECTORY  [default: ./] Directory to contain all output, the entire sitemap-dir-url structure will be created
-                    here, with the index file one directory up from the sitemap files
-  INDEX-FILE-NAME   [default: index.xml] Filename for the sitemap index file - will gzip if .gz extension is present
+  TABLE-NAME          Name of the DynamoDB table to use for the data
+  SITEMAP-DIR-URL     Sitemap directory URL for the sitemap files, used to write links in the sitemap-index file (e.g.
+                      `https://www.example.com/sitemaps/`)
+  [OUTPUT-DIRECTORY]  [default: ./] Directory to contain all output, the entire sitemap-dir-url structure will be
+                      created here, with the index file one directory up from the sitemap files
+  [INDEX-FILE-NAME]   [default: index.xml] Filename for the sitemap index file - will gzip if .gz extension is present
 
 FLAGS
   -c, --compress                 Create .xml.gz files if true
@@ -192,7 +202,7 @@ Initiate rewriting a sitemap or all sitemaps in a sitemap index from DynamoDB, o
 ```
 USAGE
   $ sitemaps-cli freshen [--dry-run] [--dry-run-db] [--s3-directory-override <value>] [--stream-name <value>]
-    [--function-name <value>] [--table-item-type <value>] [--itemid-regex-test-url <value> [--itemid-regex <value>
+    [--function-name <value>] [--table-item-type <value>] [--itemid-regex-test-url <value>... [--itemid-regex <value>
     --repair-db]] [--filename <value>] [-y]
 
 FLAGS
@@ -212,13 +222,16 @@ FLAGS
       Synchronously invokes the named Lambda function to start a sitemap freshen
 
   --itemid-regex=<value>
+      Only needed when `repair-db` is enabled
       Regular expression to parse the `ItemID` out of the URL in the S3 sitemaps
       Returned as named match `(?<ItemID>...)`
       MUST match the `ItemID` field in DynamoDB
       EXAMPLE: "^https:\/\/www\.example\.com\/widget-(?<ItemID>[0-9]+)"
 
   --itemid-regex-test-url=<value>...
-      URL to test the `itemIDRegex`
+      Only needed when `repair-db` is enabled
+      URL to test the `itemid-regex`
+
       User will be prompted to confirm that the extracted ID is correct
       EXAMPLE: "https://www.example.com/widget-123456789-super-sale-50%25-off"
 
@@ -229,7 +242,10 @@ FLAGS
       - For items in the S3 sitemap file owned by another file, removing them from the S3 file
 
   --s3-directory-override=<value>
-      s3 directory to override the default upload directory of sitemaps
+      S3 directory to override the default upload directory of sitemaps
+      This allows you to write to a different directory than the default,
+      enabling evaluation of the results before overwriting the existing
+      sitemaps by moving the files with, for example, the AWS CLI or Console
 
   --stream-name=<value>
       Asynchronously starts a freshen by writing a message to the Kinesis stream of the sitemap freshener
@@ -256,7 +272,7 @@ USAGE
   $ sitemaps-cli help [COMMAND...] [-n]
 
 ARGUMENTS
-  COMMAND...  Command to show help for.
+  [COMMAND...]  Command to show help for.
 
 FLAGS
   -n, --nested-commands  Include all nested commands in the output.
@@ -265,7 +281,7 @@ DESCRIPTION
   Display help for sitemaps-cli.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.0.22/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/7.0.2/src/commands/help.ts)_
 
 ## `sitemaps-cli mirror-to-s3 INDEX-URL S3-BUCKET-URL`
 
@@ -286,6 +302,296 @@ DESCRIPTION
 EXAMPLES
   $ sitemaps-cli mirror-to-s3 https://www.example.com/sitemaps/sitemap-index.xml s3://doc-example-bucket
 ```
+
+## `sitemaps-cli plugins`
+
+List installed plugins.
+
+```
+USAGE
+  $ sitemaps-cli plugins [--json] [--core]
+
+FLAGS
+  --core  Show core plugins.
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+DESCRIPTION
+  List installed plugins.
+
+EXAMPLES
+  $ sitemaps-cli plugins
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/index.ts)_
+
+## `sitemaps-cli plugins add PLUGIN`
+
+Installs a plugin into sitemaps-cli.
+
+```
+USAGE
+  $ sitemaps-cli plugins add PLUGIN... [--json] [-f] [-h] [-s | -v]
+
+ARGUMENTS
+  PLUGIN...  Plugin to install.
+
+FLAGS
+  -f, --force    Force npm to fetch remote resources even if a local copy exists on disk.
+  -h, --help     Show CLI help.
+  -s, --silent   Silences npm output.
+  -v, --verbose  Show verbose npm output.
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+DESCRIPTION
+  Installs a plugin into sitemaps-cli.
+
+  Uses npm to install plugins.
+
+  Installation of a user-installed plugin will override a core plugin.
+
+  Use the SITEMAPS_CLI_NPM_LOG_LEVEL environment variable to set the npm loglevel.
+  Use the SITEMAPS_CLI_NPM_REGISTRY environment variable to set the npm registry.
+
+ALIASES
+  $ sitemaps-cli plugins add
+
+EXAMPLES
+  Install a plugin from npm registry.
+
+    $ sitemaps-cli plugins add myplugin
+
+  Install a plugin from a github url.
+
+    $ sitemaps-cli plugins add https://github.com/someuser/someplugin
+
+  Install a plugin from a github slug.
+
+    $ sitemaps-cli plugins add someuser/someplugin
+```
+
+## `sitemaps-cli plugins:inspect PLUGIN...`
+
+Displays installation properties of a plugin.
+
+```
+USAGE
+  $ sitemaps-cli plugins inspect PLUGIN...
+
+ARGUMENTS
+  PLUGIN...  [default: .] Plugin to inspect.
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+DESCRIPTION
+  Displays installation properties of a plugin.
+
+EXAMPLES
+  $ sitemaps-cli plugins inspect myplugin
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/inspect.ts)_
+
+## `sitemaps-cli plugins install PLUGIN`
+
+Installs a plugin into sitemaps-cli.
+
+```
+USAGE
+  $ sitemaps-cli plugins install PLUGIN... [--json] [-f] [-h] [-s | -v]
+
+ARGUMENTS
+  PLUGIN...  Plugin to install.
+
+FLAGS
+  -f, --force    Force npm to fetch remote resources even if a local copy exists on disk.
+  -h, --help     Show CLI help.
+  -s, --silent   Silences npm output.
+  -v, --verbose  Show verbose npm output.
+
+GLOBAL FLAGS
+  --json  Format output as json.
+
+DESCRIPTION
+  Installs a plugin into sitemaps-cli.
+
+  Uses npm to install plugins.
+
+  Installation of a user-installed plugin will override a core plugin.
+
+  Use the SITEMAPS_CLI_NPM_LOG_LEVEL environment variable to set the npm loglevel.
+  Use the SITEMAPS_CLI_NPM_REGISTRY environment variable to set the npm registry.
+
+ALIASES
+  $ sitemaps-cli plugins add
+
+EXAMPLES
+  Install a plugin from npm registry.
+
+    $ sitemaps-cli plugins install myplugin
+
+  Install a plugin from a github url.
+
+    $ sitemaps-cli plugins install https://github.com/someuser/someplugin
+
+  Install a plugin from a github slug.
+
+    $ sitemaps-cli plugins install someuser/someplugin
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/install.ts)_
+
+## `sitemaps-cli plugins link PATH`
+
+Links a plugin into the CLI for development.
+
+```
+USAGE
+  $ sitemaps-cli plugins link PATH [-h] [--install] [-v]
+
+ARGUMENTS
+  PATH  [default: .] path to plugin
+
+FLAGS
+  -h, --help          Show CLI help.
+  -v, --verbose
+      --[no-]install  Install dependencies after linking the plugin.
+
+DESCRIPTION
+  Links a plugin into the CLI for development.
+
+  Installation of a linked plugin will override a user-installed or core plugin.
+
+  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello'
+  command will override the user-installed or core plugin implementation. This is useful for development work.
+
+
+EXAMPLES
+  $ sitemaps-cli plugins link myplugin
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/link.ts)_
+
+## `sitemaps-cli plugins remove [PLUGIN]`
+
+Removes a plugin from the CLI.
+
+```
+USAGE
+  $ sitemaps-cli plugins remove [PLUGIN...] [-h] [-v]
+
+ARGUMENTS
+  [PLUGIN...]  plugin to uninstall
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Removes a plugin from the CLI.
+
+ALIASES
+  $ sitemaps-cli plugins unlink
+  $ sitemaps-cli plugins remove
+
+EXAMPLES
+  $ sitemaps-cli plugins remove myplugin
+```
+
+## `sitemaps-cli plugins reset`
+
+Remove all user-installed and linked plugins.
+
+```
+USAGE
+  $ sitemaps-cli plugins reset [--hard] [--reinstall]
+
+FLAGS
+  --hard       Delete node_modules and package manager related files in addition to uninstalling plugins.
+  --reinstall  Reinstall all plugins after uninstalling.
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/reset.ts)_
+
+## `sitemaps-cli plugins uninstall [PLUGIN]`
+
+Removes a plugin from the CLI.
+
+```
+USAGE
+  $ sitemaps-cli plugins uninstall [PLUGIN...] [-h] [-v]
+
+ARGUMENTS
+  [PLUGIN...]  plugin to uninstall
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Removes a plugin from the CLI.
+
+ALIASES
+  $ sitemaps-cli plugins unlink
+  $ sitemaps-cli plugins remove
+
+EXAMPLES
+  $ sitemaps-cli plugins uninstall myplugin
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/uninstall.ts)_
+
+## `sitemaps-cli plugins unlink [PLUGIN]`
+
+Removes a plugin from the CLI.
+
+```
+USAGE
+  $ sitemaps-cli plugins unlink [PLUGIN...] [-h] [-v]
+
+ARGUMENTS
+  [PLUGIN...]  plugin to uninstall
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Removes a plugin from the CLI.
+
+ALIASES
+  $ sitemaps-cli plugins unlink
+  $ sitemaps-cli plugins remove
+
+EXAMPLES
+  $ sitemaps-cli plugins unlink myplugin
+```
+
+## `sitemaps-cli plugins update`
+
+Update installed plugins.
+
+```
+USAGE
+  $ sitemaps-cli plugins update [-h] [-v]
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Update installed plugins.
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/update.ts)_
 
 ## `sitemaps-cli test`
 

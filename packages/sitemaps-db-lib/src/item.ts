@@ -173,13 +173,13 @@ export class ItemRecord implements IItemRecord {
     const batchGetCommand: BatchGetCommandInput = {
       RequestItems: {},
     };
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     batchGetCommand.RequestItems![dbManager.tableName] = {
       ConsistentRead: consistentRead,
       Keys: [],
       AttributesToGet: fields,
     };
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     const requestItems = batchGetCommand.RequestItems![dbManager.tableName];
     for (const item of items) {
       requestItems.Keys?.push({
@@ -238,7 +238,6 @@ export class ItemRecord implements IItemRecord {
         }
       | undefined = undefined;
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       const result: QueryCommandOutput = await dbManager.ddbDocClient.query({
         TableName: dbManager.tableName,
@@ -329,16 +328,15 @@ export class ItemRecord implements IItemRecord {
     const batchGetCommandByItemID: BatchWriteCommandInput = {
       RequestItems: {},
     };
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     batchGetCommandByItemID.RequestItems![dbManager.tableName] = [];
 
     const batchGetCommandByFileName: BatchWriteCommandInput = {
       RequestItems: {},
     };
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     batchGetCommandByFileName.RequestItems![dbManager.tableName] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     for (const item of items) {
       // Validate that all the fields needed are present
       if (item.ItemID === undefined) {
@@ -358,14 +356,14 @@ export class ItemRecord implements IItemRecord {
       item.ResetTimeLastWrittenISO();
 
       item._keyBy = SaveBy.FileName;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       batchGetCommandByFileName.RequestItems![dbManager.tableName].push({
         PutRequest: { Item: item.dbStruct },
       });
 
       if (!byFileOnly) {
         item._keyBy = SaveBy.ItemID;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         batchGetCommandByItemID.RequestItems![dbManager.tableName].push({
           PutRequest: { Item: item.dbStruct },
         });

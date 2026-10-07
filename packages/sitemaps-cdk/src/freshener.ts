@@ -236,6 +236,8 @@ export class SitemapFreshenerConstruct extends Construct implements ISitemapFres
         {
           entry: path.join(__dirname, '..', '..', 'kinesis-sitemap-freshener', 'src', 'index.ts'),
           handler: 'handler',
+          // Preserve the previous NodejsFunction connection reuse default.
+          awsSdkConnectionReuse: true,
           bundling: {
             sourceMap: !testBuild,
             keepNames: !testBuild,

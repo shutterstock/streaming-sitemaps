@@ -1,4 +1,5 @@
-import fs, { createWriteStream, WriteStream } from 'fs-extra';
+import fs, { createWriteStream } from 'fs-extra';
+import type { WriteStream } from 'fs';
 import { IndexItem, SitemapIndexStream, SitemapItemLoose, SitemapStream } from 'sitemap';
 import zlib, { createGunzip } from 'zlib';
 import { finished, Readable } from 'stream';
@@ -87,7 +88,7 @@ export class SitemapWrapperBase {
     if (this._compress) {
       this._gzip = zlib.createGzip();
       this._gzip.pipe(this._fileStream);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       this._sitemapDest = this._gzip!;
     }
   }

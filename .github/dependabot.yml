@@ -38,7 +38,7 @@ updates:
       security-updates:
         applies-to: security-updates
         patterns: ['*']
-    # Majors remain individual PRs after 14 days; review Node >=18, CJS,
+    # Majors remain individual PRs after 14 days; review Node >=24, CJS,
     # jsii/CDK and CLI compatibility before accepting any migration.
 
   - package-ecosystem: github-actions

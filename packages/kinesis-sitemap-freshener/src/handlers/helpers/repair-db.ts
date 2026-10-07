@@ -63,7 +63,7 @@ export async function prepareRepairDB(opts: {
   log.info('starting repairDB step');
 
   log.info('loading existing sitemap from S3');
-  let s3ItemsWithIDs: SitemapItemAndItemID[] | undefined = [];
+  let s3ItemsWithIDs: SitemapItemAndItemID[] | undefined;
   try {
     const ugh = await ValidateItemIDRegex({
       config,
@@ -127,7 +127,7 @@ export async function prepareRepairDB(opts: {
   // This needed to find records that were dual-written to another file
   const prefetchConsolidatedItemRecordsByItem = new IterableMapper<string[], ItemRecord[]>(
     batch(consolidatedItemIDsDeduped, 50),
-    // eslint-disable-next-line @typescript-eslint/require-await
+
     async (itemObjs) =>
       ItemRecord.loadMany(
         dbManager,
@@ -145,6 +145,7 @@ export async function prepareRepairDB(opts: {
 
   // Make sure we only use the map, which has items that do not belong
   // to this file removed
+  // eslint-disable-next-line no-useless-assignment -- Release the source array while processing its map.
   s3ItemsWithIDs = undefined;
 
   const consolidatedItemRecordsByItem: Record<string, ItemRecord> = {};

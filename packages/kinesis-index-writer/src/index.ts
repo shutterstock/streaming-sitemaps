@@ -52,7 +52,6 @@ const enableMetricScope = config.emitMetrics ? metricScope : metricScopeDummy;
 export const handler = enableMetricScope(
   (metrics) =>
     async (payload: lambda.KinesisStreamEvent, context?: lambda.Context): Promise<void> => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const startTime = Date.now();
 
       // Set logger request-specific context

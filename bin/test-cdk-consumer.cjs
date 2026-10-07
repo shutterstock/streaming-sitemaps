@@ -9,6 +9,11 @@ const os = require('node:os');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
+const pnpm = process.env.npm_execpath;
+assert.ok(
+  pnpm && /pnpm(?:-native|\.(?:cjs|mjs|js))$/.test(pnpm),
+  'Run with pnpm run test:cdk-consumer',
+);
 const archive = process.argv[2] && path.resolve(process.argv[2]);
 const output = path.resolve(process.argv[3] || path.join(root, '.validation/cdk-consumer'));
 assert.ok(
@@ -78,9 +83,15 @@ function run(command, args) {
   }
   return result.stdout;
 }
+function runPnpm(args) {
+  // Corepack's default outside the workspace can differ from our package pin.
+  return pnpm.endsWith('-native')
+    ? run(pnpm, args)
+    : run(process.execPath, [pnpm, ...args]);
+}
 try {
   assert.equal(
-    run('pnpm', ['--version']).trim(),
+    runPnpm(['--version']).trim(),
     rootManifest.packageManager.replace('pnpm@', ''),
     'Use the pinned repository pnpm version',
   );
@@ -115,7 +126,7 @@ try {
   assert.ok(releaseAge, 'Missing root minimum release age policy');
   // A private temporary store/cache and copied package files cannot mutate the restored workspace tree.
   // --ignore-workspace also ignores YAML policy; pass the inherited age explicitly.
-  run('pnpm', [
+  runPnpm([
     'install',
     '--ignore-workspace',
     '--ignore-scripts',

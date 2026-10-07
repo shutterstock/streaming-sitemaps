@@ -4,6 +4,7 @@
     "emitDecoratorMetadata": true,
 
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "skipLibCheck": true,
     "strict": true,
     "allowJs": false,

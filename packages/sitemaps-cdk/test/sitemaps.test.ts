@@ -298,13 +298,6 @@ describe('SitemapsConstruct', () => {
                     },
                   },
                   {
-                    Action: 'kinesis:DescribeStream',
-                    Effect: 'Allow',
-                    Resource: {
-                      'Fn::GetAtt': ['TestConstructsitemapsinputstreamD34990D2', 'Arn'],
-                    },
-                  },
-                  {
                     Action: ['kinesis:ListShards', 'kinesis:PutRecord', 'kinesis:PutRecords'],
                     Effect: 'Allow',
                     Resource: {
@@ -314,8 +307,6 @@ describe('SitemapsConstruct', () => {
                   {
                     Action: [
                       'dynamodb:BatchGetItem',
-                      'dynamodb:GetRecords',
-                      'dynamodb:GetShardIterator',
                       'dynamodb:Query',
                       'dynamodb:GetItem',
                       'dynamodb:Scan',
@@ -331,8 +322,14 @@ describe('SitemapsConstruct', () => {
                       {
                         'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
                       },
+                    ],
+                  },
+                  {
+                    Action: ['dynamodb:GetRecords', 'dynamodb:GetShardIterator'],
+                    Effect: 'Allow',
+                    Resource: [
                       {
-                        Ref: 'AWS::NoValue',
+                        'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
                       },
                     ],
                   },
@@ -342,9 +339,6 @@ describe('SitemapsConstruct', () => {
                     Resource: [
                       {
                         'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
-                      },
-                      {
-                        Ref: 'AWS::NoValue',
                       },
                     ],
                   },
@@ -457,17 +451,8 @@ describe('SitemapsConstruct', () => {
                     ],
                   },
                   {
-                    Action: 'kinesis:DescribeStream',
-                    Effect: 'Allow',
-                    Resource: {
-                      'Fn::GetAtt': ['TestConstructsitemapindexwriterstream517F6DD8', 'Arn'],
-                    },
-                  },
-                  {
                     Action: [
                       'dynamodb:BatchGetItem',
-                      'dynamodb:GetRecords',
-                      'dynamodb:GetShardIterator',
                       'dynamodb:Query',
                       'dynamodb:GetItem',
                       'dynamodb:Scan',
@@ -483,8 +468,14 @@ describe('SitemapsConstruct', () => {
                       {
                         'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
                       },
+                    ],
+                  },
+                  {
+                    Action: ['dynamodb:GetRecords', 'dynamodb:GetShardIterator'],
+                    Effect: 'Allow',
+                    Resource: [
                       {
-                        Ref: 'AWS::NoValue',
+                        'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
                       },
                     ],
                   },
@@ -494,9 +485,6 @@ describe('SitemapsConstruct', () => {
                     Resource: [
                       {
                         'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
-                      },
-                      {
-                        Ref: 'AWS::NoValue',
                       },
                     ],
                   },
@@ -680,13 +668,6 @@ describe('SitemapsConstruct', () => {
                     },
                   },
                   {
-                    Action: 'kinesis:DescribeStream',
-                    Effect: 'Allow',
-                    Resource: {
-                      'Fn::GetAtt': ['TestConstructsitemapsinputstreamD34990D2', 'Arn'],
-                    },
-                  },
-                  {
                     Action: ['kinesis:ListShards', 'kinesis:PutRecord', 'kinesis:PutRecords'],
                     Effect: 'Allow',
                     Resource: {
@@ -696,8 +677,6 @@ describe('SitemapsConstruct', () => {
                   {
                     Action: [
                       'dynamodb:BatchGetItem',
-                      'dynamodb:GetRecords',
-                      'dynamodb:GetShardIterator',
                       'dynamodb:Query',
                       'dynamodb:GetItem',
                       'dynamodb:Scan',
@@ -713,8 +692,14 @@ describe('SitemapsConstruct', () => {
                       {
                         'Fn::GetAtt': ['TestConstructsitemapstable767D06B8', 'Arn'],
                       },
+                    ],
+                  },
+                  {
+                    Action: ['dynamodb:GetRecords', 'dynamodb:GetShardIterator'],
+                    Effect: 'Allow',
+                    Resource: [
                       {
-                        Ref: 'AWS::NoValue',
+                        'Fn::GetAtt': ['TestConstructsitemapstable767D06B8', 'Arn'],
                       },
                     ],
                   },
@@ -724,9 +709,6 @@ describe('SitemapsConstruct', () => {
                     Resource: [
                       {
                         'Fn::GetAtt': ['TestConstructsitemapstable767D06B8', 'Arn'],
-                      },
-                      {
-                        Ref: 'AWS::NoValue',
                       },
                     ],
                   },
@@ -839,17 +821,8 @@ describe('SitemapsConstruct', () => {
                     ],
                   },
                   {
-                    Action: 'kinesis:DescribeStream',
-                    Effect: 'Allow',
-                    Resource: {
-                      'Fn::GetAtt': ['TestConstructsitemapindexwriterstream517F6DD8', 'Arn'],
-                    },
-                  },
-                  {
                     Action: [
                       'dynamodb:BatchGetItem',
-                      'dynamodb:GetRecords',
-                      'dynamodb:GetShardIterator',
                       'dynamodb:Query',
                       'dynamodb:GetItem',
                       'dynamodb:Scan',
@@ -865,8 +838,14 @@ describe('SitemapsConstruct', () => {
                       {
                         'Fn::GetAtt': ['TestConstructsitemapstable767D06B8', 'Arn'],
                       },
+                    ],
+                  },
+                  {
+                    Action: ['dynamodb:GetRecords', 'dynamodb:GetShardIterator'],
+                    Effect: 'Allow',
+                    Resource: [
                       {
-                        Ref: 'AWS::NoValue',
+                        'Fn::GetAtt': ['TestConstructsitemapstable767D06B8', 'Arn'],
                       },
                     ],
                   },
@@ -876,9 +855,6 @@ describe('SitemapsConstruct', () => {
                     Resource: [
                       {
                         'Fn::GetAtt': ['TestConstructsitemapstable767D06B8', 'Arn'],
-                      },
-                      {
-                        Ref: 'AWS::NoValue',
                       },
                     ],
                   },
@@ -1024,7 +1000,6 @@ describe('SitemapsConstruct', () => {
     expect(() => {
       new SitemapsConstruct(stack, 'TestConstruct', {
         dynamodbTable,
-        // @ts-expect-error testing invalid props mix
         dynamodbTableProps: {
           billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
         },
@@ -1059,7 +1034,6 @@ describe('SitemapsConstruct', () => {
     });
     expect(() => {
       new SitemapsConstruct(stack, 'TestConstruct', {
-        // @ts-expect-error testing invalid props mix
         dynamodbTableProps: {
           sortKey: { name: 'id', type: dynamodb.AttributeType.STRING },
         },

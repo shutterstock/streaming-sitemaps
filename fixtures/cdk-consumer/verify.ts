@@ -133,7 +133,7 @@ const matchedAssets = new Set<string>();
 for (const [functionName, bundle, metrics] of functions) {
   template.hasResourceProperties('AWS::Lambda::Function', {
     FunctionName: functionName,
-    Runtime: 'nodejs18.x',
+    Runtime: 'nodejs24.x',
     Handler: 'index.handler',
     Architectures: ['arm64'],
     Environment: {

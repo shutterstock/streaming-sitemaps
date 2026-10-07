@@ -9,21 +9,25 @@
   "private": true,
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.567.0",
-    "@aws-sdk/lib-storage": "^3.567.0",
-    "fs-extra": "^10.0.0",
-    "wtfnode": "^0.9.1",
-    "lodash": "4.17.21",
-    "tslib": "^2.3.0"
+    "@aws-sdk/client-s3": "3.1143.0",
+    "@aws-sdk/lib-storage": "3.1143.0",
+    "fs-extra": "^11.4.1",
+    "wtfnode": "^0.10.1",
+    "lodash": "4.18.1",
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.12",
-    "@types/node": "^18",
-    "@types/node-fetch": "^2.5.12",
-    "@types/wtfnode": "^0.7.0",
-    "node-fetch": "^2.6.1",
-    "@types/jest": "29.5.12",
-    "@types/lodash": "^4.14.171",
-    "aws-sdk-client-mock": "3.1.0"
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.19.0",
+    "@types/node-fetch": "^2.6.13",
+    "@types/wtfnode": "^0.10.0",
+    "node-fetch": "^2.7.0",
+    "@types/jest": "30.0.0",
+    "@types/lodash": "^4.17.25",
+    "aws-sdk-client-mock": "4.1.0",
+    "nock": "14.0.17"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

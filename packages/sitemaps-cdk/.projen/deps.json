@@ -2,71 +2,77 @@
   "dependencies": [
     {
       "name": "@types/jest",
-      "version": "29.5.12",
+      "version": "30.0.0",
       "type": "build"
     },
     {
       "name": "@types/node",
-      "version": "^18",
+      "version": "24.19.0",
+      "type": "build"
+    },
+    {
+      "name": "commit-and-tag-version",
+      "version": "13.2.1",
       "type": "build"
     },
     {
       "name": "esbuild",
-      "version": "0.21.0",
+      "version": "0.28.2",
       "type": "build"
     },
     {
       "name": "jsii-diff",
+      "version": "1.140.0",
       "type": "build"
     },
     {
       "name": "jsii-docgen",
+      "version": "10.12.6",
       "type": "build"
     },
     {
       "name": "jsii-pacmak",
+      "version": "1.140.0",
       "type": "build"
     },
     {
       "name": "jsii-rosetta",
-      "version": "~5.4.0",
+      "version": "~6.0.17",
       "type": "build"
     },
     {
       "name": "jsii",
-      "version": "~5.4.0",
+      "version": "~6.0.16",
       "type": "build"
     },
     {
       "name": "projen",
-      "type": "build"
-    },
-    {
-      "name": "standard-version",
-      "version": "^9",
+      "version": "0.103.27",
       "type": "build"
     },
     {
       "name": "ts-node",
+      "version": "10.9.2",
       "type": "build"
     },
     {
       "name": "tslib",
-      "version": "^2.3.0",
+      "version": "^2.8.1",
       "type": "build"
     },
     {
       "name": "typescript",
+      "version": "6.0.3",
       "type": "build"
     },
     {
       "name": "aws-cdk-lib",
-      "version": "^2.117.0",
+      "version": "^2.271.0",
       "type": "peer"
     },
     {
       "name": "constructs",
-      "version": "^10.1.244",
+      "version": "^10.8.1",
       "type": "peer"
     }
   ],

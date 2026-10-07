@@ -107,6 +107,7 @@ export async function handleFreshenFileMessage(opts: {
 
   const dbItemRecordsByFileMap = keyBy(itemRecordsByFile, (item) => item.ItemID);
   // Make sure we only use the map
+  // eslint-disable-next-line no-useless-assignment -- Release the source array while processing its map.
   itemRecordsByFile = undefined;
 
   try {

@@ -78,13 +78,13 @@ describe('shard state records', () => {
   it('save throws if key is missing Type', async () => {
     // @ts-expect-error
     const record = new ShardStateRecord({});
-    await expect(async () => record.save(dbManager)).rejects.toThrowError('Type is required');
+    await expect(async () => record.save(dbManager)).rejects.toThrow('Type is required');
   });
 
   it('save throws if key is missing ShardId', async () => {
     // @ts-expect-error
     const record = new ShardStateRecord({ Type: 'widget' });
-    await expect(async () => record.save(dbManager)).rejects.toThrowError('ShardId is required');
+    await expect(async () => record.save(dbManager)).rejects.toThrow('ShardId is required');
   });
 
   describe('two records', () => {

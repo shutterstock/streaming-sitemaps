@@ -9,8 +9,6 @@ on:
       - '**'
       - '!cf/**'
   pull_request:
-    branches:
-      - main
     paths:
       - '**'
       - '!cf/**'
@@ -107,6 +105,9 @@ jobs:
       - name: Test foundation helpers
         run: pnpm run test:foundation
 
+      - name: Lint TypeScript
+        run: pnpm run lint
+
       - name: Run Node Tests
         run: pnpm run test
 
@@ -162,9 +163,6 @@ jobs:
           test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
           printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
 
-      - name: Run Lint
-        run: pnpm run lint
-
       # Change owned source manifests only. Verification stays disabled in
       # strict consumers, and no consumer saves the dependency tree.
       - name: Set version for PR
@@ -181,6 +179,10 @@ jobs:
       - name: Build All TypeScript
         run: |
           pnpm run build:all
+
+      # Type-aware lint resolves declarations from sibling workspace packages.
+      - name: Run Lint
+        run: pnpm run lint
 
       - name: Pack supporting libraries without registry credentials
         run: |

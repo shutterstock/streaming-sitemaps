@@ -313,7 +313,7 @@ describe('SitemapFileWrapper', () => {
         compress: true,
         siteBaseURL,
       }),
-    ).rejects.toThrowError('some weird s3 failure');
+    ).rejects.toThrow('some weird s3 failure');
   });
 
   it('counts size correctly - uncompressed', async () => {
@@ -344,7 +344,7 @@ describe('SitemapFileWrapper', () => {
     expect(sitemap.items.length).toBe(10);
 
     // Write another item to make the map full
-    await sitemap.write({ item: { url: `/some/path/${++itemsToWrite}` } });
+    await sitemap.write({ item: { url: `/some/path/${itemsToWrite + 1}` } });
     expect(sitemap.sizeUncompressed).toBe(2418);
     expect(sitemap.full).toBe(true);
     expect(sitemap.items.length).toBe(11);
@@ -352,7 +352,7 @@ describe('SitemapFileWrapper', () => {
     // Writing another item should throw due to byte limit
     await expect(async () =>
       sitemap.write({ item: { url: `/some/path/${++itemsToWrite}` } }),
-    ).rejects.toThrowError(
+    ).rejects.toThrow(
       'Cannot write to already full sitemap: 11 of 12 item limit, 2418 bytes of 2418 bytes limit',
     );
     expect(sitemap.sizeUncompressed).toBe(2418);
@@ -370,7 +370,7 @@ describe('SitemapFileWrapper', () => {
     // Writing another item should throw due to count limit
     await expect(async () =>
       sitemap.write({ item: { url: `/some/path/${++itemsToWrite}` }, disregardByteLimit: true }),
-    ).rejects.toThrowError(
+    ).rejects.toThrow(
       'Cannot write to already full sitemap: 12 of 12 item limit, 2487 bytes of 2418 bytes limit',
     );
     expect(sitemap.sizeUncompressed).toBe(2487);
@@ -386,7 +386,7 @@ describe('SitemapFileWrapper', () => {
     expect(sitemap.full).toBe(true);
     expect(sitemap.items.length).toBe(13);
 
-    expect(() => sitemap.sizeUncompressedBytesEmitted).toThrowError(
+    expect(() => sitemap.sizeUncompressedBytesEmitted).toThrow(
       'cannot get size of dest stream until closed',
     );
     await sitemap.end();
@@ -418,7 +418,7 @@ describe('SitemapFileWrapper', () => {
       siteBaseURL: 'https://www.example.com',
     });
     expect(sitemap.full).toBe(false);
-    let itemsToWrite = 10;
+    const itemsToWrite = 10;
     for (let i = 1; i <= itemsToWrite; i++) {
       await sitemap.write({
         item: {
@@ -436,10 +436,10 @@ describe('SitemapFileWrapper', () => {
     expect(sitemap.full).toBe(false);
 
     // Write another item to make the map full
-    await sitemap.write({ item: { url: `/some/path/${++itemsToWrite}` } });
+    await sitemap.write({ item: { url: `/some/path/${itemsToWrite + 1}` } });
     expect(sitemap.sizeUncompressed).toBe(2418);
     expect(sitemap.full).toBe(true);
-    expect(() => sitemap.sizeUncompressedBytesEmitted).toThrowError(
+    expect(() => sitemap.sizeUncompressedBytesEmitted).toThrow(
       'cannot get size of dest stream until closed',
     );
     await sitemap.end();
@@ -483,7 +483,7 @@ describe('SitemapFileWrapper', () => {
     // Confirm that writing another item throws after full
     await expect(async () => {
       return sitemap.write({ item: { url: `/some/path/${++itemsToWrite}` } });
-    }).rejects.toThrowError(
+    }).rejects.toThrow(
       'Cannot write to already full sitemap: 10 of 10 item limit, 1017 bytes of 47185920 bytes limit',
     );
     expect(sitemap.sizeUncompressed).toBe(1017);
@@ -511,7 +511,7 @@ describe('SitemapFileWrapper', () => {
     // Confirm that writing another item throws after full
     await expect(async () => {
       return sitemap.write({ item: { url: `/some/path/${++itemsToWrite}` } });
-    }).rejects.toThrowError(
+    }).rejects.toThrow(
       'Cannot write to already full sitemap: 10 of 50000 item limit, 1017 bytes of 1017 bytes limit',
     );
     expect(sitemap.sizeUncompressed).toBe(1017);

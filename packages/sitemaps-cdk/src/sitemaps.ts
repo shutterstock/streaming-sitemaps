@@ -425,6 +425,8 @@ export class SitemapsConstruct extends Construct implements ISitemapsConstruct {
         {
           entry: path.join(__dirname, '..', '..', 'kinesis-sitemap-writer', 'src', 'index.ts'),
           handler: 'handler',
+          // Preserve the previous NodejsFunction connection reuse default.
+          awsSdkConnectionReuse: true,
           bundling: {
             sourceMap: !testBuild,
             keepNames: !testBuild,
@@ -516,6 +518,8 @@ export class SitemapsConstruct extends Construct implements ISitemapsConstruct {
         {
           entry: path.join(__dirname, '..', '..', 'kinesis-index-writer', 'src', 'index.ts'),
           handler: 'handler',
+          // Preserve the previous NodejsFunction connection reuse default.
+          awsSdkConnectionReuse: true,
           bundling: {
             sourceMap: !testBuild,
             keepNames: !testBuild,

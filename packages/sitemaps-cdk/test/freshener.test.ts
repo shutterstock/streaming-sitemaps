@@ -218,8 +218,6 @@ describe('SitemapFreshenerConstruct', () => {
                   {
                     Action: [
                       'dynamodb:BatchGetItem',
-                      'dynamodb:GetRecords',
-                      'dynamodb:GetShardIterator',
                       'dynamodb:Query',
                       'dynamodb:GetItem',
                       'dynamodb:Scan',
@@ -235,8 +233,14 @@ describe('SitemapFreshenerConstruct', () => {
                       {
                         'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
                       },
+                    ],
+                  },
+                  {
+                    Action: ['dynamodb:GetRecords', 'dynamodb:GetShardIterator'],
+                    Effect: 'Allow',
+                    Resource: [
                       {
-                        Ref: 'AWS::NoValue',
+                        'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
                       },
                     ],
                   },
@@ -246,9 +250,6 @@ describe('SitemapFreshenerConstruct', () => {
                     Resource: [
                       {
                         'Fn::GetAtt': ['dynamodbtable650E77A7', 'Arn'],
-                      },
-                      {
-                        Ref: 'AWS::NoValue',
                       },
                     ],
                   },

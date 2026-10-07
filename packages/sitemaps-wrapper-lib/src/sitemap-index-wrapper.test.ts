@@ -311,7 +311,7 @@ describe('SitemapIndexWrapper', () => {
         filenameRoot,
         compress: true,
       }),
-    ).rejects.toThrowError('some weird s3 failure');
+    ).rejects.toThrow('some weird s3 failure');
   }, 60000);
 
   it('stable ordering on load', async () => {

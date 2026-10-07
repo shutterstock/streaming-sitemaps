@@ -119,7 +119,6 @@ export class ShardStateRecord implements IShardStateRecord {
         }
       | undefined = undefined;
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       const result: QueryCommandOutput = await dbManager.ddbDocClient.query({
         TableName: dbManager.tableName,
