@@ -136,13 +136,13 @@
           "exec": "jsii --silence-warnings=reserved-word"
         },
         {
-          "exec": "esbuild ../kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-index-writer/index.js"
+          "exec": "esbuild ../kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-index-writer/index.js"
         },
         {
-          "exec": "esbuild ../kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-sitemap-freshener/index.js"
+          "exec": "esbuild ../kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-sitemap-freshener/index.js"
         },
         {
-          "exec": "esbuild ../kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-sitemap-writer/index.js"
+          "exec": "esbuild ../kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-sitemap-writer/index.js"
         }
       ]
     },

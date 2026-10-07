@@ -21,8 +21,8 @@ need compatibility review, especially when a major is required. These semantics
 and scan locations follow [GitHub's Dependabot options reference](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference).
 
 There are no non-default maintenance targets or automatic merges. For every
-major, review CommonJS and deep imports, Node >=18 engines, ES2018 output, Node 18
-Lambda settings, CLI behavior, and the construct defaults. CDK, Projen and jsii
+major, review CommonJS and deep imports, Node >=24 engines, ES2018 library output, explicit
+Lambda runtime settings, CLI behavior, and the construct defaults. CDK, Projen and jsii
 upgrades need a coordinated review of [.projenrc.ts](../packages/sitemaps-cdk/.projenrc.ts),
 synthesized metadata, and packaged handlers. Dependabot may edit generated CDK
 metadata without updating its source: reconcile the source and run

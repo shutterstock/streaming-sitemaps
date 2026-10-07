@@ -20,17 +20,6 @@ packageExtensions:
       '@smithy/types': ^4.9.0
 
 overrides:
-  # SDK releases starting at 3.968 require Node 20. Preserve Node 18 consumers.
-  '@aws-sdk/types': 3.965.0
-  '@aws-sdk/client-dynamodb': 3.967.0
-  '@aws-sdk/client-kinesis': 3.967.0
-  '@aws-sdk/client-lambda': 3.967.0
-  '@aws-sdk/client-s3': 3.967.0
-  '@aws-sdk/credential-providers': 3.967.0
-  '@aws-sdk/lib-dynamodb': 3.967.0
-  '@aws-sdk/lib-storage': 3.967.0
-  # Protocol XML remains on major 5; SDK's older exact pin has fixed advisories.
-  fast-xml-parser: 5.11.1
   # DynamoDB's development-only v2 SDK uses the compatible CommonJS v4 API.
   aws-sdk>uuid: 11.1.1
   # downlevel-dts declares '*'; TypeScript 7 lacks the compiler API it uses.

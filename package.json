@@ -10,9 +10,9 @@
     "build:cdk": "pnpm --dir packages/sitemaps-cdk run compile",
     "build:cli": "pnpm --dir packages/sitemaps-cli run build",
     "esbuild:all": "pnpm run esbuild:index-writer && pnpm run esbuild:sitemap-freshener && pnpm run esbuild:sitemap-writer",
-    "esbuild:index-writer": "esbuild packages/kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-index-writer/index.js",
-    "esbuild:sitemap-freshener": "esbuild packages/kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-sitemap-freshener/index.js",
-    "esbuild:sitemap-writer": "esbuild packages/kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-sitemap-writer/index.js",
+    "esbuild:index-writer": "esbuild packages/kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-index-writer/index.js",
+    "esbuild:sitemap-freshener": "esbuild packages/kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-sitemap-freshener/index.js",
+    "esbuild:sitemap-writer": "esbuild packages/kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=packages/cdk/dist/kinesis-sitemap-writer/index.js",
     "clean": "node bin/clean.cjs",
     "clean:deep": "node bin/clean.cjs --modules",
     "clean:dist": "node bin/clean.cjs --outputs",
@@ -36,7 +36,7 @@
     "url": "https://github.shuttercorp.net/sreng/streaming-sitemaps.git"
   },
   "devDependencies": {
-    "@aws-sdk/types": "3.965.0",
+    "@aws-sdk/types": "3.974.6",
     "@eslint/js": "10.0.1",
     "@types/jest": "30.0.0",
     "@types/node": "^24.19.0",
@@ -62,7 +62,10 @@
     "ts-jest": "29.4.14",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",
-    "@aws-sdk/client-s3": "3.967.0"
+    "@aws-sdk/client-s3": "3.1143.0"
   },
-  "packageManager": "pnpm@12.7.0"
+  "packageManager": "pnpm@12.7.0",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

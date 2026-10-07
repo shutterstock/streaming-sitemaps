@@ -20,10 +20,12 @@ installation when invoked inside a Projen build. CI consumers must not repair
 their restored dependency trees.
 
 The construct uses jsii/Rosetta 6, TypeScript 6.0.3, CDK 2.271, and Node 24
-for local tooling. The public Node >=18 engine remains intact. Ambient types
+for local tooling. The public package minimum is Node >=24, explicitly approved
+for this refresh. Ambient types
 are narrowed to node for jsii and node/jest for tests; do not delete shared
 type packages. The TypeScript Projen runner uses its dedicated projenrc config.
-Runtime defaults stay at NODEJS_20_X; this deprecated Lambda runtime requires
+Lambda bundles target Node 20 syntax. Runtime defaults stay at NODEJS_20_X;
+this deprecated Lambda runtime requires
 an explicit operator migration. See the root dependency maintenance note.
 
 `pnpm run build:cdk` runs compile and produces lib/index.js, declarations, .jsii,

@@ -26,8 +26,8 @@ export function createConsumer() {
     metricsIndexWriterName: 'ConsumerIndex',
     sitemapWriterBatchSize: 100,
     sitemapWriterMaxBatchingWindow: Duration.seconds(10),
-    lambdaFuncSitemapWriterRuntime: Runtime.NODEJS_18_X,
-    lambdaFuncIndexWriterRuntime: Runtime.NODEJS_18_X,
+    lambdaFuncSitemapWriterRuntime: Runtime.NODEJS_24_X,
+    lambdaFuncIndexWriterRuntime: Runtime.NODEJS_24_X,
     lambdaFuncSitemapWriterExtraProps: { functionName: 'consumer-writer' },
     lambdaFuncIndexWriterExtraProps: { functionName: 'consumer-index' },
   };
@@ -41,7 +41,7 @@ export function createConsumer() {
     kinesisInputStream: publicInterface.kinesisInputStream,
     s3SitemapsPrefix: 'sitemaps/consumer/',
     metricsNamespace: 'ConsumerFreshener',
-    lambdaFuncFreshenerRuntime: Runtime.NODEJS_18_X,
+    lambdaFuncFreshenerRuntime: Runtime.NODEJS_24_X,
     lambdaFuncFreshenerExtraProps: { functionName: 'consumer-freshener' },
     kinesisEventSourceExtraProps: {
       startingPosition: StartingPosition.TRIM_HORIZON,

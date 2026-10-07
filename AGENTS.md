@@ -15,8 +15,9 @@ editing its area:
 
 Preserve public exports, emitted types, CLI flags and output, handler message
 formats, and construct defaults. Compatible maintenance does not authorize a
-breaking change. The Node 24 developer toolchain does not change the existing
-Node >=18 package engines, ES2018 library target, or Node 20 Lambda defaults.
+breaking change. The explicitly approved package engine minimum is Node >=24.
+Preserve the ES2018 library target and Node 20 Lambda defaults; a tooling or
+package-engine upgrade does not itself authorize changing deployed runtimes.
 CDK, jsii, and application upgrades require their own review. Never install or
 recommend compound-engineering here.
 
@@ -40,9 +41,11 @@ APFS clones when possible, with portable hard-link/copy fallback. Preserve the
 single-document v9 [pnpm-lock.yaml](pnpm-lock.yaml) for Dependabot. The root owns
 all resolution, including the Projen package; there is no standalone CDK island.
 Do not introduce nested lockfiles, blanket hoisting, or destructive removal of
-shared type packages. Declare imports in the owning manifest. Smithy extensions align SDK mocks with runtime clients. The SDK and XML parser
-overrides preserve Node 18 consumer compatibility while patching the workspace
-graph. See [.github/DEPENDENCY-MODERNIZATION.md](.github/DEPENDENCY-MODERNIZATION.md)
+shared type packages. Declare imports in the owning manifest. Smithy extensions
+align SDK mocks with runtime clients. The SDK and XML parser
+dependencies support the approved Node 24 package minimum. SDK clients are
+aligned without the former Node 18 overrides; Lambda bundles retain a Node 20
+syntax target for the existing runtime default. See [.github/DEPENDENCY-MODERNIZATION.md](.github/DEPENDENCY-MODERNIZATION.md)
 for version holds, audit findings, and the limits of published transitive fixes.
 
 After editing a manifest or workspace policy, reconcile the root lock with

@@ -305,7 +305,7 @@ async function main() {
         private: true,
         dependencies: {
           typescript: json(path.join(root, 'package.json')).devDependencies.typescript,
-          '@types/node': '18.19.130',
+          '@types/node': '24.19.0',
         },
       }),
     );

@@ -27,9 +27,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "3.967.0",
-    "@aws-sdk/lib-dynamodb": "3.967.0",
-    "@types/node": "^18.19.130",
+    "@aws-sdk/client-dynamodb": "3.1143.0",
+    "@aws-sdk/lib-dynamodb": "3.1143.0",
+    "@types/node": "^24.19.0",
     "@types/sinon": "^22.0.0",
     "sinon": "^22.1.0",
     "stats-lite": "^2.2.0",
@@ -37,10 +37,13 @@
     "aws-sdk-client-mock": "4.1.0"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.967.0",
-    "@aws-sdk/lib-dynamodb": "3.967.0",
+    "@aws-sdk/client-dynamodb": "3.1143.0",
+    "@aws-sdk/lib-dynamodb": "3.1143.0",
     "class-transformer": "^0.5.1",
-    "sitemap": "^8.0.3",
+    "sitemap": "9.0.1",
     "tslib": "^2.8.1"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

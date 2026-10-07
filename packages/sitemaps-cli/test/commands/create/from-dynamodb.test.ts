@@ -6,11 +6,14 @@ import { FileRecord, IFileRecord, ItemRecord, IItemRecord } from '@shutterstock/
 import fs from 'fs';
 import zlib from 'zlib';
 import path from 'path';
+import Enquirer from 'enquirer';
 
 jest.mock('@shutterstock/sitemaps-db-lib');
 
 describe('create:from-dynamodb', () => {
   let dynamoDBClient: AwsClientStub<dynamodb.DynamoDBClient>;
+  let confirmation: jest.SpyInstance;
+  let expectsConfirmation: boolean;
   const outputDir = path.join(__dirname, 'data');
   const originalCwd: string = process.cwd();
   const mockFileRecords: IFileRecord[] = [
@@ -43,6 +46,9 @@ describe('create:from-dynamodb', () => {
   ];
 
   beforeEach(() => {
+    expectsConfirmation = true;
+    // Answer when the command actually asks, independently of module-load speed.
+    confirmation = jest.spyOn(Enquirer.prototype, 'prompt').mockResolvedValue({ default: true });
     dynamoDBClient = mockClient(dynamodb.DynamoDBClient);
     dynamoDBClient.onAnyCommand().callsFake((command) => {
       console.error('DynamoDB request leaked through to mock client:', command);
@@ -59,12 +65,27 @@ describe('create:from-dynamodb', () => {
   });
 
   afterEach(() => {
+    const prompts = confirmation.mock.calls;
+    confirmation.mockRestore();
     process.chdir(originalCwd);
+    expect(prompts).toEqual(
+      expectsConfirmation
+        ? [
+            [
+              [
+                expect.objectContaining({
+                  type: 'confirm',
+                  message: expect.stringContaining('About to write'),
+                }),
+              ],
+            ],
+          ]
+        : [],
+    );
     // fs.rmSync(`${__dirname}/data/`, { recursive: true, force: true });
   });
 
   test
-    .stdin('y\n', 2500)
     .stdout()
     .do(() => {
       (FileRecord.loadOne as jest.Mock).mockResolvedValueOnce(mockFileRecords[0]);
@@ -113,7 +134,6 @@ describe('create:from-dynamodb', () => {
     );
 
   test
-    .stdin('y\n', 1000)
     .stdout()
     .do(() => {
       (FileRecord.loadOne as jest.Mock).mockResolvedValueOnce(mockFileRecords[0]);
@@ -155,7 +175,6 @@ describe('create:from-dynamodb', () => {
     });
 
   test
-    .stdin('y\n', 1000)
     .stdout()
     .do(() => {
       (FileRecord.loadOne as jest.Mock).mockResolvedValueOnce(mockFileRecords[0]);
@@ -199,7 +218,6 @@ describe('create:from-dynamodb', () => {
     });
 
   test
-    .stdin('y\n', 1000)
     .stdout()
     .do(() => {
       (FileRecord.loadOne as jest.Mock).mockResolvedValueOnce(mockFileRecords[0]);
@@ -241,7 +259,6 @@ describe('create:from-dynamodb', () => {
     });
 
   test
-    .stdin('y\n', 1000)
     .stdout()
     .do(() => {
       const mockFileRecords: IFileRecord[] = Array.from({ length: 5 }, (_, i) => ({
@@ -385,6 +402,7 @@ describe('create:from-dynamodb', () => {
       'index.xml',
     ])
     .it('creates index with all files but no sitemaps', (ctx) => {
+      expectsConfirmation = false;
       // Add your assertions here
       expect(ctx.stdout).toContain('✔ Creating local directory for sitemap files');
       expect(ctx.stdout).toContain('✔ Setting up DynamoDB client for table: myTable');

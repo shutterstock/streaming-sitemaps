@@ -12,6 +12,7 @@ const buildOptions = {
   loader: { '.node': 'copy' },
   outdir: './dist',
   platform: 'node',
+  target: 'node24',
   plugins: [],
   // splitting: true,
   treeShaking: true,

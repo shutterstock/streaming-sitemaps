@@ -3,7 +3,8 @@
 Read the [root](../../AGENTS.md) and [package](../AGENTS.md) guides first.
 [src/commands](src/commands) implements oclif commands;
 [bin/bundle.mjs](bin/bundle.mjs) uses a directly declared esbuild dependency.
-Keep command names, flags, defaults, output, and Node >=18 support compatible.
+Keep command names, flags, defaults, and output compatible. The approved package
+minimum is Node >=24; CLI bundles target Node 24.
 
 `pnpm run build:all` builds dependencies and the CLI. `build:cli` cleans CLI dist,
 emits declarations with tsc, and bundles commands and internal helpers with
@@ -27,7 +28,8 @@ scripts in sibling libraries. Preserve checked-in snapshots when maintenance
 does not change behavior.
 
 `pnpm --dir packages/sitemaps-cli pack` runs existing oclif manifest/README
-hooks and rewrites workspace ranges. Verify bin/run.js, dist/index.js,
+hooks in production mode and rewrites workspace ranges. Production mode keeps
+cached command paths pointed at shipped JavaScript instead of development source. Verify bin/run.js, dist/index.js,
 dist/index.d.ts, command bundles, and oclif.manifest.json in the tarball.
 The postpack hook removes the local generated manifest. Review README drift;
 packing must not alter dependency files. Publication is a separate explicitly

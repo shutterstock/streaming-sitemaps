@@ -281,7 +281,7 @@ DESCRIPTION
   Display help for sitemaps-cli.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/6.3.0/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/7.0.2/src/commands/help.ts)_
 
 ## `sitemaps-cli mirror-to-s3 INDEX-URL S3-BUCKET-URL`
 
@@ -324,7 +324,7 @@ EXAMPLES
   $ sitemaps-cli plugins
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/5.5.2/src/commands/plugins/index.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/index.ts)_
 
 ## `sitemaps-cli plugins add PLUGIN`
 
@@ -398,7 +398,7 @@ EXAMPLES
   $ sitemaps-cli plugins inspect myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/5.5.2/src/commands/plugins/inspect.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/inspect.ts)_
 
 ## `sitemaps-cli plugins install PLUGIN`
 
@@ -447,7 +447,7 @@ EXAMPLES
     $ sitemaps-cli plugins install someuser/someplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/5.5.2/src/commands/plugins/install.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/install.ts)_
 
 ## `sitemaps-cli plugins link PATH`
 
@@ -478,7 +478,7 @@ EXAMPLES
   $ sitemaps-cli plugins link myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/5.5.2/src/commands/plugins/link.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/link.ts)_
 
 ## `sitemaps-cli plugins remove [PLUGIN]`
 
@@ -519,7 +519,7 @@ FLAGS
   --reinstall  Reinstall all plugins after uninstalling.
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/5.5.2/src/commands/plugins/reset.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/reset.ts)_
 
 ## `sitemaps-cli plugins uninstall [PLUGIN]`
 
@@ -547,7 +547,7 @@ EXAMPLES
   $ sitemaps-cli plugins uninstall myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/5.5.2/src/commands/plugins/uninstall.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/uninstall.ts)_
 
 ## `sitemaps-cli plugins unlink [PLUGIN]`
 
@@ -591,7 +591,7 @@ DESCRIPTION
   Update installed plugins.
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/5.5.2/src/commands/plugins/update.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/7.0.3/src/commands/plugins/update.ts)_
 
 ## `sitemaps-cli test`
 

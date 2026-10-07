@@ -187,7 +187,7 @@ module.exports = {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: 'tsconfig.packages.json',
+        tsconfig: 'tsconfig.test.json',
       },
     ],
   },

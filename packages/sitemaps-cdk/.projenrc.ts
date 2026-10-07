@@ -15,7 +15,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   projenCommand: 'pnpm exec projen',
   workflowNodeVersion: '24',
   github: false,
-  minNodeVersion: '18.0.0',
+  minNodeVersion: '24.0.0',
   cdkVersion: '2.271.0',
   constructsVersion: '10.8.1',
   defaultReleaseBranch: 'main',
@@ -74,13 +74,13 @@ project.defaultTask?.env('PROJEN_DISABLE_POST', 'true');
 //
 
 project.compileTask.exec(
-  'esbuild ../kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-index-writer/index.js',
+  'esbuild ../kinesis-index-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-index-writer/index.js',
 );
 project.compileTask.exec(
-  'esbuild ../kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-sitemap-freshener/index.js',
+  'esbuild ../kinesis-sitemap-freshener/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-sitemap-freshener/index.js',
 );
 project.compileTask.exec(
-  'esbuild ../kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node18 --external:aws-sdk --outfile=lib/kinesis-sitemap-writer/index.js',
+  'esbuild ../kinesis-sitemap-writer/src/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --external:aws-sdk --outfile=lib/kinesis-sitemap-writer/index.js',
 );
 
 project.synth();

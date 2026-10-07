@@ -23,7 +23,8 @@ and example app run separately in `build:all` after their inputs are available.
 Read the [construct guide](sitemaps-cdk/AGENTS.md) before changing its configs.
 
 [jest.config.js](../jest.config.js) selects `packages/**/*.test.ts`, transforms
-with ts-jest and the root package config, and collects V8 LCOV/HTML/text coverage.
+with ts-jest and [tsconfig.test.json](../tsconfig.test.json), which extends the
+package config and explicitly loads Node/Jest types. It collects V8 LCOV/HTML/text coverage.
 There is no coverage threshold. [setupBeforeEnv.js](../setupBeforeEnv.js) starts
 jest-dynalite with the root table config. AWS clients are mocked in relevant
 suites; keep the mock's Smithy types aligned with the installed SDK.

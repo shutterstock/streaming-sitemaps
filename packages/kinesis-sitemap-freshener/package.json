@@ -17,7 +17,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/lambda-log": "^2.2.1",
     "@types/memorystream": "^0.3.4",
-    "@types/node": "^18.19.130",
+    "@types/node": "^24.19.0",
     "@types/node-fetch": "^2.6.13",
     "@types/rewire": "^2.5.30",
     "@types/traverse": "^0.6.37",
@@ -33,11 +33,11 @@
     "@smithy/types": "^4.19.0"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.967.0",
-    "@aws-sdk/client-kinesis": "3.967.0",
-    "@aws-sdk/client-s3": "3.967.0",
-    "@aws-sdk/lib-dynamodb": "3.967.0",
-    "@aws-sdk/lib-storage": "3.967.0",
+    "@aws-sdk/client-dynamodb": "3.1143.0",
+    "@aws-sdk/client-kinesis": "3.1143.0",
+    "@aws-sdk/client-s3": "3.1143.0",
+    "@aws-sdk/lib-dynamodb": "3.1143.0",
+    "@aws-sdk/lib-storage": "3.1143.0",
     "@shutterstock/aws-embedded-metrics-flatten": "^1.0.6",
     "@shutterstock/chunker": "^1.1.0",
     "@shutterstock/kinesis-helpers": "^1.0.15",
@@ -55,7 +55,7 @@
     "node-fetch": "^2.7.0",
     "readlineiter": "^1.0.1",
     "reflect-metadata": "^0.2.2",
-    "sitemap": "^8.0.3",
+    "sitemap": "9.0.1",
     "source-map-support": "^0.5.21",
     "traverse": "^0.6.11",
     "ts-convict": "^1.1.0",
@@ -68,5 +68,8 @@
     "@shutterstock/sitemaps-metrics-lib": "workspace:^",
     "@shutterstock/sitemaps-utils-lib": "workspace:^",
     "lodash": "4.18.1"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }
