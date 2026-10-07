@@ -2,6 +2,7 @@ import * as assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, realpathSync, statSync } from 'node:fs';
 import * as path from 'node:path';
+import { builtinModules } from 'node:module';
 import { Script } from 'node:vm';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { FreshenerCode, IndexWriterCode, SitemapWriterCode } from '@shutterstock/sitemaps-cdk';
@@ -24,6 +25,13 @@ const manifest = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'),
 assert.equal(manifest.version, process.env.CONSUMER_PACKAGE_VERSION);
 assert.ok(statSync(path.join(packageRoot, manifest.types)).isFile(), 'Missing public declarations');
 assert.ok(statSync(path.join(packageRoot, '.jsii')).isFile(), 'Missing jsii assembly');
+const jsii = JSON.parse(readFileSync(path.join(packageRoot, '.jsii'), 'utf8'));
+assert.equal(jsii.name, manifest.name, 'jsii assembly package name must match npm');
+assert.equal(
+  jsii.version,
+  manifest.version,
+  'Recompile after version injection; jsii must match npm',
+);
 const expected = JSON.parse(readFileSync('expected-bundles.json', 'utf8')) as Record<
   string,
   string
@@ -45,6 +53,19 @@ for (const [name, code] of Object.entries(helpers)) {
   );
   assert.ok(bytes.length > 10000, `${name} is too small to be a real bundled handler`);
   new Script(bytes.toString(), { filename: file }); // Parse without executing handlers or calling AWS.
+  // These are the SDK's guarded optional signing implementations. Ordinary
+  // handlers must bundle all other npm imports rather than resolving them from
+  // the development workspace or assuming a Lambda-provided dependency.
+  const optionalSigners = new Set(['@aws-sdk/signature-v4-crt', '@aws-sdk/signature-v4a']);
+  for (const match of bytes.toString().matchAll(/\brequire\(["']([^"']+)["']\)/g)) {
+    const dependency = match[1];
+    assert.ok(
+      builtinModules.includes(dependency) ||
+        dependency.startsWith('node:') ||
+        optionalSigners.has(dependency),
+      `${name} leaves an unresolved external import: ${dependency}`,
+    );
+  }
   const map = JSON.parse(readFileSync(`${file}.map`, 'utf8'));
   assert.ok(
     map.sources.some((source: string) => source.endsWith(`${name}/src/index.ts`)),

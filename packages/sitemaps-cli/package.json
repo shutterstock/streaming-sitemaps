@@ -39,11 +39,13 @@
   },
   "license": "MIT",
   "files": [
-    "/bin",
-    "/dist",
-    "/oclif.manifest.json",
-    "package.json",
-    "LICENSE.md"
+    "bin/run.js",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "!dist/**/*.test.*",
+    "oclif.manifest.json",
+    "LICENSE.md",
+    "README.md"
   ],
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "3.1143.0",
@@ -98,5 +100,14 @@
     ],
     "topicSeparator": " ",
     "topics": {}
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shutterstock/streaming-sitemaps.git",
+    "directory": "packages/sitemaps-cli"
+  },
+  "homepage": "https://github.com/shutterstock/streaming-sitemaps/tree/main/packages/sitemaps-cli",
+  "bugs": {
+    "url": "https://github.com/shutterstock/streaming-sitemaps/issues"
   }
 }

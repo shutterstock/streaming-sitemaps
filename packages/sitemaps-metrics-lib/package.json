@@ -17,22 +17,59 @@
     "@types/node": "^24.19.0"
   },
   "files": [
-    "dist/",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist/**/*.js.map",
+    "src/**/*.ts",
     "!dist/**/*.test.*",
-    "!dist/**/*.d.ts.map",
-    "src/",
     "!src/**/*.test.*",
+    "!dist/**/mocks/**",
+    "!src/**/mocks/**",
+    "!dist/**/__snapshots__/**",
+    "!src/**/__snapshots__/**",
     "LICENSE.md",
-    "package.json"
+    "README.md"
   ],
   "exports": {
-    ".": "./dist/index.js",
-    "./*": "./dist/*"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json",
+    "./*.d.ts": "./dist/*.d.ts",
+    "./*.js": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    }
   },
   "dependencies": {
     "tslib": "^2.8.1"
   },
   "engines": {
     "node": ">=24.0.0"
+  },
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "dist/*": [
+        "dist/*"
+      ],
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shutterstock/streaming-sitemaps.git",
+    "directory": "packages/sitemaps-metrics-lib"
+  },
+  "homepage": "https://github.com/shutterstock/streaming-sitemaps/tree/main/packages/sitemaps-metrics-lib",
+  "bugs": {
+    "url": "https://github.com/shutterstock/streaming-sitemaps/issues"
   }
 }

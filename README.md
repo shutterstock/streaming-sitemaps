@@ -149,6 +149,13 @@ the CLI README changed by pack hooks, and removes temporary fixtures/locks.
 Library source versions remain `0.0.0`; no second lockfile is committed. PR CI runs this
 check after version materialization and builds, without saving consumer caches.
 
+# Package verification
+
+Package maintenance and release preparation use the
+[public package contract](.github/PACKAGE-CONTENTS.md). After `pnpm run build:all`
+and unit tests, rebuild the CLI and run `pnpm run test:packages` to verify every
+public tarball in isolated consumers, including offline commands and CDK assets.
+
 # License
 
 Streaming Sitemaps is licensed under the MIT License. For more information, see the [LICENSE.md](LICENSE.md) file.

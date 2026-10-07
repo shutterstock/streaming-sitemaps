@@ -38,6 +38,12 @@ seven-day policy and `npm_config_min_release_age: '7'`.
 
 ## Validation and release boundaries
 
+The build job runs `pnpm run test:packages` after version injection/build/pack.
+This explicit disposable consumer install uses its own temporary store/home
+outside the workspace. It must never install into or save the restored tree.
+See the [public package contract](PACKAGE-CONTENTS.md) for the complete npm set,
+dependency order, offline checks and publication limits.
+
 CI retains the `install-deps`, `test`, and `build` job identifiers. The always
 running build gate fails setup/test failures instead of reporting a skipped
 required check. Coverage comments use public peter-evans actions and skip fork

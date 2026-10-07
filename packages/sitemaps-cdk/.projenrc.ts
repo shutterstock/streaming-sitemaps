@@ -24,7 +24,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   typescriptVersion: '6.0.3',
   name: '@shutterstock/sitemaps-cdk',
   projenrcTs: true,
-  repositoryUrl: 'git@github.shuttercorp.net:sreng/streaming-sitemaps.git',
+  repositoryUrl: 'https://github.com/shutterstock/streaming-sitemaps.git',
   // We run eslint from the root of the monorepo
   eslint: false,
 
@@ -63,8 +63,23 @@ project.tsconfigDev.file.addOverride('compilerOptions.ignoreDeprecations', '6.0'
 // The construct bundles sibling workspace sources; one root install/lock owns
 // the whole graph. Generated nested workflows are not runnable from repo root.
 project.package.addField('packageManager', 'pnpm@12.7.0');
+project.package.file.addOverride('repository.directory', 'packages/sitemaps-cdk');
+project.package.addField('homepage', 'https://github.com/shutterstock/streaming-sitemaps');
+project.package.addField('bugs', {
+  url: 'https://github.com/shutterstock/streaming-sitemaps/issues',
+});
+project.package.addField('files', [
+  'lib/**/*.js',
+  'lib/**/*.d.ts',
+  'lib/**/*.js.map',
+  '.jsii',
+  'LICENSE',
+  'README.md',
+  'API.md',
+]);
 project.gitignore.addPatterns('/pnpm-lock.yaml');
 project.npmignore?.exclude('/AGENTS.md');
+project.npmignore?.exclude('/lib/**/*.test.*', '/lib/**/*.tsbuildinfo', '/.agents/', '/.codex/');
 // Synthesis describes the workspace; dependency installation belongs to the
 // root lock owner and is an explicit separate step, including in CI builds.
 project.defaultTask?.env('PROJEN_DISABLE_POST', 'true');

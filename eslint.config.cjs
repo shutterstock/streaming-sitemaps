@@ -15,7 +15,7 @@ module.exports = [
       '**/coverage/**',
       '**/*.{js,cjs,mjs}',
       'docs/**',
-      'fixtures/cdk-consumer/**',
+      'fixtures/**',
     ],
   },
   {
