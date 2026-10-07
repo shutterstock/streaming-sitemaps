@@ -129,6 +129,8 @@ jobs:
         run: pnpm run build:cli
 
       - name: Verify isolated packed consumers
+        env:
+          SITEMAPS_AUDIT_PACKAGES: '1'
         run: pnpm run test:packages
 
       - name: Pack the exact six packages in dependency order

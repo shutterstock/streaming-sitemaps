@@ -11,10 +11,17 @@ Never commit materialized versions.
 
 Read the [package contract](PACKAGE-CONTENTS.md) and
 [dependency decisions](DEPENDENCY-MODERNIZATION.md). The checked-in
-[publication hold](release-policy.json) blocks registry writes until a reviewed
-patched-consumer strategy or explicit compatibility-policy decision addresses
-the held SDK's isolated `fast-xml-parser` 5.2.5 graph. Passing tests and workspace
-overrides do not resolve that decision. Record its resolution in a reviewed PR.
+[publication policy](release-policy.json) records the reviewed dependency state.
+SDK clients 3.1143.0 replace the former pinned XML implementation; the obsolete
+SDK 3.967.0 / fast-xml-parser publication hold is removed after a fresh packed
+production-consumer audit. Recheck that graph for each release with
+`SITEMAPS_AUDIT_PACKAGES=1 pnpm run test:packages`. Workspace tooling findings
+and independent npm owner/publisher configuration remain separate requirements;
+an audit does not establish publisher settings or guarantee future results.
+The final release checkout's October 7, 2026 UTC audit reports zero advisories
+across 122 production dependencies and no fast-xml-parser. The root workspace
+audit separately reports 2 high, 1 moderate and 1 low tooling/test advisory;
+see the dependency guide for current findings and release-age holds.
 
 ## Exact package set
 
@@ -53,6 +60,16 @@ compatibility, fixes, upgrade instructions, all six coordinated packages, SDK
 consumer limits and retained Lambda defaults. Record exact commit, version,
 channel, verified checks and exceptions before reviewing the publication plan.
 
+The next release intentionally raises every public package's minimum from
+Node >=18 to **Node >=24.0.0**. Treat the support change as breaking during version
+review: an established stable 1.x-or-later line needs its next major, rather than
+a patch/minor under the former Node floor. For an unpublished or 0.x line, review
+the initial/next compatibility line explicitly against actual registry history;
+do not invent a prior version from source `0.0.0`. Apply one reviewed version to
+all six packages and its candidate channel. Start with the
+[draft release notes](RELEASE-NOTES.md), including the Node 24 migration, retained
+CommonJS/deep imports and separate Node 20 Lambda deployment defaults.
+
 Use Node 24 and pnpm 12.7.0 and run the committed gates:
 
 ```sh
@@ -63,7 +80,7 @@ pnpm run lint
 pnpm run test
 pnpm run test:foundation
 pnpm run build:cli
-pnpm run test:packages
+SITEMAPS_AUDIT_PACKAGES=1 pnpm run test:packages
 pnpm run build:docs
 pnpm run synth:cdk
 pnpm run synth:cdk
@@ -151,6 +168,19 @@ channels. Verify each package's repository URL. Code, dry runs and green CI do
 not prove these settings or a working OIDC publish. This PR does not create
 publishers, secrets or packages, or change repository/account settings.
 
+Anonymous public npm reads on October 7, 2026 UTC returned HTTP 404 for every
+name below. Owners must verify ownership/bootstrap/public visibility and the
+publisher fields above independently; a 404 is not account-settings evidence.
+
+| Public package | Public registry read | Publisher/owner configuration |
+| --- | --- | --- |
+| `@shutterstock/sitemaps-models-lib` | HTTP 404 | Unverified; owner action required |
+| `@shutterstock/sitemaps-db-lib` | HTTP 404 | Unverified; owner action required |
+| `@shutterstock/sitemaps-metrics-lib` | HTTP 404 | Unverified; owner action required |
+| `@shutterstock/sitemaps-wrapper-lib` | HTTP 404 | Unverified; owner action required |
+| `@shutterstock/sitemaps-cli` | HTTP 404 | Unverified; owner action required |
+| `@shutterstock/sitemaps-cdk` | HTTP 404 | Unverified; owner action required |
+
 ## Partial-publication recovery
 
 Stop at the first failure. Inspect the exact failed run/source commit, retained
@@ -218,7 +248,7 @@ constant-false deploy diagnostic is expected; do not enable deployment.
 Fixture tests cover Git refs, event guards, immutable recovery, registry errors,
 archive tampering and docs gating without publication. Hosted PR CI proves cache
 and consumer behavior, not real release routing, npm owner settings/OIDC writes
-or Pages deployment. Record these limits and the publication hold in review.
+or Pages deployment. Record these limits, current audits and owner blockers in review.
 
 The audit's anonymous registry reads returned HTTP 404 for all six package
 names. That does not prove owner/private-package state; owners must independently

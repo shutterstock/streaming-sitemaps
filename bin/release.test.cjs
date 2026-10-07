@@ -150,6 +150,21 @@ test('explicit SemVer/tag parsing and channel comparison reject ambiguous versio
   assert.equal(compare('1.0.0-rc.1', '1.0.0-rc.1'), 0);
 });
 
+test('public release manifests enforce the reviewed Node 24 floor in source and tagged commits', (t) => {
+  const { cwd, git } = fixture(t);
+  assert.equal(publicManifests(cwd).length, 6);
+  const file = path.join(cwd, 'packages', packages[0], 'package.json');
+  const manifest = JSON.parse(fs.readFileSync(file));
+  for (const engine of ['>=18.0.0', '>=22.0.0', '>=26.0.0', undefined]) {
+    fs.writeFileSync(file, JSON.stringify({ ...manifest, engines: { node: engine } }));
+    assert.throws(() => publicManifests(cwd), /Node >=24\.0\.0/);
+  }
+  fs.writeFileSync(file, JSON.stringify({ ...manifest, engines: { node: '>=18.0.0' } }));
+  git('add', '.');
+  git('commit', '-m', 'unsupported historical engine');
+  assert.throws(() => publicManifests(cwd, '0.0.0', 'HEAD'), /Node >=24\.0\.0/);
+});
+
 test('published stable/prerelease and manual provenance accept explicit main ancestors', (t) => {
   const { options, commit, release } = fixture(t);
   assert.equal(validateRelease(options).commit, commit);
@@ -435,7 +450,7 @@ test('docs require agreement of every stable published package', () => {
   );
 });
 
-test('OIDC requirements and the reviewed publication hold cannot fall back to tokens', () => {
+test('OIDC requirements and future reviewed publication holds cannot fall back to tokens', () => {
   const env = {
     ACTIONS_ID_TOKEN_REQUEST_URL: 'https://example.invalid/oidc',
     ACTIONS_ID_TOKEN_REQUEST_TOKEN: 'test',
@@ -449,8 +464,9 @@ test('OIDC requirements and the reviewed publication hold cannot fall back to to
   assert.doesNotThrow(() => publisherGuard(options));
   for (const patch of [
     { policy: {} },
-    { policy: { publicationBlocked: true, reason: 'consumer SDK' } },
+    { policy: { publicationBlocked: true, reason: 'reviewed future blocker' } },
     { nodeVersion: '22.14.0' },
+    { nodeVersion: '26.0.0' },
     { npmVersion: '11.5.0' },
     { env: {} },
     { env: { ...env, NPM_TOKEN: 'fallback' } },

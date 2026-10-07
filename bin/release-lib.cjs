@@ -81,10 +81,11 @@ function publicManifests(cwd = process.cwd(), expected = '0.0.0', commit) {
     if (
       manifest.name !== `@shutterstock/${directory}` ||
       manifest.private ||
-      manifest.version !== expected
+      manifest.version !== expected ||
+      !['>=24.0.0', '>= 24.0.0'].includes(manifest.engines?.node)
     ) {
       throw new Error(
-        `Unexpected public manifest: ${directory}; expected source/version ${expected}`,
+        `Unexpected public manifest: ${directory}; expected source/version ${expected} and Node >=24.0.0`,
       );
     }
     if (manifest.repository?.url !== `https://github.com/${repository}.git`)

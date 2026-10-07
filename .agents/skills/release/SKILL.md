@@ -8,7 +8,7 @@ description: Prepare, validate, or recover coordinated Streaming Sitemaps npm re
 Read the current checkout's [release guide](../../../.github/RELEASING.md),
 [package contract](../../../.github/PACKAGE-CONTENTS.md),
 [dependency decisions](../../../.github/DEPENDENCY-MODERNIZATION.md), and
-[publication hold](../../../.github/release-policy.json) before deciding readiness.
+[publication policy](../../../.github/release-policy.json) before deciding readiness.
 Use the selected workspace for edits, builds and Git. Reference checkouts are
 read-only. Inspect actual pushed prerequisite commits and hosted checks; local
 passes do not bypass failing prerequisites.
@@ -31,17 +31,25 @@ app, utils and all three handlers stay private.
 Start from clean reviewed source and current origin. Inspect prior GitHub
 releases and every package's registry versions/dist-tags. Prepare notes from the
 previous release diff, covering user changes, compatibility, all six packages
-and known limits. Keep publication blocked until the reviewed SDK consumer
-policy is resolved; overrides and passing packed tests do not resolve that
-owner decision. Independently report publisher settings for each package as
+and known limits. The intentional Node >=24.0.0 minimum is a breaking support
+change: review an established 1.x-or-later line as a new major; review an
+unpublished/0.x line explicitly against real history without guessing versions.
+Use the [draft notes](../../../.github/RELEASE-NOTES.md). Preserve CommonJS/deep
+imports, Node types 24 and CLI target 24. Lambda defaults and handler bundle
+targets remain Node 20 as a separate deployment migration; packed fixtures
+request Node 24. The SDK 3.1143.0 refresh resolves the former pinned XML-parser
+hold; audit fresh public consumers independently from workspace tooling.
+Independently report publisher settings for each package as
 unverified until owner evidence exists; code cannot prove them.
 
 Run the guide's committed Node 24/pnpm 12.7.0 gates: frozen install, clean
 `build:all`, lint, full tests, `test:foundation`, CLI rebuild after tests,
 **`pnpm run test:packages`**, `build:docs`, repeated `synth:cdk`, and generated
-drift inspection. Also validate the explicitly injected candidate and the
-credentialless six-package pack/dry run. Inject after installation/strict
-restore. Never rewrite the lock, implicitly install/repair/save restored trees,
+drift inspection. Verify actual `node --version` is major 24, not the shared
+default 26. Run `SITEMAPS_AUDIT_PACKAGES=1 pnpm run test:packages` and record
+current production audit results and graph size. Also validate the explicitly
+injected candidate and the credentialless six-package pack/dry run. Inject after
+installation/strict restore. Never rewrite the lock, implicitly install/repair/save restored trees,
 or commit versions, archives or build outputs.
 
 Before publication, verify the immutable remote tag object/peeled commit,
@@ -84,4 +92,5 @@ provenance bypass. See [docs recovery](../../../.github/RELEASING.md#stable-docu
 
 Report actual gates, readiness and remaining owner blockers. PR dry runs do not
 establish npm OIDC owner settings, real publication or Pages behavior. Preserve
-the guide's publication hold and prerequisite merge order.
+the guide's publication policy, separate tooling/owner requirements and
+prerequisite merge order.

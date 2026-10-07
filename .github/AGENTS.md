@@ -75,8 +75,12 @@ stay at their existing convention; manual publication requires a version tag.
 The [release guide](RELEASING.md), [release skill](../.agents/skills/release/SKILL.md)
 and reusable [guards](../bin/release-lib.cjs) define immutable tag/event provenance,
 stable/next channels, partial recovery, docs gating and independent per-package
-npm owner settings. Keep the [publication hold](release-policy.json) until a
-reviewed consumer strategy or explicit policy decision resolves it. Do not run
+npm owner settings. The [publication policy](release-policy.json) reflects the
+reviewed SDK 3.1143.0 consumer refresh; re-audit fresh public tarballs independently
+from workspace tooling with `SITEMAPS_AUDIT_PACKAGES=1 pnpm run test:packages`.
+Public package minimums are intentionally Node >=24; record this breaking support
+change in version review and notes while keeping Lambda defaults at Node 20.
+Do not run
 release workflows, publish npm packages, create
 releases/tags, merge PRs, change repository settings, or deploy infrastructure
 without an explicit user request. Name dependencies and merge order in stacked
