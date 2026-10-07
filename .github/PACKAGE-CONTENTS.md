@@ -19,9 +19,13 @@ inputs for the CLI; handlers are bundled construct assets. They must never
 become dependencies on unpublished npm packages. The wrapper is public because
 the CLI's shipped helper declarations reference its types. Its file-stream
 declaration uses Node's `fs.WriteStream`, so production `@types/fs-extra` is
-unnecessary (unlike the former declaration examined in PR #6).
+unnecessary for this declaration. The production classification of
+`@types/fs-extra` from merged PR #6 is retained through the prerequisite branch.
 
-All entries retain CommonJS. Models, database, and metrics accept both
+All public packages and the CLI require Node >=24, an explicitly approved
+support change that must be called out in release notes and version review.
+CommonJS and deep-import compatibility remain independent of the engine floor.
+Models, database, and metrics accept both
 extensionless deep imports (for example `sitemaps-db-lib/manager`) and explicit
 `.js` imports, plus existing explicit `.d.ts` type-only imports. Their type maps
 support legacy and modern TypeScript resolution.
@@ -59,7 +63,9 @@ packing. `test:packages` packs **every** public workspace itself and checks the
 actual manifests and archives. Its checked-in
 [fixtures](../fixtures/packed-consumer) extend the packaged CLI checks from
 PR #6; [construct fixtures](../fixtures/cdk-consumer) reuse PR #5's real asset
-and resource assertions. Neither PR is merged or required for this gate.
+and resource assertions. Both PRs are merged through prerequisite #7; their
+standalone `test:cli:packaged` and `test:cdk-consumer` gates remain alongside
+the all-package gate.
 
 The runner creates a disposable consumer outside this checkout, rejects any
 ancestor `node_modules`, and uses isolated non-hoisted production installs.
@@ -102,16 +108,27 @@ SITEMAPS_CONSUMER_NODE=/absolute/path/to/node pnpm run test:packages
 
 This gate certifies JavaScript archives and offline consumption, not cloud
 deployment, full multilingual jsii packaging, or registry owner settings.
-The existing Node 20 Lambda defaults are retained; fixture overrides use Node 18
-to exercise the consumer compatibility boundary. Lifecycle warnings do not
-authorize runtime migration.
+The existing Node 20 Lambda defaults and Node 20 bundle syntax target are
+retained; packed fixtures explicitly request Node 24 for all three Lambdas.
+Changing deployment defaults remains a separate migration.
 
-Root overrides do not propagate to npm consumers. The Node 18 compatible SDK
-still pins `fast-xml-parser` 5.2.5 in an isolated public install; the workspace's
-patched override is not a consumer resolution strategy. See
-[dependency decisions](DEPENDENCY-MODERNIZATION.md). Publication remains blocked
-on a reviewed patched-consumer strategy or an explicit compatibility-policy
-decision; successful packed checks are not a security exception. This change
-neither upgrades dependencies nor masks that graph with consumer overrides.
+Public consumers are audited independently because root policy does not
+propagate into tarballs. To audit the freshly packed six-package production
+consumer against the current registry, run:
+
+```sh
+SITEMAPS_AUDIT_PACKAGES=1 pnpm run test:packages
+```
+
+This optional registry check reports the actual advisory counts and fails on
+production advisories. It runs after the isolated production install and before
+the offline checks; registry audit availability is required. The consumer also
+reports any installed `fast-xml-parser` versions. The old SDK 3.967/parser
+blocker is removed by the Node 24 dependency refresh. On October 7, 2026 UTC,
+the actual six-tarball production consumer (including explicit CDK peers)
+reported zero advisories across 122 production dependencies and contained no
+`fast-xml-parser`. This is a measured registry result, not a guarantee against
+future advisories. Workspace tooling findings remain separate; see
+[dependency decisions](DEPENDENCY-MODERNIZATION.md).
 Release provenance, publisher configuration, channel policy and
 partial-publication recovery belong to the following release PR.

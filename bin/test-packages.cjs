@@ -179,6 +179,11 @@ async function main() {
       const packageDir = path.join(extracted, 'package');
       const manifest = json(path.join(packageDir, 'package.json'));
       assert.equal(manifest.version, source.version);
+      assert.equal(
+        manifest.engines.node.replace(/\s/g, ''),
+        '>=24.0.0',
+        `${manifest.name} must retain Node 24 support`,
+      );
       assert(!manifest.private, `${manifest.name} must be public`);
       for (const field of [
         'dependencies',
@@ -368,6 +373,16 @@ async function main() {
           .join('; ')}`,
       );
     }
+    if (process.env.SITEMAPS_AUDIT_PACKAGES === '1') {
+      const result = await runPnpm(['audit', '--prod', '--json'], consumer, env);
+      const audit = JSON.parse(result.output);
+      assert.equal(
+        Object.values(audit.metadata.vulnerabilities).reduce((total, count) => total + count, 0),
+        0,
+        result.output,
+      );
+      console.log(`Packed production audit: ${JSON.stringify(audit.metadata)}`);
+    }
     assert.deepEqual(
       [...served].sort(),
       publicPackages
@@ -502,10 +517,13 @@ async function main() {
     );
     const wrapperRequire = createRequire(cliRequire.resolve('@shutterstock/sitemaps-wrapper-lib'));
     const sdkRequire = createRequire(wrapperRequire.resolve('@aws-sdk/client-s3'));
-    const coreRequire = createRequire(sdkRequire.resolve('@aws-sdk/core'));
-    const xmlRequire = createRequire(coreRequire.resolve('@aws-sdk/xml-builder'));
+    const parsers = files(path.join(consumer, 'node_modules'))
+      .filter((file) => path.basename(file) === 'package.json')
+      .map(json)
+      .filter((manifest) => manifest.name === 'fast-xml-parser')
+      .map((manifest) => manifest.version);
     console.log(
-      `Published SDK XML parser: ${installedVersion(xmlRequire, 'fast-xml-parser')} (no workspace overrides)`,
+      `Published S3 SDK: ${installedVersion(sdkRequire, '@aws-sdk/client-s3')}; fast-xml-parser versions: ${JSON.stringify(parsers)} (no workspace overrides)`,
     );
     console.log(
       `Production versions: sitemap ${installedVersion(cliRequire, 'sitemap')}, CLI fs-extra ${installedVersion(cliRequire, 'fs-extra')}, wrapper fs-extra ${installedVersion(wrapperRequire, 'fs-extra')}`,
@@ -533,8 +551,8 @@ async function main() {
     fs.symlinkSync(runtimeNode, path.join(toolbin, 'node'));
     const runtimeVersion = (await run(runtimeNode, ['--version'], consumer, offline)).output.trim();
     assert(
-      Number(runtimeVersion.split('.')[0].slice(1)) >= 18,
-      'Consumer runtime must satisfy Node >=18',
+      Number(runtimeVersion.split('.')[0].slice(1)) >= 24,
+      'Consumer runtime must satisfy Node >=24',
     );
     console.log(`Packed runtime checks: ${runtimeVersion}`);
     fs.copyFileSync(path.join(fixtures, 'exports.cjs'), path.join(consumer, 'exports.cjs'));
