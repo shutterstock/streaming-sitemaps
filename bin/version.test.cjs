@@ -31,12 +31,20 @@ test('version materialization changes only owned manifests, including with pnpm 
       dependencies.map((file) => fs.readFileSync(path.join(cwd, file), 'utf8')),
       before,
     );
-    const invalid = spawnSync(
-      process.execPath,
-      [path.join(__dirname, 'version'), 'not-a-version'],
-      { cwd },
-    );
-    assert.notEqual(invalid.status, 0);
+    for (const version of [
+      'not-a-version',
+      'other/v1.2.3',
+      'refs/tags/v1.2.3',
+      'from-git',
+      '01.2.3',
+      '1.2.3+build',
+      '1.2.3-01',
+    ]) {
+      const invalid = spawnSync(process.execPath, [path.join(__dirname, 'version'), version], {
+        cwd,
+      });
+      assert.notEqual(invalid.status, 0);
+    }
     for (const file of owned)
       assert.equal(JSON.parse(fs.readFileSync(path.join(cwd, file))).version, '1.2.3');
   } finally {

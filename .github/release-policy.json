@@ -1,0 +1,11 @@
+{
+  "publicationBlocked": false,
+  "reason": "The obsolete SDK 3.967.0 / fast-xml-parser hold is resolved by the reviewed Node 24 and SDK 3.1143.0 refresh. Re-audit fresh public consumers for each release; workspace-tooling advisories and independent per-package npm ownership/trusted-publisher verification remain separate requirements. Explicit publishing authorization is still required.",
+  "consumerAudit": {
+    "dateUtc": "2026-10-07",
+    "sdkClients": "3.1143.0",
+    "productionDependencies": 122,
+    "advisories": 0,
+    "fastXmlParserPresent": false
+  }
+}

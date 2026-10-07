@@ -6,8 +6,8 @@ Projen's nested construct workflows are disabled at their source.
 | Workflow | Behavior |
 | --- | --- |
 | [ci.yml](workflows/ci.yml) | Push/PR to main: populate dependencies, build/test, lint/build/pack; build remains an always-running gate on setup and test success. Deployment stays disabled. |
-| [docs.yml](workflows/docs.yml) | Release or manual dispatch: restore dependencies, build the existing construct API page, and publish docs with the existing Pages action. |
-| [publish.yml](workflows/publish.yml) | Release or manual dispatch on a version tag: restore, materialize version, build/lint/test, pack public packages, and publish tarballs with the existing token mechanism. |
+| [docs.yml](workflows/docs.yml) | Successful publication only, including authorized reruns of that docs attempt: verify all six stable registry versions and immutable tag/source, restore, inject stable version, build the existing API page and gate Pages publication. |
+| [publish.yml](workflows/publish.yml) | Published release or explicit manual recovery from current main: verify tag/release provenance, strictly restore, inject explicit version, build/lint/test/verify consumers, and publish six ordered archives with npm OIDC, subject to the reviewed publication hold. |
 
 ## Completed dependency caching
 
@@ -72,9 +72,16 @@ archives so workspace protocols cannot leak into registry manifests. Keep
 release authentication confined to the actual publication job. Source versions
 stay at their existing convention; manual publication requires a version tag.
 
-This foundation preserves the existing release triggers/token and Pages flow.
-Release provenance/channel redesign and broader security/toolchain work belong
-to separate changes. Do not run release workflows, publish npm packages, create
+The [release guide](RELEASING.md), [release skill](../.agents/skills/release/SKILL.md)
+and reusable [guards](../bin/release-lib.cjs) define immutable tag/event provenance,
+stable/next channels, partial recovery, docs gating and independent per-package
+npm owner settings. The [publication policy](release-policy.json) reflects the
+reviewed SDK 3.1143.0 consumer refresh; re-audit fresh public tarballs independently
+from workspace tooling with `SITEMAPS_AUDIT_PACKAGES=1 pnpm run test:packages`.
+Public package minimums are intentionally Node >=24; record this breaking support
+change in version review and notes while keeping Lambda defaults at Node 20.
+Do not run
+release workflows, publish npm packages, create
 releases/tags, merge PRs, change repository settings, or deploy infrastructure
 without an explicit user request. Name dependencies and merge order in stacked
 PRs; report checks actually verified and concrete remaining limitations.

@@ -1,28 +1,63 @@
 name: Package and Publish
 
-# Controls when the action will run.
 on:
   release:
     types: [published]
-  # push:
-  #   branches:
-  #     - main
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing published release tag (vX.Y.Z or vX.Y.Z-prerelease)
+        required: true
+        type: string
+
+permissions:
+  contents: read
 
 env:
   npm_config_min_release_age: '7'
 
+# Queue releases, recovery, and docs without cancelling an in-flight publication.
+concurrency:
+  group: npm-release-and-docs
+  queue: max
+  cancel-in-progress: false
+
 jobs:
+  select-release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      commit: ${{ steps.release.outputs.commit }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # Validate the requested tag with reviewed main's scripts before
+          # executing anything from that tag or a user-supplied checkout ref.
+          ref: refs/heads/main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Use Node 24 for dependency-free provenance guards
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '^24.0.0'
+          package-manager-cache: false
+
+      - name: Check current release, remote tag, source versions, and main ancestry
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node bin/release.cjs select
+
   install-deps:
+    needs: select-release
     runs-on: ubuntu-latest
     outputs:
       cache-key: ${{ steps.configure-nodejs.outputs.cache-key }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ needs.select-release.outputs.commit }}
           persist-credentials: false
 
       - name: Populate completed dependencies
@@ -38,19 +73,18 @@ jobs:
           cache-key-suffix: streaming-sitemaps-8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3-${{ hashFiles('package.json', 'packages/**/package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.npmrc', 'packages/**/.npmrc', 'packages/sitemaps-cdk/.projenrc.ts') }}
 
   publish:
-    env:
-      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
-    needs:
-      - install-deps
+    needs: [select-release, install-deps]
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      id-token: write
+    env:
+      PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ needs.select-release.outputs.commit }}
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Restore completed dependencies
@@ -74,15 +108,15 @@ jobs:
           test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
           printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
 
-      # Change owned source manifests only. Verification stays disabled in
-      # strict consumers, and no consumer saves the dependency tree.
-      - name: Set version for PR or from Tag
-        run: |
-          VERSION_TO_USE="${GITHUB_REF_NAME##*/}"
-          echo "Version is ${VERSION_TO_USE}"
-          bin/version "$VERSION_TO_USE"
+      - name: Verify release and recovery guards
+        run: pnpm run test:foundation
 
-      - name: Build
+      - name: Inject the verified explicit version after strict restore
+        env:
+          RELEASE_VERSION: ${{ needs.select-release.outputs.version }}
+        run: bin/version "$RELEASE_VERSION"
+
+      - name: Build all packages
         run: pnpm run build:all
 
       - name: Lint
@@ -94,46 +128,33 @@ jobs:
       - name: Restore CLI bundles after source-mode tests
         run: pnpm run build:cli
 
-      - name: NPM registry authentication
-        run: npm set //registry.npmjs.org/:_authToken ${{ secrets.NPMJSORG_PUBLISH_TOKEN }}
+      - name: Verify isolated packed consumers
+        env:
+          SITEMAPS_AUDIT_PACKAGES: '1'
+        run: pnpm run test:packages
 
-      - name: Release supporting libraries - NPM
-        run: |
-          pnpm --dir packages/sitemaps-wrapper-lib pack
-          npm publish packages/sitemaps-wrapper-lib/*.tgz --ignore-scripts
+      - name: Pack the exact six packages in dependency order
+        env:
+          RELEASE_VERSION: ${{ needs.select-release.outputs.version }}
+        run: node bin/release.cjs pack "$RELEASE_VERSION" release-packages
 
-      - name: Release sitemaps-cli - NPM
-        id: sitemaps-cli
-        working-directory: packages/sitemaps-cli
-        run: |
-          pnpm pack
-          npm publish ./*.tgz --ignore-scripts
+      - name: Retain validated immutable archives for recovery investigation
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-packages-${{ needs.select-release.outputs.version }}-${{ github.run_attempt }}
+          path: release-packages
+          if-no-files-found: error
 
-      - name: Release sitemaps-db-lib - NPM
-        id: sitemaps-db-lib
-        working-directory: packages/sitemaps-db-lib
-        run: |
-          pnpm pack
-          npm publish ./*.tgz --ignore-scripts
+      # Node 24 bundles compatible npm. Assert the official npm >=11.5.1
+      # minimum in the guard; never install tooling or write token .npmrc here.
+      - name: Revalidate provenance and registry, then publish or verify each immutable version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node bin/release.cjs publish release-packages
 
-      - name: Release sitemaps-metrics-lib - NPM
-        id: sitemaps-metrics-lib
-        working-directory: packages/sitemaps-metrics-lib
-        run: |
-          pnpm pack
-          npm publish ./*.tgz --ignore-scripts
-
-      - name: Release sitemaps-models-lib - NPM
-        id: sitemaps-models-lib
-        working-directory: packages/sitemaps-models-lib
-        run: |
-          pnpm pack
-          npm publish ./*.tgz --ignore-scripts
-
-      - name: Release sitemaps-cdk - NPM
-        id: sitemaps-cdk
-        working-directory: packages/sitemaps-cdk
-        run: |
-          # pnpm run release
-          pnpm pack
-          npm publish ./*.tgz --ignore-scripts
+      - name: Retain verified publication source for this successful attempt
+        uses: actions/upload-artifact@v7
+        with:
+          name: publication-${{ github.run_attempt }}
+          path: release-packages/publication.json
+          if-no-files-found: error

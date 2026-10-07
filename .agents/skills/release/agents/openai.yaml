@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Streaming Sitemaps Release'
+  short_description: 'Validate and recover coordinated npm releases'
+  default_prompt: 'Use $release to prepare and verify a Streaming Sitemaps release.'

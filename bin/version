@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const semver = require('semver');
+const { parseVersion } = require('./release-lib.cjs');
 
 // Get the new version from the command-line arguments
 let newVersion = process.argv[2];
@@ -13,10 +13,15 @@ if (!newVersion) {
   process.exit(1);
 }
 
-newVersion = newVersion.replace(/.*\//, '').replace(/^v/, '');
+// Accept explicit legacy release/v tags, v tags, or a plain version. Never
+// guess a version from an arbitrary ref/path or npm's from-git lookup.
+newVersion = newVersion.replace(/^(?:release\/)?v/, '');
 
 // Validate the new version
-if (!semver.valid(newVersion)) {
+try {
+  parseVersion(newVersion);
+  if (process.argv.length !== 3) throw new Error('Expected one explicit version');
+} catch {
   console.error(
     'Invalid version. Please provide a version in the format x.y.z as the first argument.',
   );

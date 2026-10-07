@@ -184,90 +184,26 @@ jobs:
       - name: Run Lint
         run: pnpm run lint
 
-      - name: Pack supporting libraries without registry credentials
+      - name: Pack all six public packages in dependency order without credentials
         run: |
-          pnpm --dir packages/sitemaps-wrapper-lib pack
+          VERSION_TO_USE=$(node -p 'require("./package.json").version')
+          node bin/release.cjs pack "$VERSION_TO_USE" release-packages
+          node bin/release.cjs dry-run "$VERSION_TO_USE" release-packages
 
-      - name: Upload supporting libraries
+      - name: Upload validated public archives and integrity plan
         uses: actions/upload-artifact@v7
         with:
-          name: sitemaps-supporting-libraries
-          path: |
-            packages/sitemaps-wrapper-lib/*.tgz
-
-      - name: Release sitemaps-cli - NPM - Dry Run
-        id: sitemaps-cli
-        working-directory: packages/sitemaps-cli
-        run: |
-          pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
-
-      - name: Upload sitemaps-cli artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: sitemaps-cli
-          path: packages/sitemaps-cli/*.tgz
-
-      - name: Release sitemaps-db-lib - NPM - Dry Run
-        id: sitemaps-db-lib
-        working-directory: packages/sitemaps-db-lib
-        run: |
-          pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
-
-      - name: Upload sitemaps-db-lib artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: sitemaps-db-lib
-          path: packages/sitemaps-db-lib/*.tgz
-
-      - name: Release sitemaps-metrics-lib - NPM - Dry Run
-        id: sitemaps-metrics-lib
-        working-directory: packages/sitemaps-metrics-lib
-        run: |
-          pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
-
-      - name: Upload sitemaps-metrics-lib artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: sitemaps-metrics-lib
-          path: packages/sitemaps-metrics-lib/*.tgz
-
-      - name: Release sitemaps-models-lib - NPM - Dry Run
-        id: sitemaps-models-lib
-        working-directory: packages/sitemaps-models-lib
-        run: |
-          pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
-
-      - name: Upload sitemaps-models-lib artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: sitemaps-models-lib
-          path: packages/sitemaps-models-lib/*.tgz
+          name: public-packages
+          path: release-packages
+          if-no-files-found: error
 
       - name: Verify clean-room packaged CLI consumption
         run: pnpm run test:cli:packaged
 
-      - name: Release sitemaps-cdk - NPM - Dry Run
-        id: sitemaps-cdk
-        working-directory: packages/sitemaps-cdk
-        run: |
-          # pnpm run package
-          pnpm pack
-          npm publish ./*.tgz --dry-run --ignore-scripts --tag ci-preview
-
-      - name: Upload sitemaps-cdk artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: sitemaps-cdk
-          path: packages/sitemaps-cdk/*.tgz
-
       - name: Verify the packed JavaScript CDK package in an isolated consumer
         run: |
           VERSION=$(node -p "require('./packages/sitemaps-cdk/package.json').version")
-          pnpm run test:cdk-consumer "packages/sitemaps-cdk/shutterstock-sitemaps-cdk-${VERSION}.tgz"
+          pnpm run test:cdk-consumer "release-packages/shutterstock-sitemaps-cdk-${VERSION}.tgz"
 
       - name: Upload CDK consumer diagnostics and local assembly
         if: always()

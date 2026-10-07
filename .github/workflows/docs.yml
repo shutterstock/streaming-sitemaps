@@ -1,23 +1,60 @@
 name: Publish Docs
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: [Package and Publish]
+    types: [completed]
 
-  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
 
 env:
   npm_config_min_release_age: '7'
 
+concurrency:
+  group: npm-release-and-docs
+  queue: max
+  cancel-in-progress: false
+
 jobs:
+  select-docs:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.docs.outputs.publish }}
+      version: ${{ steps.docs.outputs.version }}
+      commit: ${{ steps.docs.outputs.commit }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Use Node 24 for dependency-free provenance guards
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '^24.0.0'
+          package-manager-cache: false
+
+      - name: Select fully published stable tag and verify release provenance
+        id: docs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node bin/release.cjs docs-select
+
   install-deps:
+    needs: select-docs
+    if: needs.select-docs.outputs.publish == 'true'
     runs-on: ubuntu-latest
     outputs:
       cache-key: ${{ steps.configure-nodejs.outputs.cache-key }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ needs.select-docs.outputs.commit }}
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Populate completed dependencies
@@ -34,16 +71,21 @@ jobs:
 
   build:
     permissions:
-      contents: write
-    needs: install-deps
+      contents: read
+      actions: read
+    needs: [select-docs, install-deps]
     runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.deployment.outputs.publish }}
     env:
       PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: 'false'
+      RELEASE_VERSION: ${{ needs.select-docs.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ needs.select-docs.outputs.commit }}
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Restore completed dependencies
@@ -67,11 +109,79 @@ jobs:
           test "$CONSUMER_CACHE_KEY" = "$PRODUCER_CACHE_KEY"
           printf 'Completed dependency cache key: %s\n' "$CONSUMER_CACHE_KEY"
 
+      - name: Inject verified stable version after strict restore
+        run: bin/version "$RELEASE_VERSION"
+
       - name: Build Docs
-        run: pnpm run build:docs
+        run: |
+          pnpm run build
+          pnpm run build:docs
+
+      - name: Recheck full stable publication and immutable source before deployment
+        id: deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node bin/release.cjs docs-verify
+
+      - name: Retain docs only after source and registry verification
+        if: steps.deployment.outputs.publish == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: verified-stable-docs-${{ github.run_attempt }}
+          path: ./docs
+          if-no-files-found: error
+
+  deploy:
+    needs: [select-docs, build]
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      # Privileged publication executes only workflow-source code from main,
+      # never release checkout scripts or downloaded artifact code.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '^24.0.0'
+          package-manager-cache: false
+
+      - name: Recheck publication provenance and current stable registry source
+        id: stable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node bin/release.cjs docs-select
+
+      - name: Require the current stable source to match the verified build
+        if: steps.stable.outputs.publish == 'true'
+        env:
+          BUILT_VERSION: ${{ needs.select-docs.outputs.version }}
+          BUILT_COMMIT: ${{ needs.select-docs.outputs.commit }}
+          CURRENT_VERSION: ${{ steps.stable.outputs.version }}
+          CURRENT_COMMIT: ${{ steps.stable.outputs.commit }}
+        run: |
+          test -n "$CURRENT_VERSION"
+          test -n "$CURRENT_COMMIT"
+          test "$BUILT_VERSION" = "$CURRENT_VERSION"
+          test "$BUILT_COMMIT" = "$CURRENT_COMMIT"
+
+      - name: Download this attempt's verified static docs
+        if: steps.stable.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download "$GITHUB_RUN_ID" --repo shutterstock/streaming-sitemaps \
+            --name "verified-stable-docs-${GITHUB_RUN_ATTEMPT}" --dir docs-published
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        if: steps.stable.outputs.publish == 'true'
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./docs-published

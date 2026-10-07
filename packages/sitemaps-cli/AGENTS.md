@@ -33,8 +33,12 @@ scripts in sibling libraries. Preserve checked-in snapshots when maintenance
 does not change behavior.
 
 `pnpm --dir packages/sitemaps-cli pack` runs existing oclif manifest/README
-hooks in production mode and rewrites workspace ranges. Production mode keeps
-cached command paths pointed at shipped JavaScript instead of development source. Verify bin/run.js, dist/index.js,
+hooks in production mode and rewrites workspace ranges. The prepack helper sorts only command-map
+keys after discovery, preserving flag metadata and arrays, so repeated archives
+have identical bytes for immutable recovery. It runs oclif in production mode
+so an ambient development environment cannot record unpackaged TypeScript paths.
+The root packed-consumer gate
+checks real consecutive CLI archives and recovery integrity. Verify bin/run.js, dist/index.js,
 dist/index.d.ts, command bundles, and oclif.manifest.json in the tarball.
 The postpack hook removes the local generated manifest. Review README drift;
 packing must not alter dependency files. Publication is a separate explicitly
