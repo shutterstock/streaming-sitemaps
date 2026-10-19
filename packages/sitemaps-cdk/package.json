@@ -37,7 +37,7 @@
     "@types/node": "^18",
     "aws-cdk-lib": "2.117.0",
     "constructs": "10.1.244",
-    "esbuild": "0.21.0",
+    "esbuild": "0.28.2",
     "jsii": "~5.4.0",
     "jsii-diff": "^1.98.0",
     "jsii-docgen": "^10.4.9",

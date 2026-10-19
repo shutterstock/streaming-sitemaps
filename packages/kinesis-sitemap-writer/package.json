@@ -55,7 +55,7 @@
     "memorystream": "^0.3.1",
     "node-fetch": "^2.6.1",
     "readlineiter": "^1.0.1",
-    "reflect-metadata": "^0.1.13",
+    "reflect-metadata": "^0.2.2",
     "sitemap": "^8.0.0",
     "source-map-support": "^0.5.19",
     "traverse": "^0.6.6",
@@ -66,7 +66,7 @@
     "@shutterstock/sitemaps-db-lib": "workspace:^",
     "@shutterstock/sitemaps-wrapper-lib": "workspace:^",
     "@shutterstock/sitemaps-models-lib": "workspace:^",
-    "graceful-fs": "4.2.9",
+    "graceful-fs": "4.2.11",
     "@shutterstock/sitemaps-metrics-lib": "workspace:^",
     "aggregate-error": "3.1.0",
     "@shutterstock/sitemaps-utils-lib": "workspace:^"

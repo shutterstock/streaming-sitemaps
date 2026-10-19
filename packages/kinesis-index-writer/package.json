@@ -48,7 +48,7 @@
     "lambda-log": "^3.0.0",
     "node-fetch": "^2.6.1",
     "readlineiter": "^1.0.1",
-    "reflect-metadata": "^0.1.13",
+    "reflect-metadata": "^0.2.2",
     "sitemap": "^8.0.0",
     "source-map-support": "^0.5.19",
     "ts-convict": "^1.1.0",
