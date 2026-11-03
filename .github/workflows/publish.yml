@@ -27,7 +27,7 @@ jobs:
 
       - name: Populate completed dependencies
         id: configure-nodejs
-        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        uses: pwrdrvr/configure-nodejs@9bb6e786801cf822d57b2298e02ccefd05e8ef0f # v1.7.0
         with:
           node-version: '^24.0.0'
           package-manager: pnpm
@@ -55,7 +55,7 @@ jobs:
 
       - name: Restore completed dependencies
         id: configure-nodejs
-        uses: pwrdrvr/configure-nodejs@8876dbf3c524c8a765543dae3ae5b55d7b5ecfb3 # v1.6.0
+        uses: pwrdrvr/configure-nodejs@9bb6e786801cf822d57b2298e02ccefd05e8ef0f # v1.7.0
         with:
           node-version: '^24.0.0'
           package-manager: pnpm
